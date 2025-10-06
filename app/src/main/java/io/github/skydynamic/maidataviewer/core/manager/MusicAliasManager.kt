@@ -1,6 +1,5 @@
 package io.github.skydynamic.maidataviewer.core.manager
 
-import android.util.Log
 import io.github.skydynamic.maidataviewer.core.data.MaimaiAliasData
 import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import io.github.skydynamic.maidataviewer.core.network.AppHttpClient
@@ -10,7 +9,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.io.File
-import kotlin.collections.plusAssign
 
 class MusicAliasManager(
     private val dataFile: File,

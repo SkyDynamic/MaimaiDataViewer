@@ -1,6 +1,5 @@
 package io.github.skydynamic.maidataviewer.ui.page
 
-import android.widget.Space
 import android.widget.Toast
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -265,15 +264,15 @@ fun MusicDetailPage(
     val isDX = music.id in 10000 until 100000
 
     var currentChoiceDifficulty by remember { mutableIntStateOf(0) }
-
     val defaultJacketFile = remember { instance.getJacketFromAssets(0) }
     var jacketFile by remember { mutableStateOf<File?>(null) }
-
     var currentChoiceNoteType by remember { mutableStateOf(NoteType.TAP) }
 
-    val achievementDataList = music.difficulties.map {
-        val calculator = AchievementCalculator(it.notes)
-        calculator.getResult()
+    val achievementDataList by remember(music.difficulties) {
+        mutableStateOf(music.difficulties.map { difficulty ->
+            val calculator = AchievementCalculator(difficulty.notes)
+            calculator.getResult()
+        })
     }
 
     LaunchedEffect(music.id) {
@@ -302,264 +301,146 @@ fun MusicDetailPage(
                 Spacer(Modifier.height(40.dp))
                 Spacer(Modifier.height(WindowInsetsSpacer.topPadding))
 
-                Box(
+                // 音乐基本信息卡片
+                MusicInfoCard(
+                    music = music,
+                    jacketFile = jacketFile,
+                    defaultJacketFile = defaultJacketFile,
+                    color = color,
+                    commonRoundedShape = commonRoundedShape,
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedContentScope = animatedContentScope
+                )
+
+                // 难度选择区域
+                DifficultySelectionRow(
+                    difficulties = music.difficulties,
+                    currentChoiceDifficulty = currentChoiceDifficulty,
+                    color = color,
+                    commonRoundedShape = commonRoundedShape,
+                    onDifficultySelected = { index -> currentChoiceDifficulty = index }
+                )
+
+                // 详细信息卡片
+                MusicDetailCard(
+                    music = music,
+                    currentChoiceDifficulty = currentChoiceDifficulty,
+                    isDX = isDX,
+                    color = color,
+                    achievementDataList = achievementDataList,
+                    dataTableHeader = dataTableHeader,
+                    onDataTableClickable = onDataTableClickable
+                )
+
+                // 容错率计算卡片
+                FaultToleranceCard(
+                    achievementDataList = achievementDataList,
+                    currentChoiceDifficulty = currentChoiceDifficulty,
+                    currentChoiceNoteType = currentChoiceNoteType,
+                    onNoteTypeSelected = { noteType -> currentChoiceNoteType = noteType }
+                )
+
+                // 操作按钮行
+                ActionButtonsRow(
+                    jacketFile = jacketFile,
+                    musicName = music.name ?: "",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .wrapContentHeight()
+                        .height(40.dp)
                         .padding(
                             horizontal = 16.dp,
-                            vertical = 8.dp
+                            vertical = 4.dp
                         )
-                        .background(
-                            color = color.copy(alpha = 0.6f),
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                        .border(
-                            width = 2.dp,
-                            color = color,
-                            shape = RoundedCornerShape(16.dp)
-                        ),
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            AsyncImage(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data(jacketFile ?: defaultJacketFile)
-                                    .crossfade(true)
-                                    .build(),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .sharedElement(
-                                        sharedTransitionScope
-                                            .rememberSharedContentState(key = "image-$music.id"),
-                                        animatedContentScope
-                                    )
-                                    .clip(commonRoundedShape)
-                                    .size(140.dp)
-                                    .border(
-                                        width = 2.dp,
-                                        color = color,
-                                        shape = commonRoundedShape
-                                    )
-                            )
+                )
 
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = 16.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .height(30.dp)
-                                        .fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxHeight()
-                                            .width(2.dp)
-                                            .clip(RoundedCornerShape(4.dp))
-                                            .background(color)
-                                    )
+                Spacer(modifier = Modifier.height(15.dp))
+            }
 
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .horizontalScroll(rememberScrollState())
-                                    ) {
-                                        Text(
-                                            text = music.name ?: "",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            fontSize = 16.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            maxLines = 1,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(start = 8.dp),
-                                            textAlign = TextAlign.Start,
-                                            color = Color.White
-                                        )
-                                    }
-                                }
+            // 顶部返回栏
+            TopAppBar(
+                onBackPressed = onBackPressed,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        top = WindowInsetsSpacer.topPadding,
+                        bottom = WindowInsetsSpacer.bottomPadding
+                    )
+            )
+        }
+    }
+}
 
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .wrapContentHeight()
-                                        .padding(top = 8.dp)
-                                        .background(
-                                            Color.White,
-                                            shape = commonRoundedShape
-                                        ),
-                                ) {
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .wrapContentHeight()
-                                            .padding(
-                                                horizontal = 8.dp,
-                                                vertical = 8.dp
-                                            ),
-                                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                                    ) {
-                                        InfoBox(
-                                            type = R.string.music_type.getString(),
-                                            text = MaiGenreManager.get(GenreType.MUSIC)
-                                                .getGenreName(music.genre),
-                                            color = color
-                                        )
-                                        InfoBox(
-                                            type = "BPM",
-                                            text = music.bpm.toString(),
-                                            color = color
-                                        )
-                                        InfoBox(
-                                            type = R.string.music_version.getString(),
-                                            text = MaiGenreManager.get(GenreType.VERSION)
-                                                .getGenreName(music.addVersion.id),
-                                            color = color
-                                        )
-                                        InfoBox(
-                                            type = R.string.artist.getString(),
-                                            text = music.artist ?: "",
-                                            color = color
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+private fun MusicInfoCard(
+    music: MaimaiMusicData,
+    jacketFile: File?,
+    defaultJacketFile: ByteArray?,
+    color: Color,
+    commonRoundedShape: RoundedCornerShape,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope
+) {
+    with(sharedTransitionScope) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(
+                    horizontal = 16.dp,
+                    vertical = 8.dp
+                )
+                .background(
+                    color = color.copy(alpha = 0.6f),
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .border(
+                    width = 2.dp,
+                    color = color,
+                    shape = RoundedCornerShape(16.dp)
+                )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    music.difficulties.forEachIndexed { index, difficulty ->
-                        val isSelected = currentChoiceDifficulty == index
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(jacketFile ?: defaultJacketFile)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .sharedElement(
+                                sharedTransitionScope
+                                    .rememberSharedContentState(key = "image-${music.id}"),
+                                animatedContentScope
+                            )
+                            .clip(commonRoundedShape)
+                            .size(140.dp)
+                            .border(
+                                width = 2.dp,
+                                color = color,
+                                shape = commonRoundedShape
+                            )
+                    )
 
-                        if (isSelected) {
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f / music.difficulties.size)
-                                    .height(60.dp)
-                                    .background(
-                                        brush = Brush.linearGradient(
-                                            colors = listOf(
-                                                color,
-                                                color.copy(alpha = 0.9f),
-                                                color.copy(alpha = 0.6f),
-                                            ),
-                                            start = Offset.Zero,
-                                            end = Offset.Infinite
-                                        ),
-                                        shape = commonRoundedShape
-                                    )
-                                    .border(
-                                        width = 2.dp,
-                                        color = color,
-                                        shape = commonRoundedShape
-                                    )
-                                    .padding(horizontal = 4.dp),
-                            ) {
-                                DifficultyContent(index, difficulty, Color.White)
-                            }
-                        } else {
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f / music.difficulties.size)
-                                    .height(60.dp)
-                                    .background(
-                                        color = MaterialTheme.colorScheme.surfaceContainerHighest,
-                                        shape = commonRoundedShape
-                                    )
-                                    .border(
-                                        width = 2.dp,
-                                        color = MaterialTheme.colorScheme.outline,
-                                        shape = commonRoundedShape
-                                    )
-                                    .padding(horizontal = 4.dp)
-                                    .clickable {
-                                        currentChoiceDifficulty = index
-                                    }
-                            ) {
-                                DifficultyContent(index, difficulty, MaterialTheme.colorScheme.outline)
-                            }
-                        }
-                    }
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .padding(
-                            horizontal = 16.dp,
-                            vertical = 8.dp
-                        )
-                        .background(
-                            color = color.copy(alpha = 0.6f),
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                        .border(
-                            width = 2.dp,
-                            color = color,
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(start = 16.dp)
                     ) {
-                        InfoBox(
-                            type = R.string.music_level.getString(),
-                            text = "%.1f".format(music.difficulties[currentChoiceDifficulty].level),
-                            color = Color.White
-                        )
-
-                        Spacer(Modifier.height(8.dp))
-
-                        InfoBox(
-                            type = R.string.designer.getString(),
-                            text = music.difficulties[currentChoiceDifficulty].noteDesigner,
-                            color = Color.White
-                        )
-
-                        Spacer(Modifier.height(8.dp))
-
-                        InfoBox(
-                            type = R.string.note_type.getString(),
-                            text = if (isDX) R.string.dx.getString() else R.string.standard.getString(),
-                            color = Color.White
-                        )
-
-                        HorizontalDivider(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            thickness = 1.dp,
-                            color = Color.White
-                        )
-
-                        val achievementData = achievementDataList[currentChoiceDifficulty]
-                            .buildDataTableRow()
-
                         Row(
                             modifier = Modifier
-                                .height(16.dp)
+                                .height(30.dp)
                                 .fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -568,489 +449,620 @@ fun MusicDetailPage(
                                     .fillMaxHeight()
                                     .width(2.dp)
                                     .clip(RoundedCornerShape(4.dp))
-                                    .background(Color.White)
+                                    .background(color)
                             )
 
-                            Text(
-                                text = R.string.note_score_detail.getString(),
-                                style = MaterialTheme.typography.bodySmall,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                maxLines = 1,
+                            Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(start = 8.dp),
-                                textAlign = TextAlign.Start,
-                                color = Color.White
-                            )
-                        }
-
-                        Text(
-                            text = "(${R.string.achievement_datatable_tips.getString()})",
-                            style = MaterialTheme.typography.bodySmall,
-                            fontSize = 8.sp,
-                            maxLines = 2,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 8.dp),
-                            textAlign = TextAlign.Start,
-                            color = Color.White
-                        )
-
-                        DataTable(
-                            columns = dataTableHeader,
-                            rows = achievementData,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                                .clickable {
-                                    onDataTableClickable(dataTableHeader, achievementData)
-                                }
-                        )
-                    }
-                }
-
-                ElevatedCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .padding(
-                            horizontal = 16.dp,
-                            vertical = 8.dp
-                        )
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Text(
-                            text = R.string.fault_tolerance_calc.getString(),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            maxLines = 1,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-
-                        HorizontalDivider(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(1.dp),
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
-                        )
-
-                        FlowRow(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentHeight()
-                                .padding(vertical = 8.dp),
-                            maxItemsInEachRow = 3,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            NoteType.entries.forEach {
-                                val isSelected = currentChoiceNoteType == it
-
-                                val textColor = if (isSelected) {
-                                    Color.White
-                                } else {
-                                    Color(0xFF0A305F)
-                                }
-
-                                val backgroundColor = if (isSelected) {
-                                    Color(0xFF284777)
-                                } else {
-                                    Color(0xFFAAC7FF)
-                                }
-
-                                Box(
+                                    .horizontalScroll(rememberScrollState())
+                            ) {
+                                Text(
+                                    text = music.name ?: "",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 1,
                                     modifier = Modifier
-                                        .weight(1f)
-                                        .height(40.dp)
-                                        .clip(RoundedCornerShape(4.dp))
-                                        .background(backgroundColor)
-                                        .clickable {
-                                            currentChoiceNoteType = it
-                                        }
-                                        .padding(horizontal = 8.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = it.typeNmae,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        maxLines = 1,
-                                        textAlign = TextAlign.Center,
-                                        color = textColor,
-                                        modifier = Modifier
-                                            .padding(horizontal = 4.dp)
-                                    )
-                                }
+                                        .fillMaxWidth()
+                                        .padding(start = 8.dp),
+                                    textAlign = TextAlign.Start,
+                                    color = Color.White
+                                )
                             }
                         }
 
-                        ShadowElevatedCard(
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .wrapContentHeight()
-                                .padding(8.dp)
+                                .padding(top = 8.dp)
+                                .background(
+                                    Color.White,
+                                    shape = commonRoundedShape
+                                )
                         ) {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .wrapContentHeight()
-                                    .padding(8.dp),
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    .padding(
+                                        horizontal = 8.dp,
+                                        vertical = 8.dp
+                                    ),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Text(
-                                    text = R.string.fault_torlerance.getString()
-                                        .format(currentChoiceNoteType.typeNmae),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    maxLines = 1,
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    textAlign = TextAlign.Center,
+                                InfoBox(
+                                    type = R.string.music_type.getString(),
+                                    text = MaiGenreManager.get(GenreType.MUSIC)
+                                        .getGenreName(music.genre),
+                                    color = color
                                 )
-
-                                ShadowElevatedCard(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(140.dp)
-                                        .padding(8.dp)
-                                ) {
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(8.dp),
-                                        verticalArrangement = Arrangement.spacedBy(2.dp)
-                                    ) {
-                                        Text(
-                                            text = R.string.rate_fault_torlerance.getString()
-                                                .format(
-                                                    "SSS+",
-                                                    "0.5%"
-                                                ),
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.primary,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(8.dp)
-                                        )
-
-                                        HorizontalDivider(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(1.dp),
-                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
-                                        )
-
-                                        FlowRow(
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .padding(8.dp),
-                                            maxItemsInEachRow = 3,
-                                            maxLines = 1,
-                                            horizontalArrangement = Arrangement.spacedBy(2.dp),
-                                            verticalArrangement = Arrangement.Center
-                                        ) {
-                                            val greatFaultToleranceCount = getFaultTolerance(
-                                                achievementDataList[currentChoiceDifficulty],
-                                                currentChoiceNoteType,
-                                                0.5f
-                                            )
-
-                                            Column(
-                                                modifier = Modifier
-                                                    .weight(1f)
-                                                    .height(40.dp),
-                                                verticalArrangement = Arrangement.spacedBy(2.dp),
-                                                horizontalAlignment = Alignment.CenterHorizontally
-                                            ) {
-                                                Text(
-                                                    text = "Great:",
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                    color = MaterialTheme.colorScheme.onSurface.copy(0.4f),
-                                                )
-
-                                                Text(
-                                                    text = greatFaultToleranceCount[0],
-                                                    style = MaterialTheme.typography.bodyLarge,
-                                                    fontWeight = FontWeight.Bold,
-                                                    color = MaterialTheme.colorScheme.primary,
-                                                )
-                                            }
-
-                                            Column(
-                                                modifier = Modifier
-                                                    .weight(1f)
-                                                    .height(40.dp),
-                                                verticalArrangement = Arrangement.spacedBy(2.dp),
-                                                horizontalAlignment = Alignment.CenterHorizontally
-                                            ) {
-                                                Text(
-                                                    text = "Good:",
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                    color = MaterialTheme.colorScheme.onSurface.copy(0.4f),
-                                                )
-
-                                                Text(
-                                                    text = greatFaultToleranceCount[1],
-                                                    style = MaterialTheme.typography.bodyLarge,
-                                                    fontWeight = FontWeight.Bold,
-                                                    color = MaterialTheme.colorScheme.primary,
-                                                )
-                                            }
-
-                                            Column(
-                                                modifier = Modifier
-                                                    .weight(1f)
-                                                    .height(40.dp),
-                                                verticalArrangement = Arrangement.spacedBy(2.dp),
-                                                horizontalAlignment = Alignment.CenterHorizontally
-                                            ) {
-                                                Text(
-                                                    text = "Miss:",
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                    color = MaterialTheme.colorScheme.onSurface.copy(0.4f),
-                                                )
-
-                                                Text(
-                                                    text = greatFaultToleranceCount[2],
-                                                    style = MaterialTheme.typography.bodyLarge,
-                                                    fontWeight = FontWeight.Bold,
-                                                    color = MaterialTheme.colorScheme.primary,
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-
-                                ShadowElevatedCard(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(140.dp)
-                                        .padding(8.dp)
-                                ) {
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(8.dp),
-                                        verticalArrangement = Arrangement.spacedBy(2.dp)
-                                    ) {
-                                        Text(
-                                            text = R.string.rate_fault_torlerance.getString()
-                                                .format(
-                                                    "SSS",
-                                                    "1%"
-                                                ),
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.primary,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(8.dp)
-                                        )
-
-                                        HorizontalDivider(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(1.dp),
-                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
-                                        )
-
-                                        FlowRow(
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .padding(8.dp),
-                                            maxItemsInEachRow = 3,
-                                            maxLines = 1,
-                                            horizontalArrangement = Arrangement.spacedBy(2.dp),
-                                            verticalArrangement = Arrangement.Center
-                                        ) {
-                                            val greatFaultToleranceCount = getFaultTolerance(
-                                                achievementDataList[currentChoiceDifficulty],
-                                                currentChoiceNoteType,
-                                                1f
-                                            )
-
-                                            Column(
-                                                modifier = Modifier
-                                                    .weight(1f)
-                                                    .height(40.dp),
-                                                verticalArrangement = Arrangement.spacedBy(2.dp),
-                                                horizontalAlignment = Alignment.CenterHorizontally
-                                            ) {
-                                                Text(
-                                                    text = "Great:",
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                    color = MaterialTheme.colorScheme.onSurface.copy(0.4f),
-                                                )
-
-                                                Text(
-                                                    text = greatFaultToleranceCount[0],
-                                                    style = MaterialTheme.typography.bodyLarge,
-                                                    fontWeight = FontWeight.Bold,
-                                                    color = MaterialTheme.colorScheme.primary,
-                                                )
-                                            }
-
-                                            Column(
-                                                modifier = Modifier
-                                                    .weight(1f)
-                                                    .height(40.dp),
-                                                verticalArrangement = Arrangement.spacedBy(2.dp),
-                                                horizontalAlignment = Alignment.CenterHorizontally
-                                            ) {
-                                                Text(
-                                                    text = "Good:",
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                    color = MaterialTheme.colorScheme.onSurface.copy(0.4f),
-                                                )
-
-                                                Text(
-                                                    text = greatFaultToleranceCount[1],
-                                                    style = MaterialTheme.typography.bodyLarge,
-                                                    fontWeight = FontWeight.Bold,
-                                                    color = MaterialTheme.colorScheme.primary,
-                                                )
-                                            }
-
-                                            Column(
-                                                modifier = Modifier
-                                                    .weight(1f)
-                                                    .height(40.dp),
-                                                verticalArrangement = Arrangement.spacedBy(2.dp),
-                                                horizontalAlignment = Alignment.CenterHorizontally
-                                            ) {
-                                                Text(
-                                                    text = "Miss:",
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                    color = MaterialTheme.colorScheme.onSurface.copy(0.4f),
-                                                )
-
-                                                Text(
-                                                    text = greatFaultToleranceCount[2],
-                                                    style = MaterialTheme.typography.bodyLarge,
-                                                    fontWeight = FontWeight.Bold,
-                                                    color = MaterialTheme.colorScheme.primary,
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
+                                InfoBox(
+                                    type = "BPM",
+                                    text = music.bpm.toString(),
+                                    color = color
+                                )
+                                InfoBox(
+                                    type = R.string.music_version.getString(),
+                                    text = MaiGenreManager.get(GenreType.VERSION)
+                                        .getGenreName(music.addVersion.id),
+                                    color = color
+                                )
+                                InfoBox(
+                                    type = R.string.artist.getString(),
+                                    text = music.artist ?: "",
+                                    color = color
+                                )
                             }
                         }
                     }
                 }
-
-                FlowRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(40.dp)
-                        .padding(
-                            horizontal = 16.dp,
-                            vertical = 4.dp
-                        ),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Button(
-                        onClick = {
-                            if (jacketFile == null) {
-                                Toast.makeText(
-                                    application,
-                                    R.string.save_jacket_failed.getString(),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            } else {
-                                application.saveImageToGallery(
-                                    jacketFile!!.readBytes(),
-                                    R.string.save_jacket_success.getString()
-                                )
-                            }
-                        },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(30.dp),
-                        shape = RoundedCornerShape(4.dp),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
-                    ) {
-                        Text(
-                            text = R.string.save_jacket.getString(),
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodyMedium,
-                            autoSize = TextAutoSize.StepBased(minFontSize = 8.sp, maxFontSize = 16.sp)
-                        )
-                    }
-
-                    Button(
-                        onClick = {
-                            application.openBilibiliSearch(music.name ?: "")
-                        },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(30.dp),
-                        shape = RoundedCornerShape(4.dp),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
-                    ) {
-                        Text(
-                            text = R.string.search_bilibili.getString(),
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodyMedium,
-                            autoSize = TextAutoSize.StepBased(minFontSize = 8.sp, maxFontSize = 16.sp)
-                        )
-                    }
-
-                }
-
-                Spacer(modifier = Modifier.height(15.dp))
             }
+        }
+    }
+}
 
-            Box(
+@Composable
+private fun DifficultySelectionRow(
+    difficulties: List<MaimaiMusicData.MaimaiMusicDifficultyData>,
+    currentChoiceDifficulty: Int,
+    color: Color,
+    commonRoundedShape: RoundedCornerShape,
+    onDifficultySelected: (Int) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        difficulties.forEachIndexed { index, difficulty ->
+            val isSelected = currentChoiceDifficulty == index
+
+            if (isSelected) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f / difficulties.size)
+                        .height(60.dp)
+                        .background(
+                            brush = Brush.linearGradient(
+                                colors = listOf(
+                                    color,
+                                    color.copy(alpha = 0.9f),
+                                    color.copy(alpha = 0.6f),
+                                ),
+                                start = Offset.Zero,
+                                end = Offset.Infinite
+                            ),
+                            shape = commonRoundedShape
+                        )
+                        .border(
+                            width = 2.dp,
+                            color = color,
+                            shape = commonRoundedShape
+                        )
+                        .padding(horizontal = 4.dp)
+                ) {
+                    DifficultyContent(index, difficulty, Color.White)
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .weight(1f / difficulties.size)
+                        .height(60.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                            shape = commonRoundedShape
+                        )
+                        .border(
+                            width = 2.dp,
+                            color = MaterialTheme.colorScheme.outline,
+                            shape = commonRoundedShape
+                        )
+                        .padding(horizontal = 4.dp)
+                        .clickable {
+                            onDifficultySelected(index)
+                        }
+                ) {
+                    DifficultyContent(index, difficulty, MaterialTheme.colorScheme.outline)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MusicDetailCard(
+    music: MaimaiMusicData,
+    currentChoiceDifficulty: Int,
+    isDX: Boolean,
+    color: Color,
+    achievementDataList: List<AchievementCalculator.AchievementData>,
+    dataTableHeader: List<DataTableColumn>,
+    onDataTableClickable: (List<DataTableColumn>, List<BasicDataTableRow>) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(
+                horizontal = 16.dp,
+                vertical = 8.dp
+            )
+            .background(
+                color = color.copy(alpha = 0.6f),
+                shape = RoundedCornerShape(16.dp)
+            )
+            .border(
+                width = 2.dp,
+                color = color,
+                shape = RoundedCornerShape(16.dp)
+            )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            InfoBox(
+                type = R.string.music_level.getString(),
+                text = "%.1f".format(music.difficulties[currentChoiceDifficulty].level),
+                color = Color.White
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            InfoBox(
+                type = R.string.designer.getString(),
+                text = music.difficulties[currentChoiceDifficulty].noteDesigner,
+                color = Color.White
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            InfoBox(
+                type = R.string.note_type.getString(),
+                text = if (isDX) R.string.dx.getString() else R.string.standard.getString(),
+                color = Color.White
+            )
+
+            HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(
-                        top = WindowInsetsSpacer.topPadding,
-                        bottom = WindowInsetsSpacer.bottomPadding
-                    )
+                    .padding(vertical = 8.dp),
+                thickness = 1.dp,
+                color = Color.White
+            )
+
+            val achievementData = achievementDataList[currentChoiceDifficulty]
+                .buildDataTableRow()
+
+            Row(
+                modifier = Modifier
+                    .height(16.dp)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(2.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(Color.White)
+                )
+
+                Text(
+                    text = R.string.note_score_detail.getString(),
+                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 8.dp),
+                    textAlign = TextAlign.Start,
+                    color = Color.White
+                )
+            }
+
+            Text(
+                text = "(${R.string.achievement_datatable_tips.getString()})",
+                style = MaterialTheme.typography.bodySmall,
+                fontSize = 8.sp,
+                maxLines = 2,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 8.dp),
+                textAlign = TextAlign.Start,
+                color = Color.White
+            )
+
+            DataTable(
+                columns = dataTableHeader,
+                rows = achievementData,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+                    .clickable {
+                        onDataTableClickable(dataTableHeader, achievementData)
+                    }
+            )
+        }
+    }
+}
+
+@Composable
+private fun FaultToleranceCard(
+    achievementDataList: List<AchievementCalculator.AchievementData>,
+    currentChoiceDifficulty: Int,
+    currentChoiceNoteType: NoteType,
+    onNoteTypeSelected: (NoteType) -> Unit
+) {
+    ElevatedCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(
+                horizontal = 16.dp,
+                vertical = 8.dp
+            )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = R.string.fault_tolerance_calc.getString(),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+            )
+
+            FlowRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(vertical = 8.dp),
+                maxItemsInEachRow = 3,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                NoteType.entries.forEach { noteType ->
+                    val isSelected = currentChoiceNoteType == noteType
+
+                    val textColor = if (isSelected) {
+                        Color.White
+                    } else {
+                        Color(0xFF0A305F)
+                    }
+
+                    val backgroundColor = if (isSelected) {
+                        Color(0xFF284777)
+                    } else {
+                        Color(0xFFAAC7FF)
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(40.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(backgroundColor)
+                            .clickable {
+                                onNoteTypeSelected(noteType)
+                            }
+                            .padding(horizontal = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = noteType.typeNmae,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            textAlign = TextAlign.Center,
+                            color = textColor,
+                            modifier = Modifier
+                                .padding(horizontal = 4.dp)
+                        )
+                    }
+                }
+            }
+
+            ShadowElevatedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(8.dp)
+            ) {
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
-                        .padding(
-                            horizontal = 16.dp,
-                            vertical = 4.dp
-                        ),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    IconButton(
-                        onClick = {
-                            onBackPressed()
-                        }
-                    ) {
-                        Icon(
-                            Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-
                     Text(
-                        text = R.string.back.getString(),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurface
+                        text = R.string.fault_torlerance.getString()
+                            .format(currentChoiceNoteType.typeNmae),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+
+                    FaultToleranceDetailCard(
+                        achievementDataList = achievementDataList,
+                        currentChoiceDifficulty = currentChoiceDifficulty,
+                        currentChoiceNoteType = currentChoiceNoteType,
+                        faultValue = 0.5f,
+                        title = R.string.rate_fault_torlerance.getString()
+                            .format("SSS+", "0.5%")
+                    )
+
+                    FaultToleranceDetailCard(
+                        achievementDataList = achievementDataList,
+                        currentChoiceDifficulty = currentChoiceDifficulty,
+                        currentChoiceNoteType = currentChoiceNoteType,
+                        faultValue = 1f,
+                        title = R.string.rate_fault_torlerance.getString()
+                            .format("SSS", "1%")
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun FaultToleranceDetailCard(
+    achievementDataList: List<AchievementCalculator.AchievementData>,
+    currentChoiceDifficulty: Int,
+    currentChoiceNoteType: NoteType,
+    faultValue: Float,
+    title: String
+) {
+    ShadowElevatedCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(140.dp)
+            .padding(8.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            )
+
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+            )
+
+            FlowRow(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+                maxItemsInEachRow = 3,
+                maxLines = 1,
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                verticalArrangement = Arrangement.Center
+            ) {
+                val faultToleranceCount = getFaultTolerance(
+                    achievementDataList[currentChoiceDifficulty],
+                    currentChoiceNoteType,
+                    faultValue
+                )
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(40.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Great:",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(0.4f)
+                    )
+
+                    Text(
+                        text = faultToleranceCount[0],
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(40.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Good:",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(0.4f)
+                    )
+
+                    Text(
+                        text = faultToleranceCount[1],
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(40.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Miss:",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(0.4f)
+                    )
+
+                    Text(
+                        text = faultToleranceCount[2],
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ActionButtonsRow(
+    jacketFile: File?,
+    musicName: String,
+    modifier: Modifier = Modifier
+) {
+    FlowRow(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Button(
+            onClick = {
+                if (jacketFile == null) {
+                    Toast.makeText(
+                        application,
+                        R.string.save_jacket_failed.getString(),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    application.saveImageToGallery(
+                        jacketFile.readBytes(),
+                        R.string.save_jacket_success.getString()
+                    )
+                }
+            },
+            modifier = Modifier
+                .weight(1f)
+                .height(30.dp),
+            shape = RoundedCornerShape(4.dp),
+            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+        ) {
+            Text(
+                text = R.string.save_jacket.getString(),
+                modifier = Modifier
+                    .fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyMedium,
+                autoSize = TextAutoSize.StepBased(minFontSize = 8.sp, maxFontSize = 16.sp)
+            )
+        }
+
+        Button(
+            onClick = {
+                application.openBilibiliSearch(musicName)
+            },
+            modifier = Modifier
+                .weight(1f)
+                .height(30.dp),
+            shape = RoundedCornerShape(4.dp),
+            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+        ) {
+            Text(
+                text = R.string.search_bilibili.getString(),
+                modifier = Modifier
+                    .fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyMedium,
+                autoSize = TextAutoSize.StepBased(minFontSize = 8.sp, maxFontSize = 16.sp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun TopAppBar(
+    onBackPressed: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(
+                    horizontal = 16.dp,
+                    vertical = 4.dp
+                ),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = onBackPressed
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Default.ArrowBack,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            Text(
+                text = R.string.back.getString(),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
         }
     }
 }

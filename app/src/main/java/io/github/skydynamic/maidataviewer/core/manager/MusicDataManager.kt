@@ -1,6 +1,5 @@
 package io.github.skydynamic.maidataviewer.core.manager
 
-import android.util.Log
 import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import io.github.skydynamic.maidataviewer.core.data.MaimaiUpdateData
 import kotlinx.serialization.json.Json

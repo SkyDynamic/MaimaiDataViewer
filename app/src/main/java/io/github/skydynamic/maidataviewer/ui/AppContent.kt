@@ -46,10 +46,10 @@ import io.github.skydynamic.maidataviewer.core.getString
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
 import io.github.skydynamic.maidataviewer.ui.component.WindowInsetsSpacer
 import io.github.skydynamic.maidataviewer.ui.page.AchievementDataTablePage
+import io.github.skydynamic.maidataviewer.ui.page.EmptyPage
 import io.github.skydynamic.maidataviewer.ui.page.HomePage
 import io.github.skydynamic.maidataviewer.ui.page.MusicDetailPage
 import io.github.skydynamic.maidataviewer.ui.page.MusicPage
-import io.github.skydynamic.maidataviewer.ui.page.EmptyPage
 import io.github.skydynamic.maidataviewer.viewmodel.AchievementDataTablePageViewModel
 import io.github.skydynamic.maidataviewer.viewmodel.GlobalViewModel
 
