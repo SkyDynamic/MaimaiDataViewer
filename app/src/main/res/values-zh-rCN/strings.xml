@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">舞萌数据查询器</string>
+    <string name="home">主页</string>
+    <string name="music_page">曲目数据</string>
+    <string name="home_songcard_title">曲目查询</string>
+    <string name="home_songcard_subtitle">查询曲目的详细信息</string>
+    <string name="jump_to">跳转到该页面</string>
+    <string name="home_songcard_desc">在该页面你可以查询曲目的详细信息: \n    谱面定数\n    谱面物量\n    单Tap失分</string>
+    <string name="setting_page">设置</string>
+    <string name="app_version">App 版本</string>
+    <string name="current_maimai_data_version">当前舞萌DX数据版本</string>
+    <string name="latest_maimai_data_version">最新的舞萌DX数据版本</string>
+    <string name="loading">加载中</string>
+    <string name="not_local_mai_data">未找到任何本地舞萌DX数据</string>
+    <string name="search">搜索</string>
+    <string name="search_placeholder">输入曲名/别名/ID/曲师关键字</string>
+    <string name="all">所有</string>
+    <string name="genre">类别</string>
+    <string name="versionGenre">游戏版本</string>
+    <string name="load_finish">已加载%s首曲目</string>
+    <string name="search_result">已成功搜索到%s首曲目</string>
+    <string name="back">返回</string>
+    <string name="music_type">类别</string>
+    <string name="music_version">版本</string>
+    <string name="artist">曲师</string>
+    <string name="designer">谱师</string>
+    <string name="arch_table_count">物量</string>
+    <string name="note_score_detail">谱面失分详情</string>
+    <string name="achievement_datatable_tips">你可以左右滑动查看完整的表格. 或者点击表格查看完整的横向表格.</string>
+    <string name="note_type">谱面类型</string>
+    <string name="standard">标准</string>
+    <string name="stage">宴会场</string>
+    <string name="dx">DX</string>
+    <string name="fault_tolerance_calc">容错计算</string>
+    <string name="fault_torlerance">%s 容错数量</string>
+    <string name="rate_fault_torlerance">%s 容错 (%s)</string>
+    <string name="save_jacket">保存曲绘到相册</string>
+    <string name="save_jacket_success">已保存到相册</string>
+    <string name="save_jacket_failed">曲绘没有下载成功, 保存失败</string>
+    <string name="search_bilibili">从B站搜索</string>
+    <string name="music_level">定数</string>
+</resources>
