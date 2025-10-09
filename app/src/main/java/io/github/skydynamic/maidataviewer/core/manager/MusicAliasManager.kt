@@ -68,35 +68,13 @@ class MusicAliasManager(
     }
 
     fun getMusicByAlias(
-        key: String,
-        genreId: Int? = null,
-        versionId: Int? = null
+        key: String
     ): List<MaimaiMusicData> {
-        var result = aliases.filter {
+        return aliases.filter {
             it.value.any { alias -> alias.lowercase().contains(key.lowercase()) }
         }.mapNotNull {
             MusicDataManager.getMusicData(it.key)
         }
-
-        if (genreId != null) {
-            result.filter {
-                it.genre == genreId
-            }
-        }
-
-        if (versionId != null) {
-            result = if (versionId >= 13 && versionId % 2 == 0) {
-                result.filter {
-                    it.addVersion.id == versionId || it.addVersion.id == versionId + 1
-                }
-            } else {
-                result.filter {
-                    it.addVersion.id == versionId
-                }
-            }
-        }
-
-        return result
     }
 
     suspend fun updateAliasData() {
@@ -143,11 +121,9 @@ class MusicAliasManager(
         }
 
         fun getMusicByAlias(
-            key: String,
-            genreId: Int? = null,
-            versionId: Int? = null
+            key: String
         ): List<MaimaiMusicData> {
-            return instance.getMusicByAlias(key, genreId, versionId)
+            return instance.getMusicByAlias(key)
         }
      }
 }

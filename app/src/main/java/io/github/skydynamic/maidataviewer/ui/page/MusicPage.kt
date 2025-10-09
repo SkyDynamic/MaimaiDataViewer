@@ -96,13 +96,6 @@ fun search() {
                     genre,
                     version
                 )
-            MusicAliasManager.getMusicByAlias(
-                SongPageViewModel.searchText.value,
-                genre,
-                version
-            ).forEach {
-                if (!result.contains(it)) result.add(it)
-            }
 
             SongPageViewModel.searchResult.value = result
             SongPageViewModel.isSearchingActive.value = false

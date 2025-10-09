@@ -2,6 +2,7 @@ package io.github.skydynamic.maidataviewer.core.manager
 
 import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import io.github.skydynamic.maidataviewer.core.data.MaimaiUpdateData
+import io.github.skydynamic.maidataviewer.viewmodel.SongPageViewModel
 import kotlinx.serialization.json.Json
 import java.io.File
 
@@ -59,23 +60,29 @@ class MusicDataManager(
             (it.name?.lowercase()?.contains(keyword.lowercase()) == true
                     || it.artist?.lowercase()?.contains(keyword.lowercase()) == true)
                     || it.id.toString() == keyword
+        }.toMutableList()
+
+        MusicAliasManager.getMusicByAlias(
+            SongPageViewModel.searchText.value
+        ).forEach {
+            if (!result.contains(it)) result.add(it)
         }
 
         if (genreId != null) {
             result = result.filter {
                 it.genre == genreId
-            }
+            }.toMutableList ()
         }
 
         if (versionId != null) {
             result = if (versionId >= 13 && versionId % 2 == 0) {
                 result.filter {
                     it.addVersion.id == versionId || it.addVersion.id == versionId + 1
-                }
+                }.toMutableList ()
             } else {
                 result.filter {
                     it.addVersion.id == versionId
-                }
+                }.toMutableList ()
             }
         }
         return result
