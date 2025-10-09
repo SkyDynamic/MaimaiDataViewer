@@ -92,6 +92,10 @@ class MusicDataManager(
         return musicDataList.any { it.id == id }
     }
 
+    fun getMusicLoadedSize(): Int {
+        return musicDataList.size
+    }
+
     companion object {
         lateinit var instance: MusicDataManager
 
@@ -105,6 +109,10 @@ class MusicDataManager(
 
         fun getMusicData(id: Int): MaimaiMusicData? {
             return instance.getMusicData(id)
+        }
+
+        fun getMusicLoadedSize(): Int {
+            return instance.getMusicLoadedSize()
         }
     }
 }

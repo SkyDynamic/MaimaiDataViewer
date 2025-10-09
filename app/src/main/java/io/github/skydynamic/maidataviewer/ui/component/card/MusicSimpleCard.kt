@@ -1,8 +1,6 @@
 package io.github.skydynamic.maidataviewer.ui.component.card
 
-import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -53,8 +51,6 @@ import java.io.File
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun MusicSimpleCard(
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope,
     modifier: Modifier = Modifier,
     music: MaimaiMusicData,
     onClick: () -> Unit
@@ -81,212 +77,206 @@ fun MusicSimpleCard(
                 .padding(16.dp)
                 .fillMaxWidth()
         ) {
-            with(sharedTransitionScope) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(jacketFile ?: defaultJacketFile)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .sharedElement(
-                            sharedTransitionScope.rememberSharedContentState(key = "image-$music.id"),
-                            animatedContentScope
-                        )
-                        .clip(RoundedCornerShape(8.dp))
-                        .size(80.dp)
-                )
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(jacketFile ?: defaultJacketFile)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = null,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .size(80.dp)
+            )
 
-                Column(
+            Column(
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .fillMaxWidth()
+            ) {
+                Row(
                     modifier = Modifier
-                        .padding(start = 16.dp)
                         .fillMaxWidth()
                 ) {
-                    Row(
+                    Text(
+                        text = music.name ?: "",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .weight(0.65f)
+                            .fillMaxWidth(),
+                        maxLines = 1
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .weight(0.35f)
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
                     ) {
                         Text(
-                            text = music.name ?: "",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .weight(0.65f)
-                                .fillMaxWidth(),
-                            maxLines = 1
-                        )
-
-                        Box(
-                            modifier = Modifier
-                                .weight(0.35f)
-                                .fillMaxHeight()
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
-                        ) {
-                            Text(
-                                text = "#${music.id}",
-                                style = MaterialTheme.typography.bodySmallEmphasized,
-                                textAlign = TextAlign.Center,
-                                maxLines = 1,
-                                modifier = Modifier
-                                    .padding(4.dp)
-                                    .align(Alignment.Center),
-                            )
-                        }
-                    }
-
-                    Row(
-                        modifier = Modifier
-                            .padding(top = 4.dp)
-                            .fillMaxWidth()
-                            .height(20.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = music.artist ?: "",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            text = "#${music.id}",
+                            style = MaterialTheme.typography.bodySmallEmphasized,
+                            textAlign = TextAlign.Center,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
                             modifier = Modifier
-                                .weight(1f)
-                                .fillMaxWidth(),
+                                .padding(4.dp)
+                                .align(Alignment.Center),
                         )
+                    }
+                }
 
-                        val isDX = music.id in 10000 until 100000
-                        val isStage = music.id >= 100000
+                Row(
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .fillMaxWidth()
+                        .height(20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = music.artist ?: "",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                    )
 
-                        Box(
-                            modifier = Modifier
-                                .weight(0.4f)
-                                .fillMaxHeight()
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(
-                                    if (isDX) {
-                                        Color(0xFFF57C00)
-                                    } else if (isStage) {
-                                        Color(0xFF7B1FA2)
-                                    } else {
-                                        Color(0xFF0288D1)
-                                    }
-                                )
-                        ) {
-                            Text(
-                                text = if (isDX) {
-                                    R.string.dx.getString()
+                    val isDX = music.id in 10000 until 100000
+                    val isStage = music.id >= 100000
+
+                    Box(
+                        modifier = Modifier
+                            .weight(0.4f)
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(
+                                if (isDX) {
+                                    Color(0xFFF57C00)
                                 } else if (isStage) {
-                                    R.string.stage.getString()
+                                    Color(0xFF7B1FA2)
                                 } else {
-                                    R.string.standard.getString()
-                                },
-                                style = MaterialTheme.typography.bodySmallEmphasized,
-                                textAlign = TextAlign.Center,
-                                maxLines = 1,
-                                modifier = Modifier
-                                    .padding(start = 2.dp, end = 2.dp)
-                                    .align(Alignment.Center),
-                                color = Color.White,
-                                autoSize = TextAutoSize.StepBased(
-                                    minFontSize = 8.sp,
-                                    maxFontSize = 12.sp
-                                ),
-                                fontWeight = FontWeight.Bold
+                                    Color(0xFF0288D1)
+                                }
                             )
-                        }
+                    ) {
+                        Text(
+                            text = if (isDX) {
+                                R.string.dx.getString()
+                            } else if (isStage) {
+                                R.string.stage.getString()
+                            } else {
+                                R.string.standard.getString()
+                            },
+                            style = MaterialTheme.typography.bodySmallEmphasized,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
+                            modifier = Modifier
+                                .padding(start = 2.dp, end = 2.dp)
+                                .align(Alignment.Center),
+                            color = Color.White,
+                            autoSize = TextAutoSize.StepBased(
+                                minFontSize = 8.sp,
+                                maxFontSize = 12.sp
+                            ),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 35.dp)
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .weight(0.25f)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(Color(0x662196F3)),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = music.addVersion.name?.replace(
+                                "plus",
+                                "+",
+                                true
+                            ) ?: "",
+                            color = Color(0xFF1976D2),
+                            maxLines = 1,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 4.dp, end = 4.dp),
+                            textAlign = TextAlign.Center,
+                            autoSize = TextAutoSize
+                                .StepBased(
+                                    minFontSize = 7.sp,
+                                    maxFontSize = 16.sp,
+                                    stepSize = 0.1.sp
+                                )
+                        )
                     }
 
-                    Row(
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(max = 35.dp)
-                            .padding(top = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(2.dp)
+                            .fillMaxHeight()
+                            .weight(0.25f)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(Color(0x668BC34A)),
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        Column(
+                        Text(
+                            text = MaiGenreManager.get(GenreType.MUSIC)
+                                .getGenreName(music.genre),
+                            color = Color(0xFF4CAF50),
+                            maxLines = 1,
                             modifier = Modifier
-                                .fillMaxHeight()
-                                .weight(0.25f)
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(Color(0x662196F3)),
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = music.addVersion.name?.replace(
-                                    "plus",
-                                    "+",
-                                    true
-                                ) ?: "",
-                                color = Color(0xFF1976D2),
-                                maxLines = 1,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = 4.dp, end = 4.dp),
-                                textAlign = TextAlign.Center,
-                                autoSize = TextAutoSize
-                                    .StepBased(
-                                        minFontSize = 7.sp,
-                                        maxFontSize = 16.sp,
-                                        stepSize = 0.1.sp
-                                    )
-                            )
-                        }
+                                .fillMaxWidth()
+                                .padding(start = 4.dp, end = 4.dp),
+                            textAlign = TextAlign.Center,
+                            autoSize = TextAutoSize
+                                .StepBased(
+                                    minFontSize = 8.sp,
+                                    maxFontSize = 12.sp,
+                                    stepSize = 0.1.sp
+                                )
+                        )
+                    }
 
-                        Column(
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .weight(0.5f)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(Color(0x66FF9800)),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = music.difficulties.filter {
+                                it.levelLabel != "0"
+                            }.joinToString("/") {
+                                it.levelLabel
+                            },
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFFFF5722),
+                            maxLines = 1,
                             modifier = Modifier
-                                .fillMaxHeight()
-                                .weight(0.25f)
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(Color(0x668BC34A)),
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = MaiGenreManager.get(GenreType.MUSIC)
-                                    .getGenreName(music.genre),
-                                color = Color(0xFF4CAF50),
-                                maxLines = 1,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = 4.dp, end = 4.dp),
-                                textAlign = TextAlign.Center,
-                                autoSize = TextAutoSize
-                                    .StepBased(
-                                        minFontSize = 8.sp,
-                                        maxFontSize = 12.sp,
-                                        stepSize = 0.1.sp
-                                    )
-                            )
-                        }
-
-                        Column(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .weight(0.5f)
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(Color(0x66FF9800)),
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = music.difficulties.filter {
-                                    it.levelLabel != "0"
-                                }.joinToString("/") {
-                                    it.levelLabel
-                                },
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFFFF5722),
-                                maxLines = 1,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = 4.dp, end = 4.dp),
-                                textAlign = TextAlign.Center,
-                                autoSize = TextAutoSize
-                                    .StepBased(
-                                        minFontSize = 6.sp,
-                                        maxFontSize = 12.sp,
-                                        stepSize = 0.1.sp
-                                    )
-                            )
-                        }
+                                .fillMaxWidth()
+                                .padding(start = 4.dp, end = 4.dp),
+                            textAlign = TextAlign.Center,
+                            autoSize = TextAutoSize
+                                .StepBased(
+                                    minFontSize = 6.sp,
+                                    maxFontSize = 12.sp,
+                                    stepSize = 0.1.sp
+                                )
+                        )
                     }
                 }
             }

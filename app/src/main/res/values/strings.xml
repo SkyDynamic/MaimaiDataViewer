@@ -39,4 +39,15 @@
     <string name="save_jacket_failed">Jacket do not downlaod success, failed to save</string>
     <string name="search_bilibili">Search from bilibili</string>
     <string name="music_level">Level</string>
+    <string name="treasure_box_page">TreasureBox</string>
+    <string name="data_tool">Data Tools</string>
+    <string name="data_tool_desc">Data analyze tool</string>
+    <string name="rating_calculator">Rating Calculator</string>
+    <string name="rating_calculator_desc">Calculate rating with achievement and level</string>
+    <string name="rating_calculator_music_level">Music Level</string>
+    <string name="rating_calculator_music_level_placeholder">Type music level</string>
+    <string name="rating_calculator_achievement_placeholder">Type usic achievement</string>
+    <string name="rating_calculator_achievement">Music Achievement</string>
+    <string name="multiplierFactor">Multiplier Factor</string>
+    <string name="confirm">Confirm</string>
 </resources>

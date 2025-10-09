@@ -1,9 +1,7 @@
 package io.github.skydynamic.maidataviewer.ui.page
 
-import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.shrinkHorizontally
@@ -40,7 +38,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -189,16 +186,12 @@ private fun GenreSelector(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun MusicPage(
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope,
     onCardClick: (MaimaiMusicData) -> Unit
 ) {
     var genreDropdownMenuActive by remember { mutableStateOf(false) }
     var versionDropdownMenuActive by remember { mutableStateOf(false) }
 
     var showMessageCard by remember { mutableStateOf(false) }
-
-    var loadedMusicCount by remember { mutableIntStateOf(0) }
 
     if (SongPageViewModel.listState.value == null) {
         SongPageViewModel.listState.value = rememberLazyListState()
@@ -265,7 +258,6 @@ fun MusicPage(
             SongPageViewModel.viewModelScope.launch(Dispatchers.IO) {
                 MusicDataManager.instance.loadMusicData {
                     SongPageViewModel.isLoadingMusic.value = false
-                    loadedMusicCount = it
                     if (it > 0) {
                         SongPageViewModel.showLoadedFinishedMessage.value = true
                     }
@@ -308,7 +300,7 @@ fun MusicPage(
                             .padding(vertical = 8.dp)
                     ) {
                         Text(
-                            text = R.string.load_finish.getString().format(loadedMusicCount),
+                            text = R.string.load_finish.getString().format(MusicDataManager.getMusicLoadedSize()),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp),
@@ -391,8 +383,6 @@ fun MusicPage(
 
                                 if (activeItems.contains(index)) {
                                     MusicSimpleCard(
-                                        sharedTransitionScope,
-                                        animatedContentScope,
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .heightIn(min = 60.dp)
@@ -440,7 +430,8 @@ fun MusicPage(
                             Text(
                                 R.string.search_placeholder.getString(),
                                 autoSize = TextAutoSize.StepBased(minFontSize = 8.sp)
-                            ) },
+                            )
+                        },
                         leadingIcon = { Icon(Icons.Filled.Search, "") },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),

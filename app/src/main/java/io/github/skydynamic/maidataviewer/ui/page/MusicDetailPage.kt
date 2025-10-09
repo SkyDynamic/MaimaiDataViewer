@@ -1,9 +1,7 @@
 package io.github.skydynamic.maidataviewer.ui.page
 
 import android.widget.Toast
-import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -256,8 +254,6 @@ fun getFaultTolerance(
 @Composable
 fun MusicDetailPage(
     music: MaimaiMusicData,
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope,
     onBackPressed: () -> Unit,
     onDataTableClickable: (List<DataTableColumn>, List<BasicDataTableRow>) -> Unit
 ) {
@@ -288,85 +284,81 @@ fun MusicDetailPage(
     val color = Difficulty.entries[currentChoiceDifficulty].color
     val commonRoundedShape = RoundedCornerShape(8.dp)
 
-    with(sharedTransitionScope) {
-        Box {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .heightIn(max = 20000.dp)
-                    .background(MaterialTheme.colorScheme.background)
-            ) {
-                Spacer(Modifier.height(40.dp))
-                Spacer(Modifier.height(WindowInsetsSpacer.topPadding))
+    Box {
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .heightIn(max = 20000.dp)
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            Spacer(Modifier.height(40.dp))
+            Spacer(Modifier.height(WindowInsetsSpacer.topPadding))
 
-                // 音乐基本信息卡片
-                MusicInfoCard(
-                    music = music,
-                    jacketFile = jacketFile,
-                    defaultJacketFile = defaultJacketFile,
-                    color = color,
-                    commonRoundedShape = commonRoundedShape,
-                    sharedTransitionScope = sharedTransitionScope,
-                    animatedContentScope = animatedContentScope
-                )
+            // 音乐基本信息卡片
+            MusicInfoCard(
+                music = music,
+                jacketFile = jacketFile,
+                defaultJacketFile = defaultJacketFile,
+                color = color,
+                commonRoundedShape = commonRoundedShape
+            )
 
-                // 难度选择区域
-                DifficultySelectionRow(
-                    difficulties = music.difficulties,
-                    currentChoiceDifficulty = currentChoiceDifficulty,
-                    color = color,
-                    commonRoundedShape = commonRoundedShape,
-                    onDifficultySelected = { index -> currentChoiceDifficulty = index }
-                )
+            // 难度选择区域
+            DifficultySelectionRow(
+                difficulties = music.difficulties,
+                currentChoiceDifficulty = currentChoiceDifficulty,
+                color = color,
+                commonRoundedShape = commonRoundedShape,
+                onDifficultySelected = { index -> currentChoiceDifficulty = index }
+            )
 
-                // 详细信息卡片
-                MusicDetailCard(
-                    music = music,
-                    currentChoiceDifficulty = currentChoiceDifficulty,
-                    isDX = isDX,
-                    color = color,
-                    achievementDataList = achievementDataList,
-                    dataTableHeader = dataTableHeader,
-                    onDataTableClickable = onDataTableClickable
-                )
+            // 详细信息卡片
+            MusicDetailCard(
+                music = music,
+                currentChoiceDifficulty = currentChoiceDifficulty,
+                isDX = isDX,
+                color = color,
+                achievementDataList = achievementDataList,
+                dataTableHeader = dataTableHeader,
+                onDataTableClickable = onDataTableClickable
+            )
 
-                // 容错率计算卡片
-                FaultToleranceCard(
-                    achievementDataList = achievementDataList,
-                    currentChoiceDifficulty = currentChoiceDifficulty,
-                    currentChoiceNoteType = currentChoiceNoteType,
-                    onNoteTypeSelected = { noteType -> currentChoiceNoteType = noteType }
-                )
+            // 容错率计算卡片
+            FaultToleranceCard(
+                achievementDataList = achievementDataList,
+                currentChoiceDifficulty = currentChoiceDifficulty,
+                currentChoiceNoteType = currentChoiceNoteType,
+                onNoteTypeSelected = { noteType -> currentChoiceNoteType = noteType }
+            )
 
-                // 操作按钮行
-                ActionButtonsRow(
-                    jacketFile = jacketFile,
-                    musicName = music.name ?: "",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(40.dp)
-                        .padding(
-                            horizontal = 16.dp,
-                            vertical = 4.dp
-                        )
-                )
-
-                Spacer(modifier = Modifier.height(15.dp))
-            }
-
-            // 顶部返回栏
-            TopAppBar(
-                onBackPressed = onBackPressed,
+            // 操作按钮行
+            ActionButtonsRow(
+                jacketFile = jacketFile,
+                musicName = music.name ?: "",
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(40.dp)
                     .padding(
-                        top = WindowInsetsSpacer.topPadding,
-                        bottom = WindowInsetsSpacer.bottomPadding
+                        horizontal = 16.dp,
+                        vertical = 4.dp
                     )
             )
+
+            Spacer(modifier = Modifier.height(15.dp))
         }
+
+        // 顶部返回栏
+        TopAppBar(
+            onBackPressed = onBackPressed,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    top = WindowInsetsSpacer.topPadding,
+                    bottom = WindowInsetsSpacer.bottomPadding
+                )
+        )
     }
 }
 
@@ -377,144 +369,135 @@ private fun MusicInfoCard(
     jacketFile: File?,
     defaultJacketFile: ByteArray?,
     color: Color,
-    commonRoundedShape: RoundedCornerShape,
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope
+    commonRoundedShape: RoundedCornerShape
 ) {
-    with(sharedTransitionScope) {
-        Box(
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(
+                horizontal = 16.dp,
+                vertical = 8.dp
+            )
+            .background(
+                color = color.copy(alpha = 0.6f),
+                shape = RoundedCornerShape(16.dp)
+            )
+            .border(
+                width = 2.dp,
+                color = color,
+                shape = RoundedCornerShape(16.dp)
+            )
+    ) {
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(
-                    horizontal = 16.dp,
-                    vertical = 8.dp
-                )
-                .background(
-                    color = color.copy(alpha = 0.6f),
-                    shape = RoundedCornerShape(16.dp)
-                )
-                .border(
-                    width = 2.dp,
-                    color = color,
-                    shape = RoundedCornerShape(16.dp)
-                )
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
+            Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(jacketFile ?: defaultJacketFile)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = null,
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                        .clip(commonRoundedShape)
+                        .size(140.dp)
+                        .border(
+                            width = 2.dp,
+                            color = color,
+                            shape = commonRoundedShape
+                        )
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp)
                 ) {
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(jacketFile ?: defaultJacketFile)
-                            .crossfade(true)
-                            .build(),
-                        contentDescription = null,
+                    Row(
                         modifier = Modifier
-                            .sharedElement(
-                                sharedTransitionScope
-                                    .rememberSharedContentState(key = "image-${music.id}"),
-                                animatedContentScope
-                            )
-                            .clip(commonRoundedShape)
-                            .size(140.dp)
-                            .border(
-                                width = 2.dp,
-                                color = color,
-                                shape = commonRoundedShape
-                            )
-                    )
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp)
+                            .height(30.dp)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
+                        Box(
                             modifier = Modifier
-                                .height(30.dp)
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .width(2.dp)
-                                    .clip(RoundedCornerShape(4.dp))
-                                    .background(color)
-                            )
-
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .horizontalScroll(rememberScrollState())
-                            ) {
-                                Text(
-                                    text = music.name ?: "",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    maxLines = 1,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(start = 8.dp),
-                                    textAlign = TextAlign.Start,
-                                    color = Color.White
-                                )
-                            }
-                        }
+                                .fillMaxHeight()
+                                .width(2.dp)
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(color)
+                        )
 
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .wrapContentHeight()
-                                .padding(top = 8.dp)
-                                .background(
-                                    Color.White,
-                                    shape = commonRoundedShape
-                                )
+                                .horizontalScroll(rememberScrollState())
                         ) {
-                            Column(
+                            Text(
+                                text = music.name ?: "",
+                                style = MaterialTheme.typography.bodySmall,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .wrapContentHeight()
-                                    .padding(
-                                        horizontal = 8.dp,
-                                        vertical = 8.dp
-                                    ),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                InfoBox(
-                                    type = R.string.music_type.getString(),
-                                    text = MaiGenreManager.get(GenreType.MUSIC)
-                                        .getGenreName(music.genre),
-                                    color = color
-                                )
-                                InfoBox(
-                                    type = "BPM",
-                                    text = music.bpm.toString(),
-                                    color = color
-                                )
-                                InfoBox(
-                                    type = R.string.music_version.getString(),
-                                    text = MaiGenreManager.get(GenreType.VERSION)
-                                        .getGenreName(music.addVersion.id),
-                                    color = color
-                                )
-                                InfoBox(
-                                    type = R.string.artist.getString(),
-                                    text = music.artist ?: "",
-                                    color = color
-                                )
-                            }
+                                    .padding(start = 8.dp),
+                                textAlign = TextAlign.Start,
+                                color = Color.White
+                            )
+                        }
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                            .padding(top = 8.dp)
+                            .background(
+                                Color.White,
+                                shape = commonRoundedShape
+                            )
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight()
+                                .padding(
+                                    horizontal = 8.dp,
+                                    vertical = 8.dp
+                                ),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            InfoBox(
+                                type = R.string.music_type.getString(),
+                                text = MaiGenreManager.get(GenreType.MUSIC)
+                                    .getGenreName(music.genre),
+                                color = color
+                            )
+                            InfoBox(
+                                type = "BPM",
+                                text = music.bpm.toString(),
+                                color = color
+                            )
+                            InfoBox(
+                                type = R.string.music_version.getString(),
+                                text = MaiGenreManager.get(GenreType.VERSION)
+                                    .getGenreName(music.addVersion.id),
+                                color = color
+                            )
+                            InfoBox(
+                                type = R.string.artist.getString(),
+                                text = music.artist ?: "",
+                                color = color
+                            )
                         }
                     }
                 }

@@ -40,4 +40,15 @@
     <string name="save_jacket_failed">曲绘没有下载成功, 保存失败</string>
     <string name="search_bilibili">从B站搜索</string>
     <string name="music_level">定数</string>
+    <string name="treasure_box_page">百宝箱</string>
+    <string name="data_tool">数据工具</string>
+    <string name="data_tool_desc">数据查询与分析工具</string>
+    <string name="rating_calculator">单曲Rating计算</string>
+    <string name="rating_calculator_desc">根据定数和达成率计算出Rating</string>
+    <string name="rating_calculator_music_level">歌曲定数</string>
+    <string name="rating_calculator_music_level_placeholder">输入歌曲定数</string>
+    <string name="rating_calculator_achievement_placeholder">输入歌曲达成率</string>
+    <string name="rating_calculator_achievement">歌曲达成率</string>
+    <string name="multiplierFactor">系数</string>
+    <string name="confirm">确认</string>
 </resources>
