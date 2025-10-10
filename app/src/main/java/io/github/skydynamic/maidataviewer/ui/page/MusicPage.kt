@@ -26,8 +26,6 @@ import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -59,8 +57,10 @@ import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
 import io.github.skydynamic.maidataviewer.core.manager.MusicAliasManager
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
 import io.github.skydynamic.maidataviewer.ui.component.UnknownProgressCircularProgress
+import io.github.skydynamic.maidataviewer.ui.component.button.GenreSelectorButton
 import io.github.skydynamic.maidataviewer.ui.component.card.MusicSimpleCard
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
+import io.github.skydynamic.maidataviewer.ui.component.menu.GenreDropdownMenu
 import io.github.skydynamic.maidataviewer.viewmodel.GlobalViewModel
 import io.github.skydynamic.maidataviewer.viewmodel.SongPageViewModel
 import kotlinx.coroutines.Dispatchers
@@ -99,89 +99,6 @@ fun search() {
             SongPageViewModel.searchJob.value = null
         }
 }
-
-
-@Composable
-private fun GenreDropdownMenu(
-    expanded: Boolean,
-    onDismissRequest: () -> Unit,
-    onSelectedChange: (Int) -> Unit,
-    genreType: GenreType
-) {
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = onDismissRequest,
-        modifier = Modifier
-            .padding(4.dp)
-            .heightIn(max = 400.dp),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        DropdownMenuItem(
-            text = { Text(R.string.all.getString()) },
-            onClick = {
-                onSelectedChange(-1)
-                onDismissRequest()
-            }
-        )
-        MaiGenreManager.get(genreType)
-            .getGenreData()
-            .forEach {
-                HorizontalDivider()
-                DropdownMenuItem(
-                    text = { Text(it.name) },
-                    onClick = {
-                        onSelectedChange(it.id)
-                        onDismissRequest()
-                    }
-                )
-            }
-    }
-}
-
-
-@Composable
-private fun GenreSelector(
-    value: String,
-    label: String,
-    onClick: () -> Unit,
-) {
-    Button(
-        onClick = onClick,
-        shape = RoundedCornerShape(8.dp),
-        contentPadding = PaddingValues(8.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(55.dp)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                autoSize = TextAutoSize.StepBased(minFontSize = 8.sp, maxFontSize = 16.sp)
-            )
-            if (value.isNotEmpty()) {
-                Text(
-                    text = value.replace(
-                        "plus",
-                        "+",
-                        true
-                    ),
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center,
-                    maxLines = 1,
-                    autoSize = TextAutoSize.StepBased(maxFontSize = 16.sp)
-                )
-            }
-        }
-    }
-}
-
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
@@ -479,8 +396,8 @@ fun MusicPage(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Box(modifier = Modifier.weight(0.5f)) {
-                        GenreSelector(
-                            value = MaiGenreManager.get(GenreType.MUSIC)
+                        GenreSelectorButton(
+                            value = MaiGenreManager.musicGenre
                                 .getGenreName(SongPageViewModel.genreFilter.intValue),
                             label = R.string.genre.getString(),
                             onClick = { genreDropdownMenuActive = true }
@@ -502,8 +419,8 @@ fun MusicPage(
                     }
 
                     Box(modifier = Modifier.weight(0.5f)) {
-                        GenreSelector(
-                            value = MaiGenreManager.get(GenreType.VERSION)
+                        GenreSelectorButton(
+                            value = MaiGenreManager.versionGenre
                                 .getGenreName(SongPageViewModel.versionFilter.intValue),
                             label = R.string.versionGenre.getString(),
                             onClick = { versionDropdownMenuActive = true }

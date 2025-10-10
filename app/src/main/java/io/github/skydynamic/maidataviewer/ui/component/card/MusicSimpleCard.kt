@@ -40,7 +40,6 @@ import coil3.request.crossfade
 import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import io.github.skydynamic.maidataviewer.core.getString
-import io.github.skydynamic.maidataviewer.core.manager.GenreType
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
 import io.github.skydynamic.maidataviewer.core.manager.MaimaiJacketManager.Companion.instance
 import io.github.skydynamic.maidataviewer.viewmodel.GlobalViewModel
@@ -70,7 +69,7 @@ fun MusicSimpleCard(
 
     ShadowElevatedCard(
         modifier = modifier,
-        clickable = { onClick() }
+        clickable = onClick
     ) {
         Row(
             modifier = Modifier
@@ -232,8 +231,7 @@ fun MusicSimpleCard(
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = MaiGenreManager.get(GenreType.MUSIC)
-                                .getGenreName(music.genre),
+                            text = MaiGenreManager.musicGenre.getGenreName(music.genre),
                             color = Color(0xFF4CAF50),
                             maxLines = 1,
                             modifier = Modifier

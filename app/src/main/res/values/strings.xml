@@ -50,4 +50,11 @@
     <string name="rating_calculator_achievement">Music Achievement</string>
     <string name="multiplierFactor">Multiplier Factor</string>
     <string name="confirm">Confirm</string>
+    <string name="random_music">Random Music</string>
+    <string name="random_music_desc">Random music with level, genre and version</string>
+    <string name="min_level">Target min level</string>
+    <string name="max_level">Target max Level</string>
+    <string name="random_count">Random Music Count</string>
+    <string name="random_count_placeholder">Type random count (%s)</string>
+    <string name="start_random">Start</string>
 </resources>

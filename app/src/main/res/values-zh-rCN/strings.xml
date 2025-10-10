@@ -51,4 +51,11 @@
     <string name="rating_calculator_achievement">歌曲达成率</string>
     <string name="multiplierFactor">系数</string>
     <string name="confirm">确认</string>
+    <string name="random_music">随机乐曲</string>
+    <string name="random_music_desc">根据您的条件限制随机乐曲</string>
+    <string name="min_level">最低定数</string>
+    <string name="max_level">最高定数</string>
+    <string name="random_count">随机数量</string>
+    <string name="random_count_placeholder">数据随机数量 (%s)</string>
+    <string name="start_random">开始随机</string>
 </resources>

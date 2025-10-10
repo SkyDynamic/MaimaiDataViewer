@@ -90,6 +90,9 @@ class MaiGenreManager(
     companion object {
         private lateinit var instances: Map<GenreType, MaiGenreManager>
 
+        lateinit var musicGenre: MaiGenreManager
+        lateinit var versionGenre: MaiGenreManager
+
         fun init(
             assetsPath: AssetManager,
             overrideDataPath: File,
@@ -98,6 +101,9 @@ class MaiGenreManager(
             instances = GenreType.entries.associateWith {
                 MaiGenreManager(it, assetsPath, overrideDataPath, httpClient)
             }
+
+            musicGenre = get(GenreType.MUSIC)
+            versionGenre = get(GenreType.VERSION)
         }
 
         fun get(type: GenreType): MaiGenreManager {

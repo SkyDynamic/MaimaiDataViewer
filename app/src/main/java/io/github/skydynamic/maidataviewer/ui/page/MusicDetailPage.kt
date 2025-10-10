@@ -64,7 +64,6 @@ import io.github.skydynamic.maidataviewer.core.AchievementCalculator
 import io.github.skydynamic.maidataviewer.core.ExtensionMethods.buildDataTableRow
 import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import io.github.skydynamic.maidataviewer.core.getString
-import io.github.skydynamic.maidataviewer.core.manager.GenreType
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
 import io.github.skydynamic.maidataviewer.core.manager.MaimaiJacketManager.Companion.instance
 import io.github.skydynamic.maidataviewer.ui.component.BasicDataTableRow
@@ -478,8 +477,7 @@ private fun MusicInfoCard(
                         ) {
                             InfoBox(
                                 type = R.string.music_type.getString(),
-                                text = MaiGenreManager.get(GenreType.MUSIC)
-                                    .getGenreName(music.genre),
+                                text = MaiGenreManager.musicGenre.getGenreName(music.genre),
                                 color = color
                             )
                             InfoBox(
@@ -489,8 +487,7 @@ private fun MusicInfoCard(
                             )
                             InfoBox(
                                 type = R.string.music_version.getString(),
-                                text = MaiGenreManager.get(GenreType.VERSION)
-                                    .getGenreName(music.addVersion.id),
+                                text = MaiGenreManager.versionGenre.getGenreName(music.addVersion.id),
                                 color = color
                             )
                             InfoBox(

@@ -15,6 +15,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,10 +23,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.github.skydynamic.maidataviewer.R
+import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import io.github.skydynamic.maidataviewer.core.getString
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
+import io.github.skydynamic.maidataviewer.ui.component.dialog.RandomMusicDialog
 import io.github.skydynamic.maidataviewer.ui.component.dialog.RatingCalculatorDialog
 
 
@@ -33,21 +37,35 @@ enum class DataTool(
     val toolName: String,
     val desc: String,
     val icon: Int,
-    val action: (MutableState<Boolean>) -> Unit
+    var bindValue: MutableState<Boolean>?
 ) {
     RATING_CALCULATOR(
         R.string.rating_calculator.getString(),
         R.string.rating_calculator_desc.getString(),
         R.drawable.target,
-        {
-            it.value = true
-        }
+        null
     ),
+    RANDOM_MUSIC(
+        R.string.random_music.getString(),
+        R.string.random_music_desc.getString(),
+        R.drawable.dice,
+        null
+    );
+
+    fun bind(value: MutableState<Boolean>) {
+        bindValue = value
+    }
 }
 
 @Composable
-fun TreasureBoxPage() {
+fun TreasureBoxPage(
+    onCardClick: (MaimaiMusicData) -> Unit
+) {
     val showRatingCalculatorDialog = remember {
+        mutableStateOf(false)
+    }
+
+    val showRandomMusicDialog = remember {
         mutableStateOf(false)
     }
 
@@ -59,6 +77,16 @@ fun TreasureBoxPage() {
                 }
             )
         }
+        showRandomMusicDialog.value -> {
+            RandomMusicDialog(onDismiss = {
+                showRandomMusicDialog.value = false
+            }, onCardClick = onCardClick)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        DataTool.RATING_CALCULATOR.bind(showRatingCalculatorDialog)
+        DataTool.RANDOM_MUSIC.bind(showRandomMusicDialog)
     }
 
     Column(
@@ -105,32 +133,46 @@ fun TreasureBoxPage() {
                         Column(
                             modifier = Modifier
                                 .weight(1f)
-                                .height(100.dp)
+                                .wrapContentHeight()
                                 .padding(8.dp)
-                                .clickable { it.action(showRatingCalculatorDialog) }
+                                .clickable {
+                                    it.bindValue?.value = true
+                                }
                                 .background(
                                     color = MaterialTheme.colorScheme.surfaceContainerHigh,
                                     shape = MaterialTheme.shapes.medium
                                 ),
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
                             Image(
                                 painter = painterResource(it.icon),
                                 contentDescription = null,
+                                modifier = Modifier
+                                    .height(32.dp)
+                                    .padding(top = 4.dp)
                             )
 
                             Text(
                                 text = it.toolName,
                                 style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 4.dp)
+                                    .padding(top = 4.dp)
                             )
 
                             Text(
                                 text = it.desc,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
                                 modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 4.dp)
+                                    .padding(bottom = 4.dp)
                             )
                         }
                     }

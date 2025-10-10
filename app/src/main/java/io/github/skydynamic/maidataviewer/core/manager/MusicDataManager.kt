@@ -96,6 +96,44 @@ class MusicDataManager(
         return musicDataList.size
     }
 
+    fun randomMusic(
+        genreId: Int? = null,
+        versionId: Int? = null,
+        minLevel: Float = 0.0F,
+        maxLevel: Float = 99.9F,
+        count: Int = 1
+    ): List<MaimaiMusicData> {
+        var filteredMusic = musicDataList.filter {
+            it.difficulties.any { difficulty ->
+                        difficulty.level >= minLevel && difficulty.level <= maxLevel
+            }
+        }
+
+        if (genreId != null) {
+            filteredMusic = filteredMusic.filter {
+                it.genre == genreId
+            }
+        }
+
+        if (versionId != null) {
+            filteredMusic = if (versionId >= 13 && versionId % 2 == 0) {
+                filteredMusic.filter {
+                    it.addVersion.id == versionId || it.addVersion.id == versionId + 1
+                }
+            } else {
+                filteredMusic.filter {
+                    it.addVersion.id == versionId
+                }
+            }
+        }
+
+        filteredMusic = filteredMusic.filter {
+            it.id <= 100000
+        }
+
+        return filteredMusic.shuffled().take(count)
+    }
+
     companion object {
         lateinit var instance: MusicDataManager
 
@@ -113,6 +151,16 @@ class MusicDataManager(
 
         fun getMusicLoadedSize(): Int {
             return instance.getMusicLoadedSize()
+        }
+
+        fun randomMusic(
+            genreId: Int? = null,
+            versionId: Int? = null,
+            minLevel: Float = 0.0F,
+            maxLevel: Float = 99.9F,
+            count: Int = 1
+        ): List<MaimaiMusicData> {
+            return instance.randomMusic(genreId, versionId, minLevel, maxLevel, count)
         }
     }
 }

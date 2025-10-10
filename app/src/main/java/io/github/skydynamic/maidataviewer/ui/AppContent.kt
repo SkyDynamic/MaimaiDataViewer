@@ -87,8 +87,8 @@ object AppContent {
         TreasureBox(
             R.string.treasure_box_page.getString(),
             TabIcon.DrawableIcon(R.drawable.tbox),
-            { _, _ ->
-                TreasureBoxPage()
+            { _, onCardClick ->
+                TreasureBoxPage(onCardClick)
             }
         ),
 //        SETTING(
