@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +26,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -39,7 +41,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import io.github.skydynamic.maidataviewer.MainActivity
 import io.github.skydynamic.maidataviewer.R
-import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import io.github.skydynamic.maidataviewer.core.getString
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
 import io.github.skydynamic.maidataviewer.ui.component.WindowInsetsSpacer
@@ -48,6 +49,8 @@ import io.github.skydynamic.maidataviewer.ui.page.HomePage
 import io.github.skydynamic.maidataviewer.ui.page.MusicDetailPage
 import io.github.skydynamic.maidataviewer.ui.page.MusicPage
 import io.github.skydynamic.maidataviewer.ui.page.TreasureBoxPage
+import io.github.skydynamic.maidataviewer.ui.page.treasurebox.RandomMusicPage
+import io.github.skydynamic.maidataviewer.ui.page.treasurebox.RatingCalculatorPage
 import io.github.skydynamic.maidataviewer.viewmodel.AchievementDataTablePageViewModel
 import io.github.skydynamic.maidataviewer.viewmodel.GlobalViewModel
 
@@ -61,15 +64,14 @@ object AppContent {
     enum class Tab(
         val tabNameString: String,
         val icon: TabIcon,
-        val content: @Composable (
-            jumpFunction: (Tab) -> Unit,
-            onCardClick: (MaimaiMusicData) -> Unit
-        ) -> Unit
+        val content: (@Composable (
+            jumpFunction: (Tab) -> Unit
+        ) -> Unit) = {}
     ) {
         HOME(
             R.string.home.getString(),
             TabIcon.VectorIcon(Icons.Filled.Home),
-            { jumpFunction, _ ->
+            { jumpFunction ->
                 HomePage(
                     jumpFunction = jumpFunction
                 )
@@ -78,17 +80,15 @@ object AppContent {
         Music(
             R.string.music_page.getString(),
             TabIcon.DrawableIcon(R.drawable.music_fill),
-            { _, onCardClick ->
-                MusicPage(
-                    onCardClick = onCardClick
-                )
+            {
+                MusicPage()
             }
         ),
         TreasureBox(
             R.string.treasure_box_page.getString(),
             TabIcon.DrawableIcon(R.drawable.tbox),
-            { _, onCardClick ->
-                TreasureBoxPage(onCardClick)
+            {
+                TreasureBoxPage()
             }
         ),
 //        SETTING(
@@ -101,9 +101,7 @@ object AppContent {
     }
 
     @Composable
-    fun MainContent(
-        onCardClick: (MaimaiMusicData) -> Unit
-    ) {
+    fun MainContent() {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             bottomBar = {
@@ -183,35 +181,38 @@ object AppContent {
                             }
                         }
                     ) { targetState ->
-                        targetState.content(
-                            {
-                                GlobalViewModel.lastPage = GlobalViewModel.currentPage
-                                GlobalViewModel.currentPage = it
-                            },
-                            onCardClick
-                        )
+                        targetState.content {
+                            GlobalViewModel.lastPage = GlobalViewModel.currentPage
+                            GlobalViewModel.currentPage = it
+                        }
                     }
                 }
             }
         }
     }
 
-    @OptIn(ExperimentalSharedTransitionApi::class)
     @Composable
     fun Show() {
+        val appNavController = AppNavController.getInstance()
+
         val navController = rememberNavController()
+
+        DisposableEffect(appNavController) {
+            appNavController.initializeNavController(navController)
+            onDispose {
+                AppNavController.destroy()
+            }
+        }
 
         NavHost(
             navController = navController,
             startDestination = "mainContent",
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
         ) {
             composable("mainContent") {
-                MainContent(
-                    onCardClick = { musicData ->
-                        navController.navigate("musicDetail/${musicData.id}")
-                    }
-                )
+                MainContent()
             }
 
             composable(
@@ -249,6 +250,22 @@ object AppContent {
                     rows = AchievementDataTablePageViewModel.rows
                 ) {
                     MainActivity.rotationScreen(true)
+                    navController.popBackStack()
+                }
+            }
+
+            composable(
+                "ratingCalculatorPage"
+            ) {
+                RatingCalculatorPage {
+                    navController.popBackStack()
+                }
+            }
+
+            composable(
+                "randomMusicPage"
+            ) {
+                RandomMusicPage {
                     navController.popBackStack()
                 }
             }

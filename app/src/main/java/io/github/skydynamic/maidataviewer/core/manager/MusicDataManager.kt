@@ -134,6 +134,10 @@ class MusicDataManager(
         return filteredMusic.shuffled().take(count)
     }
 
+    fun getMusicIdList(): List<Int> {
+        return musicDataList.map { it.id }
+    }
+
     companion object {
         lateinit var instance: MusicDataManager
 

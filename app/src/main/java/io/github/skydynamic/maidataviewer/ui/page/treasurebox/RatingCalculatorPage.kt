@@ -1,17 +1,23 @@
-package io.github.skydynamic.maidataviewer.ui.component.dialog
+package io.github.skydynamic.maidataviewer.ui.page.treasurebox
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -23,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -31,8 +38,8 @@ import io.github.skydynamic.maidataviewer.core.getString
 import io.github.skydynamic.maidataviewer.core.utils.calcRating
 import io.github.skydynamic.maidataviewer.core.utils.getMultiplierFactor
 import io.github.skydynamic.maidataviewer.core.utils.getRank
+import io.github.skydynamic.maidataviewer.ui.component.WindowInsetsSpacer.TopPaddingSpacer
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
-
 
 data class CalcResultStruct(
     val title: List<String> = listOf("Rank", "Rating", R.string.multiplierFactor.getString()),
@@ -44,8 +51,8 @@ data class CalcResultStruct(
 }
 
 @Composable
-fun RatingCalculatorDialog(
-    onDismiss: () -> Unit
+fun RatingCalculatorPage(
+    onBackPressed: () -> Unit
 ) {
     var musicLevel by remember { mutableStateOf("") }
     var achievement by remember { mutableStateOf("") }
@@ -69,14 +76,45 @@ fun RatingCalculatorDialog(
         )
     }
 
-    FullScreenDialog(
-        title = "Rating Calculator",
-        onDismiss = onDismiss
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
     ) {
+        TopPaddingSpacer()
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(64.dp)
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = onBackPressed
+            ) {
+                Icon(
+                    Icons.Default.Close,
+                    contentDescription = Icons.Default.Close.name,
+                    modifier = Modifier.height(24.dp),
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            Text(
+                text = R.string.rating_calculator.getString(),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
+
         ShadowElevatedCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
+                .padding(16.dp)
         ) {
             Column(
                 modifier = Modifier
@@ -97,7 +135,7 @@ fun RatingCalculatorDialog(
                             && it.toFloat() <= 99f
                             && it.toFloat() >= 0f
                             || it.isEmpty()
-                            ) {
+                        ) {
                             musicLevel = it
                         }
                     },

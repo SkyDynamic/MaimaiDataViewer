@@ -1,4 +1,4 @@
-package io.github.skydynamic.maidataviewer.ui.component.dialog
+package io.github.skydynamic.maidataviewer.ui.page.treasurebox
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,7 +22,11 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -37,9 +42,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
@@ -52,7 +60,9 @@ import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
 import io.github.skydynamic.maidataviewer.core.manager.MaimaiJacketManager
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
 import io.github.skydynamic.maidataviewer.core.noRippleClickable
+import io.github.skydynamic.maidataviewer.ui.AppNavController
 import io.github.skydynamic.maidataviewer.ui.component.UnknownProgressCircularProgress
+import io.github.skydynamic.maidataviewer.ui.component.WindowInsetsSpacer.TopPaddingSpacer
 import io.github.skydynamic.maidataviewer.ui.component.button.GenreSelectorButton
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
 import io.github.skydynamic.maidataviewer.ui.component.menu.GenreDropdownMenu
@@ -61,6 +71,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
+
+object RandomMusicPageViewModel : ViewModel() {
+    val randomMusicList = mutableStateOf(listOf(0, 0, 0, 0))
+
+    val genreFilter = mutableIntStateOf(-1)
+    val versionFilter = mutableIntStateOf(-1)
+    val minLevel = mutableStateOf("")
+    val maxLevel = mutableStateOf("")
+    val randomCount = mutableStateOf("")
+}
 
 @Composable
 fun RandomMusicItem(
@@ -116,6 +136,9 @@ fun RandomMusicItem(
                 text = name + type,
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
+                maxLines = 1,
+                color = MaterialTheme.colorScheme.onBackground,
+                overflow = TextOverflow.MiddleEllipsis,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
@@ -125,6 +148,8 @@ fun RandomMusicItem(
                 text = "",
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onBackground,
+                overflow = TextOverflow.MiddleEllipsis,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
@@ -134,15 +159,14 @@ fun RandomMusicItem(
 }
 
 @Composable
-fun RandomMusicDialog(
-    onCardClick: (MaimaiMusicData) -> Unit,
-    onDismiss: () -> Unit
+fun RandomMusicPage(
+    onBackPressed: () -> Unit
 ) {
-    var genreFilter by remember { mutableIntStateOf(-1) }
-    var versionFilter by remember { mutableIntStateOf(-1) }
-    var minLevel by remember { mutableStateOf("") }
-    var maxLevel by remember { mutableStateOf("") }
-    var randomCount by remember { mutableStateOf("") }
+    var genreFilter by remember { RandomMusicPageViewModel.genreFilter }
+    var versionFilter by remember { RandomMusicPageViewModel.versionFilter }
+    var minLevel by remember { RandomMusicPageViewModel.minLevel }
+    var maxLevel by remember { RandomMusicPageViewModel.maxLevel }
+    var randomCount by remember { RandomMusicPageViewModel.randomCount }
 
     var genreDropdownMenuActive by remember { mutableStateOf(false) }
     var versionDropdownMenuActive by remember { mutableStateOf(false) }
@@ -151,30 +175,75 @@ fun RandomMusicDialog(
     var isRolling by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
-    var randomMusicList by remember { mutableStateOf(listOf(0, 0, 0, 0)) }
+    var randomMusicList by remember { RandomMusicPageViewModel.randomMusicList }
 
     var isLoadingMusic by remember { mutableStateOf(true) }
 
     LaunchedEffect(isRolling) {
         if (isRolling) {
             scope.launch(Dispatchers.IO) {
-                while (isRolling) {
-                    val list = MusicDataManager.randomMusic(
-                        genreId = if (genreFilter != -1) genreFilter else null,
-                        versionId = if (versionFilter != -1) versionFilter else null,
-                        minLevel = if (minLevel.isNotEmpty()) minLevel.toFloat() else 0.0F,
-                        maxLevel = if (maxLevel.isNotEmpty()) maxLevel.toFloat() else 99.9F,
-                        count = 4
-                    ).map { it.id }.toMutableList()
+                val finalList = MusicDataManager.randomMusic(
+                    genreId = if (genreFilter != -1) genreFilter else null,
+                    versionId = if (versionFilter != -1) versionFilter else null,
+                    minLevel = if (minLevel.isNotEmpty()) minLevel.toFloat() else 0.0F,
+                    maxLevel = if (maxLevel.isNotEmpty()) maxLevel.toFloat() else 99.9F,
+                    count = 4
+                ).map { it.id }.toMutableList()
 
-                    while (list.size < 4) {
-                        list.add(0)
+                while (finalList.size < 4) {
+                    finalList.add(0)
+                }
+
+                RandomMusicPageViewModel.randomMusicList.value = finalList
+
+                val allMusicIds = MusicDataManager.instance.getMusicIdList()
+
+                val startTime = System.currentTimeMillis()
+                val totalTime = 3000L
+
+                while (isRolling && System.currentTimeMillis() - startTime < totalTime) {
+                    val elapsed = System.currentTimeMillis() - startTime
+                    val progress = elapsed.toFloat() / totalTime
+
+                    val tempList = if (progress < 0.8f) {
+                        List(4) {
+                            if (allMusicIds.isNotEmpty()) {
+                                allMusicIds.random()
+                            } else {
+                                (0..10000).random()
+                            }
+                        }
+                    } else if (progress < 0.95f) {
+                        List(4) { index ->
+                            if (index < 2) {
+                                finalList[index]
+                            } else {
+                                if (allMusicIds.isNotEmpty()) {
+                                    allMusicIds.random()
+                                } else {
+                                    (0..10000).random()
+                                }
+                            }
+                        }
+                    } else {
+                        finalList
                     }
 
-                    randomMusicList = list
+                    RandomMusicPageViewModel.randomMusicList.value = tempList
 
-                    delay(200)
+                    val delayTime = when {
+                        progress < 0.1f -> 100L
+                        progress < 0.3f -> 150L
+                        progress < 0.5f -> 200L
+                        progress < 0.7f -> 250L
+                        progress < 0.9f -> 300L
+                        else -> 350L
+                    }
+
+                    delay(delayTime)
                 }
+
+                RandomMusicPageViewModel.randomMusicList.value = finalList
             }
         }
     }
@@ -191,10 +260,40 @@ fun RandomMusicDialog(
         }
     }
 
-    FullScreenDialog(
-        title = R.string.random_music.getString(),
-        onDismiss = onDismiss,
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
     ) {
+        TopPaddingSpacer()
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(64.dp)
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = onBackPressed
+            ) {
+                Icon(
+                    Icons.Default.Close,
+                    contentDescription = Icons.Default.Close.name,
+                    modifier = Modifier.height(24.dp),
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            Text(
+                text = R.string.random_music.getString(),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
+
         if (isLoadingMusic) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -210,6 +309,7 @@ fun RandomMusicDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
+                    .padding(16.dp)
             ) {
                 Column(
                     modifier = Modifier
@@ -234,7 +334,7 @@ fun RandomMusicDialog(
                             GenreDropdownMenu(
                                 expanded = genreDropdownMenuActive,
                                 onDismissRequest = { genreDropdownMenuActive = false },
-                                onSelectedChange = { genreFilter = it },
+                                onSelectedChange = { RandomMusicPageViewModel.genreFilter.intValue = it },
                                 genreType = GenreType.MUSIC,
                             )
                         }
@@ -249,7 +349,7 @@ fun RandomMusicDialog(
                             GenreDropdownMenu(
                                 expanded = versionDropdownMenuActive,
                                 onDismissRequest = { versionDropdownMenuActive = false },
-                                onSelectedChange = { versionFilter = it },
+                                onSelectedChange = { RandomMusicPageViewModel.versionFilter.intValue = it },
                                 genreType = GenreType.VERSION,
                             )
                         }
@@ -278,7 +378,7 @@ fun RandomMusicDialog(
                                         && it.toFloat() >= 0f
                                         || it.isEmpty()
                                     ) {
-                                        minLevel = it
+                                        RandomMusicPageViewModel.minLevel.value = it
                                     }
                                 },
                                 modifier = Modifier
@@ -314,7 +414,7 @@ fun RandomMusicDialog(
                                         && it.toFloat() >= 0f
                                         || it.isEmpty()
                                     ) {
-                                        maxLevel = it
+                                        RandomMusicPageViewModel.maxLevel.value = it
                                     }
                                 },
                                 modifier = Modifier
@@ -351,7 +451,7 @@ fun RandomMusicDialog(
                                 && it.toInt() > 0f
                                 || it.isEmpty()
                             ) {
-                                randomCount = it
+                                RandomMusicPageViewModel.randomCount.value = it
                             }
                         },
                         modifier = Modifier
@@ -420,7 +520,10 @@ fun RandomMusicDialog(
                         RandomMusicItem(
                             id = targetState,
                             isRolling = isRolling,
-                            onCardClick = onCardClick
+                            onCardClick = {
+                                AppNavController.getInstance()
+                                    .navigate("musicDetail/$targetState")
+                            }
                         )
                     }
                 }

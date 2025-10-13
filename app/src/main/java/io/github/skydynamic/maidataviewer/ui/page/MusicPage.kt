@@ -56,6 +56,7 @@ import io.github.skydynamic.maidataviewer.core.manager.GenreType
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
 import io.github.skydynamic.maidataviewer.core.manager.MusicAliasManager
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
+import io.github.skydynamic.maidataviewer.ui.AppNavController
 import io.github.skydynamic.maidataviewer.ui.component.UnknownProgressCircularProgress
 import io.github.skydynamic.maidataviewer.ui.component.button.GenreSelectorButton
 import io.github.skydynamic.maidataviewer.ui.component.card.MusicSimpleCard
@@ -102,9 +103,7 @@ fun search() {
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
-fun MusicPage(
-    onCardClick: (MaimaiMusicData) -> Unit
-) {
+fun MusicPage() {
     var genreDropdownMenuActive by remember { mutableStateOf(false) }
     var versionDropdownMenuActive by remember { mutableStateOf(false) }
 
@@ -180,6 +179,8 @@ fun MusicPage(
                     }
                 }
             }
+        } else {
+            SongPageViewModel.isLoadingMusic.value = false
         }
 
         if (!MusicAliasManager.instance.getIsLoaded()) {
@@ -306,7 +307,8 @@ fun MusicPage(
                                             .padding(top = 6.dp, bottom = 6.dp),
                                         music = item,
                                         onClick = {
-                                            onCardClick(item)
+                                            AppNavController.getInstance()
+                                                .navigate("musicDetail/${item.id}")
                                         }
                                     )
                                 } else {

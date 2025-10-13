@@ -71,6 +71,7 @@ import io.github.skydynamic.maidataviewer.ui.component.DataTable
 import io.github.skydynamic.maidataviewer.ui.component.DataTableColumn
 import io.github.skydynamic.maidataviewer.ui.component.DataTableRowStyle
 import io.github.skydynamic.maidataviewer.ui.component.WindowInsetsSpacer
+import io.github.skydynamic.maidataviewer.ui.component.WindowInsetsSpacer.TopPaddingSpacer
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
 import io.github.skydynamic.maidataviewer.viewmodel.GlobalViewModel
 import kotlinx.coroutines.Dispatchers
@@ -293,9 +294,8 @@ fun MusicDetailPage(
                 .background(MaterialTheme.colorScheme.background)
         ) {
             Spacer(Modifier.height(40.dp))
-            Spacer(Modifier.height(WindowInsetsSpacer.topPadding))
+            TopPaddingSpacer()
 
-            // 音乐基本信息卡片
             MusicInfoCard(
                 music = music,
                 jacketFile = jacketFile,
@@ -304,7 +304,6 @@ fun MusicDetailPage(
                 commonRoundedShape = commonRoundedShape
             )
 
-            // 难度选择区域
             DifficultySelectionRow(
                 difficulties = music.difficulties,
                 currentChoiceDifficulty = currentChoiceDifficulty,
@@ -313,7 +312,6 @@ fun MusicDetailPage(
                 onDifficultySelected = { index -> currentChoiceDifficulty = index }
             )
 
-            // 详细信息卡片
             MusicDetailCard(
                 music = music,
                 currentChoiceDifficulty = currentChoiceDifficulty,
@@ -324,7 +322,6 @@ fun MusicDetailPage(
                 onDataTableClickable = onDataTableClickable
             )
 
-            // 容错率计算卡片
             FaultToleranceCard(
                 achievementDataList = achievementDataList,
                 currentChoiceDifficulty = currentChoiceDifficulty,
@@ -332,7 +329,6 @@ fun MusicDetailPage(
                 onNoteTypeSelected = { noteType -> currentChoiceNoteType = noteType }
             )
 
-            // 操作按钮行
             ActionButtonsRow(
                 jacketFile = jacketFile,
                 musicName = music.name ?: "",
@@ -348,7 +344,6 @@ fun MusicDetailPage(
             Spacer(modifier = Modifier.height(15.dp))
         }
 
-        // 顶部返回栏
         TopAppBar(
             onBackPressed = onBackPressed,
             modifier = Modifier

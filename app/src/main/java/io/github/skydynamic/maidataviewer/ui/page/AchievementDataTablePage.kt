@@ -31,6 +31,7 @@ import io.github.skydynamic.maidataviewer.ui.component.BasicDataTableRow
 import io.github.skydynamic.maidataviewer.ui.component.DataTable
 import io.github.skydynamic.maidataviewer.ui.component.DataTableColumn
 import io.github.skydynamic.maidataviewer.ui.component.WindowInsetsSpacer
+import io.github.skydynamic.maidataviewer.ui.component.WindowInsetsSpacer.TopPaddingSpacer
 
 @Composable
 fun AchievementDataTablePage(
@@ -58,7 +59,7 @@ fun AchievementDataTablePage(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(WindowInsetsSpacer.topPadding))
+            TopPaddingSpacer()
 
             Row(
                 modifier = Modifier

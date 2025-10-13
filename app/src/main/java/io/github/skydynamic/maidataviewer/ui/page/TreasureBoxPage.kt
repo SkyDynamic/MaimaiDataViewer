@@ -15,10 +15,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -26,69 +22,33 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.github.skydynamic.maidataviewer.R
-import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import io.github.skydynamic.maidataviewer.core.getString
+import io.github.skydynamic.maidataviewer.ui.AppNavController
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
-import io.github.skydynamic.maidataviewer.ui.component.dialog.RandomMusicDialog
-import io.github.skydynamic.maidataviewer.ui.component.dialog.RatingCalculatorDialog
 
 
 enum class DataTool(
     val toolName: String,
     val desc: String,
     val icon: Int,
-    var bindValue: MutableState<Boolean>?
+    var page: String,
 ) {
     RATING_CALCULATOR(
         R.string.rating_calculator.getString(),
         R.string.rating_calculator_desc.getString(),
         R.drawable.target,
-        null
+        "ratingCalculatorPage"
     ),
     RANDOM_MUSIC(
         R.string.random_music.getString(),
         R.string.random_music_desc.getString(),
         R.drawable.dice,
-        null
+        "randomMusicPage"
     );
-
-    fun bind(value: MutableState<Boolean>) {
-        bindValue = value
-    }
 }
 
 @Composable
-fun TreasureBoxPage(
-    onCardClick: (MaimaiMusicData) -> Unit
-) {
-    val showRatingCalculatorDialog = remember {
-        mutableStateOf(false)
-    }
-
-    val showRandomMusicDialog = remember {
-        mutableStateOf(false)
-    }
-
-    when {
-        showRatingCalculatorDialog.value -> {
-            RatingCalculatorDialog(
-                onDismiss = {
-                    showRatingCalculatorDialog.value = false
-                }
-            )
-        }
-        showRandomMusicDialog.value -> {
-            RandomMusicDialog(onDismiss = {
-                showRandomMusicDialog.value = false
-            }, onCardClick = onCardClick)
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        DataTool.RATING_CALCULATOR.bind(showRatingCalculatorDialog)
-        DataTool.RANDOM_MUSIC.bind(showRandomMusicDialog)
-    }
-
+fun TreasureBoxPage() {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -136,7 +96,7 @@ fun TreasureBoxPage(
                                 .wrapContentHeight()
                                 .padding(8.dp)
                                 .clickable {
-                                    it.bindValue?.value = true
+                                    AppNavController.getInstance().navigate(it.page)
                                 }
                                 .background(
                                     color = MaterialTheme.colorScheme.surfaceContainerHigh,
