@@ -77,6 +77,12 @@ class MusicAliasManager(
         }
     }
 
+    fun getAlias(
+        id: Int
+    ): List<String> {
+        return aliases[id] ?: emptyList()
+    }
+
     suspend fun updateAliasData() {
         val aliases: ArrayList<MaimaiAliasData> = arrayListOf()
 
@@ -124,6 +130,12 @@ class MusicAliasManager(
             key: String
         ): List<MaimaiMusicData> {
             return instance.getMusicByAlias(key)
+        }
+
+        fun getAlias(
+            id: Int
+        ): List<String> {
+            return instance.getAlias(id)
         }
      }
 }

@@ -58,4 +58,7 @@
     <string name="random_count">随机数量</string>
     <string name="random_count_placeholder">数据随机数量 (%s)</string>
     <string name="start_random">开始随机</string>
+    <string name="close">关闭</string>
+    <string name="view_music_alias">查看该歌曲的别名</string>
+    <string name="song_exists_alias">该歌曲拥有的别名有:  %s</string>
 </resources>

@@ -10,9 +10,15 @@ class AppNavController private constructor() {
         this.navController = navController
     }
 
-    fun navigate(route: String) {
+    fun navigate(
+        route: String,
+        restoreState: Boolean = true
+    ) {
         if (this.navController != null) {
-            this.navController!!.navigate(route)
+            this.navController!!.navigate(route) {
+                launchSingleTop = true
+                this.restoreState = restoreState
+            }
         }
     }
 

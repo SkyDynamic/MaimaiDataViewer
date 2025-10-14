@@ -5,7 +5,7 @@
     <string name="home_songcard_title">Find Song</string>
     <string name="home_songcard_subtitle">Find song and view the information</string>
     <string name="jump_to">Jumtp to this page</string>
-    <string name="home_songcard_desc">You can view the song information here: \n    Chart Rating\n    Chart Tap Summary\n    A tap score in chart</string>
+    <string name="home_songcard_desc">You can view the song information here:      Chart Rating     Chart Tap Summary     A tap score in chart</string>
     <string name="setting_page">Setting</string>
     <string name="app_version">App Version</string>
     <string name="current_maimai_data_version">App Current maimaiDX Data Version</string>
@@ -57,4 +57,7 @@
     <string name="random_count">Random Music Count</string>
     <string name="random_count_placeholder">Type random count (%s)</string>
     <string name="start_random">Start</string>
+    <string name="close">Close</string>
+    <string name="view_music_alias">View the alias of this song</string>
+    <string name="song_exists_alias">This song has alias: \n%s</string>
 </resources>

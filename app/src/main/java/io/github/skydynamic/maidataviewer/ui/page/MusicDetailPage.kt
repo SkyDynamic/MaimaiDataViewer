@@ -37,6 +37,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -54,6 +55,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.fastJoinToString
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
@@ -66,6 +69,7 @@ import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import io.github.skydynamic.maidataviewer.core.getString
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
 import io.github.skydynamic.maidataviewer.core.manager.MaimaiJacketManager.Companion.instance
+import io.github.skydynamic.maidataviewer.core.manager.MusicAliasManager
 import io.github.skydynamic.maidataviewer.ui.component.BasicDataTableRow
 import io.github.skydynamic.maidataviewer.ui.component.DataTable
 import io.github.skydynamic.maidataviewer.ui.component.DataTableColumn
@@ -73,11 +77,20 @@ import io.github.skydynamic.maidataviewer.ui.component.DataTableRowStyle
 import io.github.skydynamic.maidataviewer.ui.component.WindowInsetsSpacer
 import io.github.skydynamic.maidataviewer.ui.component.WindowInsetsSpacer.TopPaddingSpacer
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
+import io.github.skydynamic.maidataviewer.ui.component.dialog.TextDialog
 import io.github.skydynamic.maidataviewer.viewmodel.GlobalViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.math.absoluteValue
+
+object TempState : ViewModel() {
+    var showAliasDialog by mutableStateOf(false)
+
+    fun reset() {
+        showAliasDialog = false
+    }
+}
 
 enum class Difficulty(val diffName: String, val color: Color) {
     BASIC("Basic", Color(28, 133, 0)),
@@ -281,8 +294,30 @@ fun MusicDetailPage(
         }
     }
 
+    DisposableEffect(Unit) {
+        onDispose {
+            TempState.reset()
+        }
+    }
+
     val color = Difficulty.entries[currentChoiceDifficulty].color
     val commonRoundedShape = RoundedCornerShape(8.dp)
+
+    when {
+        TempState.showAliasDialog -> {
+            TextDialog(
+                text = R.string.song_exists_alias
+                    .getString()
+                    .format(
+                        MusicAliasManager.getAlias(music.id)
+                            .fastJoinToString("\n")
+                    ),
+                onDismiss = {
+                    TempState.showAliasDialog = false
+                }
+            )
+        }
+    }
 
     Box {
         Column(
@@ -994,6 +1029,26 @@ private fun ActionButtonsRow(
         ) {
             Text(
                 text = R.string.search_bilibili.getString(),
+                modifier = Modifier
+                    .fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyMedium,
+                autoSize = TextAutoSize.StepBased(minFontSize = 8.sp, maxFontSize = 16.sp)
+            )
+        }
+
+        Button(
+            onClick = {
+                TempState.showAliasDialog = true
+            },
+            modifier = Modifier
+                .weight(1f)
+                .height(30.dp),
+            shape = RoundedCornerShape(4.dp),
+            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+        ) {
+            Text(
+                text = R.string.view_music_alias.getString(),
                 modifier = Modifier
                     .fillMaxWidth(),
                 textAlign = TextAlign.Center,
