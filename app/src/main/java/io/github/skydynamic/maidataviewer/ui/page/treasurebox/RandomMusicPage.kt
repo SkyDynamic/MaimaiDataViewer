@@ -196,7 +196,11 @@ fun RandomMusicPage(
 
                 RandomMusicPageViewModel.randomMusicList.value = finalList
 
-                val allMusicIds = MusicDataManager.instance.getMusicIdList()
+                val allMusicIds = MusicDataManager.instance.searchMusicData(
+                    "",
+                    genreId = if (genreFilter != -1) genreFilter else null,
+                    versionId = if (versionFilter != -1) versionFilter else null
+                ).map { it.id }
 
                 val startTime = System.currentTimeMillis()
                 val totalTime = 3000L
@@ -336,6 +340,7 @@ fun RandomMusicPage(
                                 onDismissRequest = { genreDropdownMenuActive = false },
                                 onSelectedChange = { RandomMusicPageViewModel.genreFilter.intValue = it },
                                 genreType = GenreType.MUSIC,
+                                excludeStage = true
                             )
                         }
 

@@ -20,7 +20,8 @@ fun GenreDropdownMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
     onSelectedChange: (Int) -> Unit,
-    genreType: GenreType
+    genreType: GenreType,
+    excludeStage: Boolean = false
 ) {
     DropdownMenu(
         expanded = expanded,
@@ -39,6 +40,13 @@ fun GenreDropdownMenu(
         )
         MaiGenreManager.get(genreType)
             .getGenreData()
+            .run {
+                if (excludeStage && genreType == GenreType.MUSIC) {
+                    filter { it.id != 107 }
+                } else {
+                    this
+                }
+            }
             .forEach {
                 HorizontalDivider()
                 DropdownMenuItem(
