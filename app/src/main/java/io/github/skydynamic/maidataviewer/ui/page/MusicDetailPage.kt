@@ -670,13 +670,14 @@ private fun MusicDetailCard(
 
             Row(
                 modifier = Modifier
-                    .height(16.dp)
+                    .heightIn(max = 32.dp)
+                    .wrapContentHeight()
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxHeight()
+                        .heightIn(min = 16.dp)
                         .width(2.dp)
                         .clip(RoundedCornerShape(4.dp))
                         .background(Color.White)
