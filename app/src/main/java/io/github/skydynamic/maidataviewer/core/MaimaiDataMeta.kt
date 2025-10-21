@@ -1,6 +1,7 @@
 package io.github.skydynamic.maidataviewer.core
 
 import androidx.lifecycle.viewModelScope
+import io.github.skydynamic.maidataviewer.core.manager.TitleDataManager
 import io.github.skydynamic.maidataviewer.core.manager.UpdateDataManager
 import io.github.skydynamic.maidataviewer.viewmodel.GlobalViewModel
 import kotlinx.coroutines.Dispatchers
@@ -9,15 +10,26 @@ import kotlinx.coroutines.launch
 
 data class MaimaiDataMeta(
     var currentMaimaiDataVersion: MaiVersion,
-    var latestMaimaiDataVersion: MaiVersion
+    var latestMaimaiDataVersion: MaiVersion,
+    var currentTitleDataVersion: MaiVersion,
+    var latestTitleDataVersion: MaiVersion
 ) {
     fun isLatestMaimaiDataVersion(): Boolean {
         return currentMaimaiDataVersion >= latestMaimaiDataVersion
     }
 
-    fun update(c: MaiVersion, l: MaiVersion) {
+    fun isLatestTitleDataVersion(): Boolean {
+        return currentTitleDataVersion >= latestTitleDataVersion
+    }
+
+    fun updateMaimaiData(c: MaiVersion, l: MaiVersion) {
         currentMaimaiDataVersion = c
         latestMaimaiDataVersion = l
+    }
+
+    fun updateTitleData(c: MaiVersion, l: MaiVersion) {
+        currentTitleDataVersion = c
+        latestTitleDataVersion = l
     }
 
     companion object {
@@ -31,12 +43,23 @@ data class MaimaiDataMeta(
             if (!this::instance.isInitialized) {
                 GlobalViewModel.viewModelScope.launch(Dispatchers.IO) {
                     val current = UpdateDataManager.instance
-                        .getLatestUpdateData() ?: MaiVersion(-1, 0)
+                        .getCurrentUpdateData() ?: MaiVersion(-1, 0)
 
                     val latest = UpdateDataManager.instance
                         .getNetworkLatestUpdateData() ?: MaiVersion(-1, 0)
 
-                    instance = MaimaiDataMeta(current, latest)
+                    val currentTitle = TitleDataManager.instance
+                        .getTitleDataVersion()
+
+                    val latestTitle = TitleDataManager.instance
+                        .getLatestUpdateData() ?: MaiVersion(-1, 0)
+
+                    instance = MaimaiDataMeta(
+                        current,
+                        latest,
+                        currentTitle,
+                        latestTitle
+                    )
                     onFinished()
                 }
             }

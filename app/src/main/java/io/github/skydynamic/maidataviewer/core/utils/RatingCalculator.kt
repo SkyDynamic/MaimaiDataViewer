@@ -1,6 +1,6 @@
 package io.github.skydynamic.maidataviewer.core.utils
 
-fun getMultiplierFactor(achievement: Float): Double {
+fun getMultiplierFactor(achievement: Double): Double {
     return when (achievement) {
         in 10.0000..19.9999 -> 1.6 // D
         in 20.0000..29.9999 -> 3.2 // D
@@ -27,7 +27,7 @@ fun getMultiplierFactor(achievement: Float): Double {
     }
 }
 
-fun getRank(achievement: Float): String {
+fun getRank(achievement: Double): String {
     return when (achievement) {
         in 00.0000..49.9999 -> "D"
         in 50.0000..59.9999 -> "C"
@@ -47,9 +47,9 @@ fun getRank(achievement: Float): String {
     }
 }
 
-fun calcRating(musicLevel: Float, achievement: Float): Int {
+fun calcRating(musicLevel: Double, achievement: Double): Int {
     var achievement = achievement
     val multiplierFactor = getMultiplierFactor(achievement)
-    if (achievement >= 100.5) achievement = 100.5F
+    if (achievement >= 100.5) achievement = 100.5
     return (musicLevel * multiplierFactor * achievement / 100).toInt()
 }

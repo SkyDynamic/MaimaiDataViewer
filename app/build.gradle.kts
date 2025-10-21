@@ -13,8 +13,8 @@ android {
         applicationId = "io.github.skydynamic.maidataviewer"
         minSdk = 28
         targetSdk = 36
-        versionCode = 542
-        versionName = "1.1.0"
+        versionCode = 543
+        versionName = "1.1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -47,7 +47,7 @@ android {
         val variant = this
         variant.outputs.all {
             if (this is com.android.build.gradle.internal.api.BaseVariantOutputImpl) {
-                outputFileName = "MaiDataViewer-${versionName}-universal-${variant.buildType.name}.apk"
+                outputFileName = "MaiDataViewer-${versionName}-${versionCode}-universal-${variant.buildType.name}.apk"
             }
         }
     }

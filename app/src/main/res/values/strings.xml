@@ -60,4 +60,10 @@
     <string name="close">Close</string>
     <string name="view_music_alias">View the alias of this song</string>
     <string name="song_exists_alias">This song has alias: \n%s</string>
+    <string name="title_version">App Current MaimaiDX Title Data Version</string>
+    <string name="title_page">Maimai Title</string>
+    <string name="title_page_desc">View all the maimaiDX title</string>
+    <string name="collection_view">Collection View Page</string>
+    <string name="collection_view_desc">You can view collection in there page</string>
+    <string name="title_search_result">%s title have been successfully searched</string>
 </resources>

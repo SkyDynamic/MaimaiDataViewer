@@ -6,9 +6,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.HorizontalDivider
@@ -45,6 +47,18 @@ enum class DataTool(
         R.drawable.dice,
         "randomMusicPage"
     );
+}
+
+enum class CollectionPage(
+    val pageName: String,
+    val desc: String,
+    var page: String
+) {
+    TITLE_PAGE(
+        R.string.title_page.getString(),
+        R.string.title_page_desc.getString(),
+        "titlePage"
+    )
 }
 
 @Composable
@@ -135,6 +149,100 @@ fun TreasureBoxPage() {
                                     .padding(bottom = 4.dp)
                             )
                         }
+                    }
+                }
+            }
+        }
+
+        ShadowElevatedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = R.string.collection_view.getString(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    text = R.string.collection_view_desc.getString(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(8.dp),
+                    maxItemsInEachRow = 2
+                ) {
+                    CollectionPage.entries.forEach {
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(96.dp)
+                                .padding(8.dp)
+                                .clickable {
+                                    AppNavController.getInstance().navigate(it.page)
+                                }
+                                .background(
+                                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                    shape = MaterialTheme.shapes.medium
+                                ),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                        ) {
+                            Text(
+                                text = it.pageName,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 4.dp)
+                                    .padding(top = 4.dp)
+                            )
+
+                            Spacer(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(8.dp)
+                            )
+
+                            Text(
+                                text = it.desc,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 4.dp)
+                                    .padding(bottom = 4.dp)
+                            )
+                        }
+                    }
+
+                    if (CollectionPage.entries.size % 2 != 0) {
+                        Spacer(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(64.dp)
+                                .padding(8.dp)
+                        )
                     }
                 }
             }

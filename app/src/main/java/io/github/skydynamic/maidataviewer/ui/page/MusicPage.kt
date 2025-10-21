@@ -101,7 +101,7 @@ fun search() {
         }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MusicPage() {
     var genreDropdownMenuActive by remember { mutableStateOf(false) }

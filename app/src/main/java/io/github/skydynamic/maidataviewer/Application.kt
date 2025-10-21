@@ -16,6 +16,7 @@ import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
 import io.github.skydynamic.maidataviewer.core.manager.MaimaiJacketManager
 import io.github.skydynamic.maidataviewer.core.manager.MusicAliasManager
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
+import io.github.skydynamic.maidataviewer.core.manager.TitleDataManager
 import io.github.skydynamic.maidataviewer.core.manager.UpdateDataManager
 import io.github.skydynamic.maidataviewer.core.network.AppHttpClient
 import java.io.FileOutputStream
@@ -44,6 +45,12 @@ class Application : Application() {
             updatePath,
             this.appHttpClient
         )
+
+        TitleDataManager.init(
+            this.filesDir,
+            this.appHttpClient
+        )
+        TitleDataManager.instance.loadTitleData()
 
         MaiGenreManager.init(
             this.assets,

@@ -51,6 +51,7 @@ import io.github.skydynamic.maidataviewer.ui.page.MusicPage
 import io.github.skydynamic.maidataviewer.ui.page.TreasureBoxPage
 import io.github.skydynamic.maidataviewer.ui.page.treasurebox.RandomMusicPage
 import io.github.skydynamic.maidataviewer.ui.page.treasurebox.RatingCalculatorPage
+import io.github.skydynamic.maidataviewer.ui.page.treasurebox.TitlePage
 import io.github.skydynamic.maidataviewer.viewmodel.AchievementDataTablePageViewModel
 import io.github.skydynamic.maidataviewer.viewmodel.GlobalViewModel
 
@@ -266,6 +267,14 @@ object AppContent {
                 "randomMusicPage"
             ) {
                 RandomMusicPage {
+                    navController.popBackStack()
+                }
+            }
+
+            composable(
+                "titlePage"
+            ) {
+                TitlePage {
                     navController.popBackStack()
                 }
             }

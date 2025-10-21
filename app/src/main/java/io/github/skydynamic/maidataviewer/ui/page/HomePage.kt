@@ -49,6 +49,7 @@ import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.MaimaiDataMeta
 import io.github.skydynamic.maidataviewer.core.getString
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
+import io.github.skydynamic.maidataviewer.core.manager.TitleDataManager
 import io.github.skydynamic.maidataviewer.core.manager.UpdateDataManager
 import io.github.skydynamic.maidataviewer.core.not
 import io.github.skydynamic.maidataviewer.ui.AppContent
@@ -150,7 +151,7 @@ fun HomePage(
                                 UpdateDataManager.instance
                                     .updateData(meta.latestMaimaiDataVersion) {
                                         if (it != null) {
-                                            meta.update(
+                                            meta.updateMaimaiData(
                                                 it,
                                                 meta.latestMaimaiDataVersion
                                             )
@@ -168,6 +169,56 @@ fun HomePage(
                         Icon(Icons.Filled.Refresh, "")
                     }
                 } else if (!meta.isLatestMaimaiDataVersion() && HomePageViewModel.isUpdateMaiDataAvailable.value) {
+                    CircularProgressIndicator(
+                        strokeWidth = 4.dp,
+                        gapSize = 4.dp
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+            ) {
+                AnimatedTextTitleGroup(
+                    title = R.string.title_version.getString(),
+                    titleStyle = MaterialTheme.typography.titleSmall,
+                    subtitle = "${meta.latestTitleDataVersion}" +
+                            " (${meta.latestTitleDataVersion.toStandardString()})",
+                    subtitleColor = if (!meta.isLatestTitleDataVersion()) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.primary
+                    },
+                    subtitleWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                if (!meta.isLatestTitleDataVersion() && !HomePageViewModel.isUpdateMaiTitleDataAvailable) {
+                    TextButton(
+                        modifier = Modifier
+                            .height(40.dp),
+                        onClick = {
+                            HomePageViewModel.isUpdateMaiTitleDataAvailable.value = true
+                            GlobalViewModel.viewModelScope.launch(Dispatchers.IO) {
+                                TitleDataManager.instance.downloadTitleData {
+                                    if (it != null) {
+                                        meta.updateTitleData(
+                                            it,
+                                            meta.latestTitleDataVersion
+                                        )
+                                    }
+                                    HomePageViewModel.isUpdateMaiTitleDataAvailable.value = false
+                                    TitleDataManager.instance.loadTitleData()
+                                }
+                            }
+                        }
+                    ) {
+                        Icon(Icons.Filled.Refresh, "")
+                    }
+                } else if (!meta.isLatestTitleDataVersion() && HomePageViewModel.isUpdateMaiTitleDataAvailable.value) {
                     CircularProgressIndicator(
                         strokeWidth = 4.dp,
                         gapSize = 4.dp

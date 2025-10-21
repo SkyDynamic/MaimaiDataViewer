@@ -1,5 +1,6 @@
 package io.github.skydynamic.maidataviewer.core.manager
 
+import android.util.Log
 import io.github.skydynamic.maidataviewer.core.MaiVersion
 import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import io.github.skydynamic.maidataviewer.core.network.AppHttpClient
@@ -39,7 +40,7 @@ class UpdateDataManager(
         } ?: emptyList()
     }
 
-    fun getLatestUpdateData(): MaiVersion? {
+    fun getCurrentUpdateData(): MaiVersion? {
         val updates = getAllUpdateData()
         return updates.maxOrNull()
     }
@@ -49,8 +50,13 @@ class UpdateDataManager(
             return@request it.get(baseUrl + "new")
         }
 
-        val body = latestUpdateResp?.body<NewVersionResponse>()
-        return MaiVersion.tryParse(body?.latest ?: "-1.0.0")
+        try {
+            val body = latestUpdateResp?.body<NewVersionResponse>()
+            return MaiVersion.tryParse(body?.latest ?: "-1.0.0")
+        }  catch (e: Exception) {
+            Log.e("UpdateDataManager", "Error getting latest update data", e)
+            return null
+        }
     }
 
     suspend fun updateData(

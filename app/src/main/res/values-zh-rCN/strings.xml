@@ -61,4 +61,10 @@
     <string name="close">关闭</string>
     <string name="view_music_alias">查看该歌曲的别名</string>
     <string name="song_exists_alias">该歌曲拥有的别名有:  %s</string>
+    <string name="title_version">当前舞萌DX称号数据版本</string>
+    <string name="title_page">舞萌称号</string>
+    <string name="title_page_desc">查看舞萌DX的所有称号及其获取方法</string>
+    <string name="collection_view">收藏品预览</string>
+    <string name="collection_view_desc">你可以在这里列出的页面中预览相应类型的收藏品</string>
+    <string name="title_search_result">已成功搜索到%s个称号</string>
 </resources>

@@ -69,9 +69,9 @@ fun RatingCalculatorPage(
         }
         calcResult = CalcResultStruct(
             value = listOf(
-                getRank(achievement.toFloat()),
-                calcRating(musicLevel.toFloat(), achievement.toFloat()).toString(),
-                getMultiplierFactor(achievement.toFloat()).toString()
+                getRank(achievement.toDouble()),
+                calcRating(musicLevel.toDouble(), achievement.toDouble()).toString(),
+                getMultiplierFactor(achievement.toDouble()).toString()
             )
         )
     }

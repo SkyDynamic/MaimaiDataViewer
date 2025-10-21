@@ -6,4 +6,5 @@ import androidx.lifecycle.ViewModel
 object HomePageViewModel : ViewModel() {
     val isMetaLoading = mutableStateOf(true)
     val isUpdateMaiDataAvailable = mutableStateOf(false)
+    val isUpdateMaiTitleDataAvailable = mutableStateOf(false)
 }
