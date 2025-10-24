@@ -1,8 +1,8 @@
 package io.github.skydynamic.maidataviewer.core
 
 import androidx.lifecycle.viewModelScope
-import io.github.skydynamic.maidataviewer.core.manager.TitleDataManager
 import io.github.skydynamic.maidataviewer.core.manager.UpdateDataManager
+import io.github.skydynamic.maidataviewer.core.manager.collection.CollectionType
 import io.github.skydynamic.maidataviewer.viewmodel.GlobalViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,11 +48,11 @@ data class MaimaiDataMeta(
                     val latest = UpdateDataManager.instance
                         .getNetworkLatestUpdateData() ?: MaiVersion(-1, 0)
 
-                    val currentTitle = TitleDataManager.instance
-                        .getTitleDataVersion()
+                    val currentTitle = CollectionType.TITLE.manager!!
+                        .currentCollectionVersion
 
-                    val latestTitle = TitleDataManager.instance
-                        .getLatestUpdateData() ?: MaiVersion(-1, 0)
+                    val latestTitle = CollectionType.TITLE.manager!!
+                        .getLatestCollectionDataVersion() ?: MaiVersion(-1, 0)
 
                     instance = MaimaiDataMeta(
                         current,

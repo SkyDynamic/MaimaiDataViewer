@@ -58,6 +58,11 @@ enum class CollectionPage(
         R.string.title_page.getString(),
         R.string.title_page_desc.getString(),
         "titlePage"
+    ),
+    ICON_PAGE(
+        R.string.icon_page.getString(),
+        R.string.icon_page_desc.getString(),
+        "iconPage"
     )
 }
 

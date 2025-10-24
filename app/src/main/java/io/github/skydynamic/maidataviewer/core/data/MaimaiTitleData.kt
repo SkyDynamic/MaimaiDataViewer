@@ -6,11 +6,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MaimaiTitleData(
-    val id: Int,
-    val name: String? = "",
-    val normalText: String? = "",
+    override val id: Int,
+    override val name: String? = "",
+    override val normalText: String? = "",
     val rareType: RareType,
-) {
+) : IMaimaiCollectionData {
     enum class RareType(
         val resId: Int,
     ) {

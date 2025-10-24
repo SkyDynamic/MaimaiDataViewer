@@ -34,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
@@ -49,8 +50,9 @@ import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.MaimaiDataMeta
 import io.github.skydynamic.maidataviewer.core.getString
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
-import io.github.skydynamic.maidataviewer.core.manager.TitleDataManager
+import io.github.skydynamic.maidataviewer.core.manager.collection.TitleDataManager
 import io.github.skydynamic.maidataviewer.core.manager.UpdateDataManager
+import io.github.skydynamic.maidataviewer.core.manager.collection.CollectionType
 import io.github.skydynamic.maidataviewer.core.not
 import io.github.skydynamic.maidataviewer.ui.AppContent
 import io.github.skydynamic.maidataviewer.ui.component.WindowInsetsSpacer
@@ -106,7 +108,9 @@ fun HomePage(
                     Spacer(modifier = Modifier.weight(1f))
                     TooltipBox(
                         modifier = Modifier.padding(end = 16.dp),
-                        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+                            TooltipAnchorPosition.Above
+                        ),
                         tooltip = {
                             PlainTooltip { Text(R.string.not_local_mai_data.getString()) }
                         },
@@ -203,7 +207,7 @@ fun HomePage(
                         onClick = {
                             HomePageViewModel.isUpdateMaiTitleDataAvailable.value = true
                             GlobalViewModel.viewModelScope.launch(Dispatchers.IO) {
-                                TitleDataManager.instance.downloadTitleData {
+                                CollectionType.TITLE.manager!!.downloadCollectionData {
                                     if (it != null) {
                                         meta.updateTitleData(
                                             it,
@@ -211,7 +215,7 @@ fun HomePage(
                                         )
                                     }
                                     HomePageViewModel.isUpdateMaiTitleDataAvailable.value = false
-                                    TitleDataManager.instance.loadTitleData()
+                                    CollectionType.TITLE.manager!!.loadCollectionData()
                                 }
                             }
                         }

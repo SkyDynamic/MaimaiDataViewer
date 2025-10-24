@@ -68,8 +68,8 @@ import io.github.skydynamic.maidataviewer.core.ExtensionMethods.buildDataTableRo
 import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import io.github.skydynamic.maidataviewer.core.getString
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
-import io.github.skydynamic.maidataviewer.core.manager.MaimaiJacketManager.Companion.instance
 import io.github.skydynamic.maidataviewer.core.manager.MusicAliasManager
+import io.github.skydynamic.maidataviewer.core.manager.resource.ResourceManagerType
 import io.github.skydynamic.maidataviewer.ui.component.BasicDataTableRow
 import io.github.skydynamic.maidataviewer.ui.component.DataTable
 import io.github.skydynamic.maidataviewer.ui.component.DataTableColumn
@@ -273,7 +273,7 @@ fun MusicDetailPage(
     val isDX = music.id in 10000 until 100000
 
     var currentChoiceDifficulty by remember { mutableIntStateOf(0) }
-    val defaultJacketFile = remember { instance.getJacketFromAssets(0) }
+    val defaultJacketFile = remember { ResourceManagerType.JACKET.instance!!.getResByteFromAssets(0) }
     var jacketFile by remember { mutableStateOf<File?>(null) }
     var currentChoiceNoteType by remember { mutableStateOf(NoteType.TAP) }
 
@@ -287,7 +287,7 @@ fun MusicDetailPage(
     LaunchedEffect(music.id) {
         GlobalViewModel.viewModelScope.launch(Dispatchers.IO) {
             jacketFile = try {
-                instance.getJacketFile(music.id)
+                ResourceManagerType.JACKET.instance!!.getResFile(music.id)
             } catch (_: Exception) {
                 null
             }

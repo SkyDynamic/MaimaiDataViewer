@@ -13,11 +13,13 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.core.net.toUri
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
-import io.github.skydynamic.maidataviewer.core.manager.MaimaiJacketManager
+import io.github.skydynamic.maidataviewer.core.manager.resource.MaimaiJacketManager
 import io.github.skydynamic.maidataviewer.core.manager.MusicAliasManager
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
-import io.github.skydynamic.maidataviewer.core.manager.TitleDataManager
+import io.github.skydynamic.maidataviewer.core.manager.collection.TitleDataManager
 import io.github.skydynamic.maidataviewer.core.manager.UpdateDataManager
+import io.github.skydynamic.maidataviewer.core.manager.collection.CollectionManager
+import io.github.skydynamic.maidataviewer.core.manager.resource.MaimaiResourceManager
 import io.github.skydynamic.maidataviewer.core.network.AppHttpClient
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -46,11 +48,11 @@ class Application : Application() {
             this.appHttpClient
         )
 
-        TitleDataManager.init(
-            this.filesDir,
-            this.appHttpClient
+        CollectionManager.initAll(
+            assets,
+            filesDir,
+            appHttpClient
         )
-        TitleDataManager.instance.loadTitleData()
 
         MaiGenreManager.init(
             this.assets,
@@ -60,14 +62,10 @@ class Application : Application() {
 
         MusicDataManager.init(this.filesDir.resolve("update"))
 
-        val jacketPath = this.filesDir.resolve("jacket")
-        if (!jacketPath.exists()) {
-            jacketPath.mkdirs()
-        }
-        MaimaiJacketManager.init(
-            this.assets,
-            jacketPath,
-            this.appHttpClient
+        MaimaiResourceManager.initAll(
+            assets,
+            filesDir,
+            appHttpClient
         )
 
         MusicAliasManager.init(

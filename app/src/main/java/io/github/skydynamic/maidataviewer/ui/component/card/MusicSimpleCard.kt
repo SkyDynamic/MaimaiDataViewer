@@ -1,6 +1,5 @@
 package io.github.skydynamic.maidataviewer.ui.component.card
 
-import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,26 +40,26 @@ import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import io.github.skydynamic.maidataviewer.core.getString
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
-import io.github.skydynamic.maidataviewer.core.manager.MaimaiJacketManager.Companion.instance
+import io.github.skydynamic.maidataviewer.core.manager.resource.ResourceManagerType
 import io.github.skydynamic.maidataviewer.viewmodel.GlobalViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MusicSimpleCard(
     modifier: Modifier = Modifier,
     music: MaimaiMusicData,
     onClick: () -> Unit
 ) {
-    val defaultJacketFile = remember { instance.getJacketFromAssets(0) }
+    val defaultJacketFile = remember { ResourceManagerType.JACKET.instance!!.getResByteFromAssets(0) }
     var jacketFile by remember { mutableStateOf<File?>(null) }
 
     LaunchedEffect(music.id) {
         GlobalViewModel.viewModelScope.launch(Dispatchers.IO) {
             jacketFile = try {
-                instance.getJacketFile(music.id)
+                ResourceManagerType.JACKET.instance!!.getResFile(music.id)
             } catch (_: Exception) {
                 null
             }

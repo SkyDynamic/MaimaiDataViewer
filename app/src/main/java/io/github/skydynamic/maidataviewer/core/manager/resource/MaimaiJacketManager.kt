@@ -1,8 +1,9 @@
-package io.github.skydynamic.maidataviewer.core.manager
+package io.github.skydynamic.maidataviewer.core.manager.resource
 
 import android.content.res.AssetManager
 import android.graphics.BitmapFactory
 import android.util.Log
+import io.github.skydynamic.maidataviewer.core.mkdirsIfNotExists
 import io.github.skydynamic.maidataviewer.core.network.AppHttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsChannel
@@ -10,11 +11,12 @@ import io.ktor.utils.io.jvm.javaio.copyTo
 import java.io.File
 
 class MaimaiJacketManager(
-    private val assetsManager: AssetManager,
-    private val dataPath: File,
-    private val httpClient: AppHttpClient
-) {
-    val assetsUrl = "https://assets2.lxns.net/maimai"
+    override val assetManager: AssetManager,
+    override val resPath: File,
+    override val httpClient: AppHttpClient,
+) : MaimaiResourceManager {
+    val assetsUrl = "https://assets2.lxns.net/maimai/jacket"
+    val baseApiUrl = "https://mdvu.skydynamic.top/api/v0/title"
 
     private fun checkFileBroken(file: File): Boolean {
         val bitmap = BitmapFactory.decodeFile(file.toString())
@@ -30,7 +32,7 @@ class MaimaiJacketManager(
         return false
     }
 
-    suspend fun getJacketFile(id: Int): File? {
+    override suspend fun getResFile(id: Int): File? {
         var yid = id
         var aid = id
         if (id > 0) {
@@ -39,12 +41,16 @@ class MaimaiJacketManager(
             } else if (yid > 10000) {
                 aid -= 10000
             }
-            val jacketFile = dataPath.resolve("$yid.png")
+
+            val jacketPath = resPath.resolve("jacket")
+            jacketPath.mkdirsIfNotExists()
+
+            val jacketFile = jacketPath.resolve("$yid.png")
             var result: Long? = null
             if (!jacketFile.exists() || checkFileBroken(jacketFile)) {
                 jacketFile.deleteOnExit()
                 result = httpClient.request {
-                    it.get("$assetsUrl/jacket/$aid.png")
+                    it.get("$assetsUrl/$aid.png")
                         .bodyAsChannel()
                         .copyTo(jacketFile.outputStream())
                 }
@@ -61,10 +67,10 @@ class MaimaiJacketManager(
         }
     }
 
-    fun getJacketFromAssets(id: Int): ByteArray? {
+    override fun getResByteFromAssets(id: Int): ByteArray? {
         if (id >= 0) {
-            val jacketData = assetsManager.open("$id.png").readBytes()
-            return jacketData
+            val jacketByte = assetManager.open("jacket/$id.png").readBytes()
+            return jacketByte
         } else {
             Log.e("MaimaiJacketManager", "Invalid jacket id: $id")
             return null
@@ -72,14 +78,12 @@ class MaimaiJacketManager(
     }
 
     companion object {
-        lateinit var instance: MaimaiJacketManager
-
-        fun init(
+        fun build(
             assetsManager: AssetManager,
-            dataPath: File,
+            resPath: File,
             httpClient: AppHttpClient
-        ) {
-            instance = MaimaiJacketManager(assetsManager, dataPath, httpClient)
+        ): MaimaiJacketManager {
+            return MaimaiJacketManager(assetsManager, resPath, httpClient)
         }
     }
 }

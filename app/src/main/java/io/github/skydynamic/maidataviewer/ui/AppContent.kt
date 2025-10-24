@@ -49,6 +49,7 @@ import io.github.skydynamic.maidataviewer.ui.page.HomePage
 import io.github.skydynamic.maidataviewer.ui.page.MusicDetailPage
 import io.github.skydynamic.maidataviewer.ui.page.MusicPage
 import io.github.skydynamic.maidataviewer.ui.page.TreasureBoxPage
+import io.github.skydynamic.maidataviewer.ui.page.treasurebox.IconPage
 import io.github.skydynamic.maidataviewer.ui.page.treasurebox.RandomMusicPage
 import io.github.skydynamic.maidataviewer.ui.page.treasurebox.RatingCalculatorPage
 import io.github.skydynamic.maidataviewer.ui.page.treasurebox.TitlePage
@@ -275,6 +276,14 @@ object AppContent {
                 "titlePage"
             ) {
                 TitlePage {
+                    navController.popBackStack()
+                }
+            }
+
+            composable(
+                "iconPage"
+            ) {
+                IconPage {
                     navController.popBackStack()
                 }
             }

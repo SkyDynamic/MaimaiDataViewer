@@ -58,7 +58,8 @@ import androidx.lifecycle.viewModelScope
 import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.data.MaimaiTitleData
 import io.github.skydynamic.maidataviewer.core.getString
-import io.github.skydynamic.maidataviewer.core.manager.TitleDataManager
+import io.github.skydynamic.maidataviewer.core.manager.collection.CollectionType
+import io.github.skydynamic.maidataviewer.core.manager.collection.TitleDataManager
 import io.github.skydynamic.maidataviewer.ui.component.UnknownProgressCircularProgress
 import io.github.skydynamic.maidataviewer.ui.component.WindowInsetsSpacer.TopPaddingSpacer
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
@@ -96,10 +97,21 @@ fun search() {
         val rareType = if (TitlePageViewModel.filterRate == -1) null
         else TitlePageViewModel.filterRate
 
-        TitlePageViewModel.searchResult = TitleDataManager.instance.search(
-            TitlePageViewModel.searchText,
-            rareType
-        )
+        TitlePageViewModel.searchResult = CollectionType.TITLE.manager!!.search(
+            TitlePageViewModel.searchText
+        ) { list ->
+            if (rareType != null) {
+                list.filter {
+                    return@filter if (it is MaimaiTitleData) {
+                        it.rareType.ordinal == rareType
+                    } else {
+                        false
+                    }
+                }
+            } else {
+                list
+            }
+        } as? List<MaimaiTitleData> ?: emptyList()
     }
 }
 
@@ -112,14 +124,15 @@ fun TitlePage(
     }
 
     LaunchedEffect(Unit) {
-        if (!TitleDataManager.isLoaded()) {
+        if (!CollectionType.TITLE.manager!!.isLoaded) {
             TitlePageViewModel.viewModelScope.launch(Dispatchers.IO) {
-                TitleDataManager.instance.loadTitleData()
+                CollectionType.TITLE.manager!!.loadCollectionData()
                 TitlePageViewModel.isLoaded = true
             }
         } else {
             TitlePageViewModel.isLoaded = true
         }
+        search()
     }
 
     Surface {
@@ -229,107 +242,99 @@ fun TitlePage(
                         }
                     }
 
-                    Column(
+                    LazyColumn(
                         modifier = Modifier
-                            .fillMaxSize()
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .heightIn(1000.dp)
                             .padding(top = 8.dp),
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        state = TitlePageViewModel.listState!!
                     ) {
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight()
-                                .heightIn(1000.dp)
-                                .padding(top = 16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            state = TitlePageViewModel.listState!!
-                        ) {
-                            if (TitlePageViewModel.isSearchingActive) {
-                                item(
-                                    key = "search_result_title"
+                        if (TitlePageViewModel.isSearchingActive) {
+                            item(
+                                key = "search_result_title"
+                            ) {
+                                ShadowElevatedCard(
+                                    modifier = Modifier
+                                        .heightIn(max = 40.dp)
+                                        .fillMaxSize()
+                                        .padding(horizontal = 8.dp)
                                 ) {
-                                    ShadowElevatedCard(
+                                    Row(
                                         modifier = Modifier
-                                            .heightIn(max = 40.dp)
-                                            .fillMaxSize()
-                                            .padding(horizontal = 8.dp)
+                                            .fillMaxSize(),
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxSize(),
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Text(
-                                                text = R.string.title_search_result.getString()
-                                                    .format(
-                                                        TitlePageViewModel.searchResult.size
-                                                    ),
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                textAlign = TextAlign.Center,
-                                                fontWeight = FontWeight.Bold,
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .padding(8.dp)
-                                            )
-                                        }
-                                    }
-
-                                    Spacer(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(8.dp)
-                                    )
-                                }
-                            }
-
-                            if (TitlePageViewModel.searchResult.isNotEmpty()) {
-                                items(
-                                    TitlePageViewModel.searchResult,
-                                    key = { it.id }
-                                ) { title ->
-                                    HorizontalDivider(
-                                        thickness = 2.dp,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 16.dp)
-                                    )
-
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth(),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Image(
-                                            painterResource(title.rareType.resId),
-                                            contentDescription = null,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .size(36.dp)
-                                        )
-
                                         Text(
-                                            text = title.name ?: "",
+                                            text = R.string.title_search_result.getString()
+                                                .format(
+                                                    TitlePageViewModel.searchResult.size
+                                                ),
                                             style = MaterialTheme.typography.bodyMedium,
                                             textAlign = TextAlign.Center,
+                                            fontWeight = FontWeight.Bold,
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .padding(horizontal = 54.dp),
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                            color = Color.Black
+                                                .padding(8.dp)
                                         )
                                     }
+                                }
+
+                                Spacer(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(8.dp)
+                                )
+                            }
+                        }
+
+                        if (TitlePageViewModel.searchResult.isNotEmpty()) {
+                            items(
+                                TitlePageViewModel.searchResult,
+                                key = { it.id }
+                            ) { title ->
+                                HorizontalDivider(
+                                    thickness = 2.dp,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp)
+                                )
+
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Image(
+                                        painterResource(title.rareType.resId),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .size(36.dp)
+                                    )
 
                                     Text(
-                                        text = title.normalText ?: "",
-                                        style = MaterialTheme.typography.bodySmall,
+                                        text = title.name ?: "",
+                                        style = MaterialTheme.typography.bodyMedium,
                                         textAlign = TextAlign.Center,
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(horizontal = 16.dp)
+                                            .padding(horizontal = 54.dp),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        color = Color.Black
                                     )
                                 }
+
+                                Text(
+                                    text = title.normalText ?: "",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp)
+                                )
                             }
                         }
                     }

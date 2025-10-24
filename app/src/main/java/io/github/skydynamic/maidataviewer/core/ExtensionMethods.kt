@@ -7,10 +7,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import io.github.skydynamic.maidataviewer.Application.Companion.application
+import java.io.File
 import kotlin.math.absoluteValue
 
 fun Int.getString() = application.getString(this)
 operator fun MutableState<Boolean>.not() = !value
+
+fun File.mkdirsIfNotExists() {
+    if (!this.exists()) {
+        mkdirs()
+    }
+}
 
 fun Double.toAchievementString(): String {
     return when {

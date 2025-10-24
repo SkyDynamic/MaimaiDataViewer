@@ -57,8 +57,8 @@ import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import io.github.skydynamic.maidataviewer.core.getString
 import io.github.skydynamic.maidataviewer.core.manager.GenreType
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
-import io.github.skydynamic.maidataviewer.core.manager.MaimaiJacketManager
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
+import io.github.skydynamic.maidataviewer.core.manager.resource.ResourceManagerType
 import io.github.skydynamic.maidataviewer.core.noRippleClickable
 import io.github.skydynamic.maidataviewer.ui.AppNavController
 import io.github.skydynamic.maidataviewer.ui.component.UnknownProgressCircularProgress
@@ -88,14 +88,14 @@ fun RandomMusicItem(
     isRolling: Boolean = false,
     onCardClick: (MaimaiMusicData) -> Unit,
 ) {
-    val defaultJacketFile = remember { MaimaiJacketManager.instance.getJacketFromAssets(0) }
+    val defaultJacketFile = remember { ResourceManagerType.JACKET.instance!!.getResByteFromAssets(0) }
     var jacketFile by remember { mutableStateOf<File?>(null) }
     val musicData: MaimaiMusicData? = MusicDataManager.getMusicData(id)
 
     LaunchedEffect(id) {
         GlobalViewModel.viewModelScope.launch(Dispatchers.IO) {
             jacketFile = try {
-                MaimaiJacketManager.instance.getJacketFile(id)
+                ResourceManagerType.JACKET.instance!!.getResFile(id)
             } catch (_: Exception) {
                 null
             }
