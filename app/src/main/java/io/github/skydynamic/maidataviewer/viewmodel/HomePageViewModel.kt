@@ -7,4 +7,5 @@ object HomePageViewModel : ViewModel() {
     val isMetaLoading = mutableStateOf(true)
     val isUpdateMaiDataAvailable = mutableStateOf(false)
     val isUpdateMaiTitleDataAvailable = mutableStateOf(false)
+    val isUpdateMaiIconAvailable = mutableStateOf(false)
 }

@@ -12,7 +12,9 @@ data class MaimaiDataMeta(
     var currentMaimaiDataVersion: MaiVersion,
     var latestMaimaiDataVersion: MaiVersion,
     var currentTitleDataVersion: MaiVersion,
-    var latestTitleDataVersion: MaiVersion
+    var latestTitleDataVersion: MaiVersion,
+    var currentIconDataVersion: MaiVersion,
+    var latestIconDataVersion: MaiVersion
 ) {
     fun isLatestMaimaiDataVersion(): Boolean {
         return currentMaimaiDataVersion >= latestMaimaiDataVersion
@@ -20,6 +22,10 @@ data class MaimaiDataMeta(
 
     fun isLatestTitleDataVersion(): Boolean {
         return currentTitleDataVersion >= latestTitleDataVersion
+    }
+
+    fun isLatestIconDataVersion(): Boolean {
+        return currentIconDataVersion >= latestIconDataVersion
     }
 
     fun updateMaimaiData(c: MaiVersion, l: MaiVersion) {
@@ -30,6 +36,11 @@ data class MaimaiDataMeta(
     fun updateTitleData(c: MaiVersion, l: MaiVersion) {
         currentTitleDataVersion = c
         latestTitleDataVersion = l
+    }
+
+    fun updateIconData(c: MaiVersion, l: MaiVersion) {
+        currentIconDataVersion = c
+        latestIconDataVersion = l
     }
 
     companion object {
@@ -54,11 +65,19 @@ data class MaimaiDataMeta(
                     val latestTitle = CollectionType.TITLE.manager!!
                         .getLatestCollectionDataVersion() ?: MaiVersion(-1, 0)
 
+                    val currentIcon = CollectionType.ICON.manager!!
+                        .currentCollectionVersion
+
+                    val latestIcon = CollectionType.ICON.manager!!
+                        .getLatestCollectionDataVersion() ?: MaiVersion(-1, 0)
+
                     instance = MaimaiDataMeta(
                         current,
                         latest,
                         currentTitle,
-                        latestTitle
+                        latestTitle,
+                        currentIcon,
+                        latestIcon
                     )
                     onFinished()
                 }

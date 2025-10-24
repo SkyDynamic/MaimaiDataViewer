@@ -59,7 +59,6 @@ import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.data.MaimaiTitleData
 import io.github.skydynamic.maidataviewer.core.getString
 import io.github.skydynamic.maidataviewer.core.manager.collection.CollectionType
-import io.github.skydynamic.maidataviewer.core.manager.collection.TitleDataManager
 import io.github.skydynamic.maidataviewer.ui.component.UnknownProgressCircularProgress
 import io.github.skydynamic.maidataviewer.ui.component.WindowInsetsSpacer.TopPaddingSpacer
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
@@ -85,40 +84,37 @@ object TitlePageViewModel : ViewModel() {
     var listState by mutableStateOf<LazyListState?>(null)
 }
 
-fun search() {
-    if (TitlePageViewModel.isSearchingActive && TitlePageViewModel.searchJob != null) {
-        TitlePageViewModel.searchJob?.cancel()
-    }
-
-    TitlePageViewModel.searchJob = TitlePageViewModel.viewModelScope.launch(Dispatchers.IO) {
-        TitlePageViewModel.isSearching = true
-        TitlePageViewModel.isSearchingActive = true
-
-        val rareType = if (TitlePageViewModel.filterRate == -1) null
-        else TitlePageViewModel.filterRate
-
-        TitlePageViewModel.searchResult = CollectionType.TITLE.manager!!.search(
-            TitlePageViewModel.searchText
-        ) { list ->
-            if (rareType != null) {
-                list.filter {
-                    return@filter if (it is MaimaiTitleData) {
-                        it.rareType.ordinal == rareType
-                    } else {
-                        false
-                    }
-                }
-            } else {
-                list
-            }
-        } as? List<MaimaiTitleData> ?: emptyList()
-    }
-}
-
 @Composable
 fun TitlePage(
     onBackPressed: () -> Unit
 ) {
+    fun search() {
+        if (TitlePageViewModel.isSearchingActive && TitlePageViewModel.searchJob != null) {
+            TitlePageViewModel.searchJob?.cancel()
+        }
+
+        TitlePageViewModel.searchJob = TitlePageViewModel.viewModelScope.launch(Dispatchers.IO) {
+            TitlePageViewModel.isSearching = true
+            TitlePageViewModel.isSearchingActive = true
+
+            val rareType = if (TitlePageViewModel.filterRate == -1) null
+            else TitlePageViewModel.filterRate
+
+            TitlePageViewModel.searchResult = CollectionType.TITLE
+                .getTypedManager<MaimaiTitleData>()?.search(
+                    TitlePageViewModel.searchText
+                ) { list ->
+                    if (rareType != null) {
+                        list.filter {
+                            it.rareType.ordinal == rareType
+                        }
+                    } else {
+                        list
+                    }
+                } ?: emptyList()
+        }
+    }
+
     if (TitlePageViewModel.listState == null) {
         TitlePageViewModel.listState = rememberLazyListState()
     }
@@ -204,7 +200,7 @@ fun TitlePage(
                                 label = { Text(R.string.search.getString()) },
                                 placeholder = {
                                     Text(
-                                        R.string.search_placeholder.getString(),
+                                        R.string.search_collection_placeholder.getString(),
                                         autoSize = TextAutoSize.StepBased(minFontSize = 8.sp)
                                     )
                                 },

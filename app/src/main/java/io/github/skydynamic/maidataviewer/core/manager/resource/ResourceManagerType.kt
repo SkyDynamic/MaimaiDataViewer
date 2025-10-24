@@ -13,5 +13,5 @@ enum class ResourceManagerType(
     var instance: MaimaiResourceManager?
 ) {
     JACKET(MaimaiJacketManager::build, null),
-    // ICON(MaimaiIconManager::build, null);
+    ICON(MaimaiIconManager::build, null);
 }

@@ -229,6 +229,56 @@ fun HomePage(
                     )
                 }
             }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+            ) {
+                AnimatedTextTitleGroup(
+                    title = R.string.icon_version.getString(),
+                    titleStyle = MaterialTheme.typography.titleSmall,
+                    subtitle = "${meta.latestIconDataVersion}" +
+                            " (${meta.latestIconDataVersion.toStandardString()})",
+                    subtitleColor = if (!meta.isLatestIconDataVersion()) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.primary
+                    },
+                    subtitleWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                if (!meta.isLatestIconDataVersion() && !HomePageViewModel.isUpdateMaiIconAvailable) {
+                    TextButton(
+                        modifier = Modifier
+                            .height(40.dp),
+                        onClick = {
+                            HomePageViewModel.isUpdateMaiIconAvailable.value = true
+                            GlobalViewModel.viewModelScope.launch(Dispatchers.IO) {
+                                CollectionType.ICON.manager!!.downloadCollectionData {
+                                    if (it != null) {
+                                        meta.updateIconData(
+                                            it,
+                                            meta.latestIconDataVersion
+                                        )
+                                    }
+                                    HomePageViewModel.isUpdateMaiIconAvailable.value = false
+                                    CollectionType.ICON.manager!!.loadCollectionData()
+                                }
+                            }
+                        }
+                    ) {
+                        Icon(Icons.Filled.Refresh, "")
+                    }
+                } else if (!meta.isLatestIconDataVersion() && HomePageViewModel.isUpdateMaiIconAvailable.value) {
+                    CircularProgressIndicator(
+                        strokeWidth = 4.dp,
+                        gapSize = 4.dp
+                    )
+                }
+            }
         }
     }
 

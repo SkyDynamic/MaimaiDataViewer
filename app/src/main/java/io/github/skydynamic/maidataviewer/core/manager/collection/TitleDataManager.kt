@@ -3,7 +3,6 @@ package io.github.skydynamic.maidataviewer.core.manager.collection
 import android.content.res.AssetManager
 import android.util.Log
 import io.github.skydynamic.maidataviewer.core.MaiVersion
-import io.github.skydynamic.maidataviewer.core.data.IMaimaiCollectionData
 import io.github.skydynamic.maidataviewer.core.data.MaimaiTitleData
 import io.github.skydynamic.maidataviewer.core.network.AppHttpClient
 import io.ktor.client.call.body
@@ -15,7 +14,7 @@ import java.io.File
 class TitleDataManager(
     private val dataFile: File,
     override val httpClient: AppHttpClient
-) : CollectionManager {
+) : CollectionManager<MaimaiTitleData> {
     override var _isLoaded: Boolean = false
     override var _currentCollectionVersion: MaiVersion = MaiVersion(-1, 0)
 
@@ -42,8 +41,8 @@ class TitleDataManager(
 
     override fun search(
         keyword: String,
-        filterAction: ((List<IMaimaiCollectionData>) -> List<IMaimaiCollectionData>)?
-    ): List<IMaimaiCollectionData> {
+        filterAction: ((List<MaimaiTitleData>) -> List<MaimaiTitleData>)?
+    ): List<MaimaiTitleData> {
         val result = titleData.values.filter {
             it.name?.contains(keyword) == true
         }
@@ -55,13 +54,17 @@ class TitleDataManager(
         return result
     }
 
+    override fun getCollection(id: Int): MaimaiTitleData? {
+        return titleData[id]
+    }
+
     override suspend fun downloadCollectionData(
         onFinished: (MaiVersion?) -> Unit
     ) {
         try {
             val titleData = httpClient.request {
                 val response = it.get("$baseApiUrl/update")
-                response.body<CollectionManager.CollectionData>()
+                response.body<TitleData>()
             }
 
             val latestVersion = MaiVersion.Companion.tryParse(titleData!!.version)
@@ -78,6 +81,7 @@ class TitleDataManager(
     }
 
     companion object {
+        @Suppress("unused")
         fun init(
             assetManager: AssetManager,
             dataFile: File,

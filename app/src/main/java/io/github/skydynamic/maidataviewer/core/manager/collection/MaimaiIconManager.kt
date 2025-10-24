@@ -3,7 +3,6 @@ package io.github.skydynamic.maidataviewer.core.manager.collection
 import android.content.res.AssetManager
 import android.util.Log
 import io.github.skydynamic.maidataviewer.core.MaiVersion
-import io.github.skydynamic.maidataviewer.core.data.IMaimaiCollectionData
 import io.github.skydynamic.maidataviewer.core.data.MaimaiIconData
 import io.github.skydynamic.maidataviewer.core.manager.resource.MaimaiResourceManager
 import io.github.skydynamic.maidataviewer.core.mkdirsIfNotExists
@@ -20,7 +19,7 @@ class MaimaiIconManager(
     override val assetManager: AssetManager,
     override val resPath: File,
     override val httpClient: AppHttpClient
-) : MaimaiResourceManager, CollectionManager {
+) : MaimaiResourceManager, CollectionManager<MaimaiIconData> {
     override var _isLoaded: Boolean = false
     override var _currentCollectionVersion: MaiVersion = MaiVersion(-1, 0)
 
@@ -47,12 +46,17 @@ class MaimaiIconManager(
         }
     }
 
+    override fun getCollection(id: Int): MaimaiIconData? {
+        return iconData[id]
+    }
+
     override fun search(
         keyword: String,
-        filterAction: ((List<IMaimaiCollectionData>) -> List<IMaimaiCollectionData>)?
-    ): List<IMaimaiCollectionData> {
+        filterAction: ((List<MaimaiIconData>) -> List<MaimaiIconData>)?
+    ): List<MaimaiIconData> {
         val result = iconData.values.filter {
             it.name?.contains(keyword) == true
+            || it.normalText?.contains(keyword) == true
         }
 
         if (filterAction != null) {
@@ -66,7 +70,7 @@ class MaimaiIconManager(
         try {
             val iconData = httpClient.request {
                 val response = it.get("${this.baseApiUrl}/update")
-                response.body<CollectionManager.CollectionData>()
+                response.body<IconData>()
             }
 
             val latestVersion = MaiVersion.Companion.tryParse(iconData!!.version)
@@ -113,12 +117,18 @@ class MaimaiIconManager(
     }
 
     companion object {
+        private var instance: MaimaiIconManager? = null
+
         fun build(
             assetsManager: AssetManager,
             resPath: File,
             httpClient: AppHttpClient
         ): MaimaiIconManager {
-            return MaimaiIconManager(assetsManager, resPath, httpClient)
+            if (instance == null) {
+                instance = MaimaiIconManager(assetsManager, resPath, httpClient)
+            }
+            instance!!.loadCollectionData()
+            return instance!!
         }
     }
 }

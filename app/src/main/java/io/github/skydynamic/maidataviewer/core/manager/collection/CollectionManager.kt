@@ -9,7 +9,7 @@ import io.ktor.client.request.get
 import kotlinx.serialization.Serializable
 import java.io.File
 
-interface CollectionManager {
+interface CollectionManager<T : IMaimaiCollectionData> {
     val collectionType: CollectionType
     val httpClient: AppHttpClient
 
@@ -37,18 +37,16 @@ interface CollectionManager {
         val version: String
     )
 
-    @Serializable
-    data class CollectionData(
-        val version: String,
-        val data: List<IMaimaiCollectionData>
-    )
-
     fun loadCollectionData()
 
     fun search(
         keyword: String,
-        filterAction: ((List<IMaimaiCollectionData>) -> List<IMaimaiCollectionData>)?
-    ): List<IMaimaiCollectionData>
+        filterAction: ((List<T>) -> List<T>)?
+    ): List<T> {
+        throw NotImplementedError()
+    }
+
+    fun getCollection(id: Int): T?
 
     suspend fun getLatestCollectionDataVersion(): MaiVersion? {
         return httpClient.request {

@@ -66,6 +66,9 @@
     <string name="collection_view">Collection View Page</string>
     <string name="collection_view_desc">You can view collection in there page</string>
     <string name="title_search_result">%s title have been successfully searched</string>
-    <string name="icon_page">Icon</string>
+    <string name="icon_page">Maimai Icon</string>
     <string name="icon_page_desc">View all the maimaiDX Icon</string>
+    <string name="search_collection_placeholder">Type keyword</string>
+    <string name="icon_version">App Current MaimaiDX Icon Data</string>
+    <string name="icon_search_result">%s icon have been successfully searched</string>
 </resources>
