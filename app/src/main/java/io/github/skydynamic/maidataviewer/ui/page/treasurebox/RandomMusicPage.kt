@@ -1,5 +1,6 @@
 package io.github.skydynamic.maidataviewer.ui.page.treasurebox
 
+import android.view.Surface
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -11,11 +12,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -29,6 +34,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -264,272 +270,277 @@ fun RandomMusicPage(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        TopPaddingSpacer()
-
-        Row(
+    Surface {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .windowInsetsPadding(WindowInsets.navigationBars)
         ) {
-            IconButton(
-                onClick = onBackPressed
-            ) {
-                Icon(
-                    Icons.Default.Close,
-                    contentDescription = Icons.Default.Close.name,
-                    modifier = Modifier.height(24.dp),
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            }
-
-            Text(
-                text = R.string.random_music.getString(),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-        }
-
-        if (isLoadingMusic) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                UnknownProgressCircularProgress(
-                    strokeWidth = 4.dp,
-                    gapSize = 4.dp
-                )
-            }
-        } else {
-            ShadowElevatedCard(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(16.dp)
+                    .height(64.dp)
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
+                IconButton(
+                    onClick = onBackPressed
+                ) {
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = Icons.Default.Close.name,
+                        modifier = Modifier.height(24.dp),
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+
+                Text(
+                    text = R.string.random_music.getString(),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            if (isLoadingMusic) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    UnknownProgressCircularProgress(
+                        strokeWidth = 4.dp,
+                        gapSize = 4.dp
+                    )
+                }
+            } else {
+                ShadowElevatedCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
-                        .padding(8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .padding(16.dp)
                 ) {
-                    Row(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            .wrapContentHeight()
+                            .padding(8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Box(modifier = Modifier.weight(0.5f)) {
-                            GenreSelectorButton(
-                                value = MaiGenreManager.musicGenre.getGenreName(genreFilter),
-                                label = R.string.genre.getString(),
-                                onClick = { genreDropdownMenuActive = true }
-                            )
-
-                            GenreDropdownMenu(
-                                expanded = genreDropdownMenuActive,
-                                onDismissRequest = { genreDropdownMenuActive = false },
-                                onSelectedChange = { RandomMusicPageViewModel.genreFilter.intValue = it },
-                                genreType = GenreType.MUSIC,
-                                excludeStage = true
-                            )
-                        }
-
-                        Box(modifier = Modifier.weight(0.5f)) {
-                            GenreSelectorButton(
-                                value = MaiGenreManager.versionGenre.getGenreName(versionFilter),
-                                label = R.string.versionGenre.getString(),
-                                onClick = { versionDropdownMenuActive = true }
-                            )
-
-                            GenreDropdownMenu(
-                                expanded = versionDropdownMenuActive,
-                                onDismissRequest = { versionDropdownMenuActive = false },
-                                onSelectedChange = { RandomMusicPageViewModel.versionFilter.intValue = it },
-                                genreType = GenreType.VERSION,
-                            )
-                        }
-                    }
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Column(
+                        Row(
                             modifier = Modifier
-                                .weight(1f)
+                                .fillMaxWidth()
+                                .padding(top = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Text(
-                                text = R.string.min_level.getString(),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
+                            Box(modifier = Modifier.weight(0.5f)) {
+                                GenreSelectorButton(
+                                    value = MaiGenreManager.musicGenre.getGenreName(genreFilter),
+                                    label = R.string.genre.getString(),
+                                    onClick = { genreDropdownMenuActive = true }
+                                )
 
-                            OutlinedTextField(
-                                value = minLevel,
-                                onValueChange = {
-                                    if (it.toFloatOrNull() != null
-                                        && it.toFloat() <= 99f
-                                        && it.toFloat() >= 0f
-                                        || it.isEmpty()
-                                    ) {
-                                        RandomMusicPageViewModel.minLevel.value = it
-                                    }
-                                },
-                                modifier = Modifier
-                                    .height(56.dp)
-                                    .fillMaxWidth(),
-                                singleLine = true,
-                                keyboardOptions = KeyboardOptions.Default.copy(
-                                    keyboardType = KeyboardType.Decimal
-                                ),
-                                placeholder = {
-                                    Text(
-                                        text = R.string.rating_calculator_music_level_placeholder.getString(),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                    )
-                                }
-                            )
+                                GenreDropdownMenu(
+                                    expanded = genreDropdownMenuActive,
+                                    onDismissRequest = { genreDropdownMenuActive = false },
+                                    onSelectedChange = {
+                                        RandomMusicPageViewModel.genreFilter.intValue = it
+                                    },
+                                    genreType = GenreType.MUSIC,
+                                    excludeStage = true
+                                )
+                            }
+
+                            Box(modifier = Modifier.weight(0.5f)) {
+                                GenreSelectorButton(
+                                    value = MaiGenreManager.versionGenre.getGenreName(versionFilter),
+                                    label = R.string.versionGenre.getString(),
+                                    onClick = { versionDropdownMenuActive = true }
+                                )
+
+                                GenreDropdownMenu(
+                                    expanded = versionDropdownMenuActive,
+                                    onDismissRequest = { versionDropdownMenuActive = false },
+                                    onSelectedChange = {
+                                        RandomMusicPageViewModel.versionFilter.intValue = it
+                                    },
+                                    genreType = GenreType.VERSION,
+                                )
+                            }
                         }
 
-                        Column(
+                        Row(
                             modifier = Modifier
-                                .weight(1f)
+                                .fillMaxWidth()
+                                .padding(top = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Text(
-                                text = R.string.max_level.getString(),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-
-                            OutlinedTextField(
-                                value = maxLevel,
-                                onValueChange = {
-                                    if (it.toFloatOrNull() != null
-                                        && it.toFloat() <= 99f
-                                        && it.toFloat() >= 0f
-                                        || it.isEmpty()
-                                    ) {
-                                        RandomMusicPageViewModel.maxLevel.value = it
-                                    }
-                                },
+                            Column(
                                 modifier = Modifier
-                                    .height(56.dp)
-                                    .fillMaxWidth(),
-                                singleLine = true,
-                                keyboardOptions = KeyboardOptions.Default.copy(
-                                    keyboardType = KeyboardType.Decimal
-                                ),
-                                placeholder = {
-                                    Text(
-                                        text = R.string.rating_calculator_music_level_placeholder.getString(),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                    )
-                                }
-                            )
-                        }
-                    }
-
-                    Text(
-                        text = R.string.random_count.getString(),
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Start,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp)
-                    )
-
-                    OutlinedTextField(
-                        value = randomCount,
-                        onValueChange = {
-                            if (it.toIntOrNull() != null
-                                && it.toInt() <= 4f
-                                && it.toInt() > 0f
-                                || it.isEmpty()
+                                    .weight(1f)
                             ) {
-                                RandomMusicPageViewModel.randomCount.value = it
+                                Text(
+                                    text = R.string.min_level.getString(),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                )
+
+                                OutlinedTextField(
+                                    value = minLevel,
+                                    onValueChange = {
+                                        if (it.toFloatOrNull() != null
+                                            && it.toFloat() <= 99f
+                                            && it.toFloat() >= 0f
+                                            || it.isEmpty()
+                                        ) {
+                                            RandomMusicPageViewModel.minLevel.value = it
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .height(56.dp)
+                                        .fillMaxWidth(),
+                                    singleLine = true,
+                                    keyboardOptions = KeyboardOptions.Default.copy(
+                                        keyboardType = KeyboardType.Decimal
+                                    ),
+                                    placeholder = {
+                                        Text(
+                                            text = R.string.rating_calculator_music_level_placeholder.getString(),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                        )
+                                    }
+                                )
                             }
-                        },
-                        modifier = Modifier
-                            .height(56.dp)
-                            .fillMaxWidth(),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            keyboardType = KeyboardType.Decimal
-                        ),
-                        placeholder = {
+
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                            ) {
+                                Text(
+                                    text = R.string.max_level.getString(),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                )
+
+                                OutlinedTextField(
+                                    value = maxLevel,
+                                    onValueChange = {
+                                        if (it.toFloatOrNull() != null
+                                            && it.toFloat() <= 99f
+                                            && it.toFloat() >= 0f
+                                            || it.isEmpty()
+                                        ) {
+                                            RandomMusicPageViewModel.maxLevel.value = it
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .height(56.dp)
+                                        .fillMaxWidth(),
+                                    singleLine = true,
+                                    keyboardOptions = KeyboardOptions.Default.copy(
+                                        keyboardType = KeyboardType.Decimal
+                                    ),
+                                    placeholder = {
+                                        Text(
+                                            text = R.string.rating_calculator_music_level_placeholder.getString(),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                        )
+                                    }
+                                )
+                            }
+                        }
+
+                        Text(
+                            text = R.string.random_count.getString(),
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Start,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp)
+                        )
+
+                        OutlinedTextField(
+                            value = randomCount,
+                            onValueChange = {
+                                if (it.toIntOrNull() != null
+                                    && it.toInt() <= 4f
+                                    && it.toInt() > 0f
+                                    || it.isEmpty()
+                                ) {
+                                    RandomMusicPageViewModel.randomCount.value = it
+                                }
+                            },
+                            modifier = Modifier
+                                .height(56.dp)
+                                .fillMaxWidth(),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions.Default.copy(
+                                keyboardType = KeyboardType.Decimal
+                            ),
+                            placeholder = {
+                                Text(
+                                    text = R.string.random_count_placeholder.getString()
+                                        .format("1...4"),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                            }
+                        )
+
+                        Button(
+                            onClick = {
+                                scope.launch(Dispatchers.IO) {
+                                    isRolling = true
+                                    delay(3000)
+                                    isRolling = false
+                                }
+                            },
+                            modifier = Modifier
+                                .padding(top = 8.dp),
+                            enabled = !isRolling
+                        ) {
                             Text(
-                                text = R.string.random_count_placeholder.getString()
-                                    .format("1...4"),
-                                style = MaterialTheme.typography.bodyMedium,
+                                text = R.string.random_music.getString(),
+                                style = MaterialTheme.typography.bodyLarge,
                             )
                         }
-                    )
-
-                    Button(
-                        onClick = {
-                            scope.launch(Dispatchers.IO) {
-                                isRolling = true
-                                delay(3000)
-                                isRolling = false
-                            }
-                        },
-                        modifier = Modifier
-                            .padding(top = 8.dp),
-                        enabled = !isRolling
-                    ) {
-                        Text(
-                            text = R.string.random_music.getString(),
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
                     }
                 }
-            }
 
-            val count = if (randomCount.isEmpty()) {
-                4
-            } else {
-                randomCount.toInt()
-            }
+                val count = if (randomCount.isEmpty()) {
+                    4
+                } else {
+                    randomCount.toInt()
+                }
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(if (count >= 2) 2 else 1),
-                state = lazyGridState,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                items(count) { index ->
-                    AnimatedContent(
-                        targetState = randomMusicList[index],
-                        label = "RandomMusicItem",
-                        transitionSpec = {
-                            (slideInVertically { it } + fadeIn()).togetherWith(
-                                slideOutVertically { -it } + fadeOut())
-                        },
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) { targetState ->
-                        RandomMusicItem(
-                            id = targetState,
-                            isRolling = isRolling,
-                            onCardClick = {
-                                AppNavController.getInstance()
-                                    .navigate("musicDetail/$targetState")
-                            }
-                        )
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(if (count >= 2) 2 else 1),
+                    state = lazyGridState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    items(count) { index ->
+                        AnimatedContent(
+                            targetState = randomMusicList[index],
+                            label = "RandomMusicItem",
+                            transitionSpec = {
+                                (slideInVertically { it } + fadeIn()).togetherWith(
+                                    slideOutVertically { -it } + fadeOut())
+                            },
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) { targetState ->
+                            RandomMusicItem(
+                                id = targetState,
+                                isRolling = isRolling,
+                                onCardClick = {
+                                    AppNavController.getInstance()
+                                        .navigate("musicDetail/$targetState")
+                                }
+                            )
+                        }
                     }
                 }
             }

@@ -14,14 +14,17 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,6 +38,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -319,75 +324,77 @@ fun MusicDetailPage(
         }
     }
 
-    Box {
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .heightIn(max = 20000.dp)
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            Spacer(Modifier.height(40.dp))
-            TopPaddingSpacer()
+    Surface {
+        Box {
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .heightIn(max = 20000.dp)
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+            ) {
+                Spacer(Modifier.height(40.dp))
+                TopPaddingSpacer()
 
-            MusicInfoCard(
-                music = music,
-                jacketFile = jacketFile,
-                defaultJacketFile = defaultJacketFile,
-                color = color,
-                commonRoundedShape = commonRoundedShape
-            )
+                MusicInfoCard(
+                    music = music,
+                    jacketFile = jacketFile,
+                    defaultJacketFile = defaultJacketFile,
+                    color = color,
+                    commonRoundedShape = commonRoundedShape
+                )
 
-            DifficultySelectionRow(
-                difficulties = music.difficulties,
-                currentChoiceDifficulty = currentChoiceDifficulty,
-                color = color,
-                commonRoundedShape = commonRoundedShape,
-                onDifficultySelected = { index -> currentChoiceDifficulty = index }
-            )
+                DifficultySelectionRow(
+                    difficulties = music.difficulties,
+                    currentChoiceDifficulty = currentChoiceDifficulty,
+                    color = color,
+                    commonRoundedShape = commonRoundedShape,
+                    onDifficultySelected = { index -> currentChoiceDifficulty = index }
+                )
 
-            MusicDetailCard(
-                music = music,
-                currentChoiceDifficulty = currentChoiceDifficulty,
-                isDX = isDX,
-                color = color,
-                achievementDataList = achievementDataList,
-                dataTableHeader = dataTableHeader,
-                onDataTableClickable = onDataTableClickable
-            )
+                MusicDetailCard(
+                    music = music,
+                    currentChoiceDifficulty = currentChoiceDifficulty,
+                    isDX = isDX,
+                    color = color,
+                    achievementDataList = achievementDataList,
+                    dataTableHeader = dataTableHeader,
+                    onDataTableClickable = onDataTableClickable
+                )
 
-            FaultToleranceCard(
-                achievementDataList = achievementDataList,
-                currentChoiceDifficulty = currentChoiceDifficulty,
-                currentChoiceNoteType = currentChoiceNoteType,
-                onNoteTypeSelected = { noteType -> currentChoiceNoteType = noteType }
-            )
+                FaultToleranceCard(
+                    achievementDataList = achievementDataList,
+                    currentChoiceDifficulty = currentChoiceDifficulty,
+                    currentChoiceNoteType = currentChoiceNoteType,
+                    onNoteTypeSelected = { noteType -> currentChoiceNoteType = noteType }
+                )
 
-            ActionButtonsRow(
-                jacketFile = jacketFile,
-                musicName = music.name ?: "",
+                ActionButtonsRow(
+                    jacketFile = jacketFile,
+                    musicName = music.name ?: "",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp)
+                        .padding(
+                            horizontal = 16.dp,
+                            vertical = 4.dp
+                        )
+                )
+
+                Spacer(modifier = Modifier.height(15.dp))
+            }
+
+            TopAppBar(
+                onBackPressed = onBackPressed,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(40.dp)
                     .padding(
-                        horizontal = 16.dp,
-                        vertical = 4.dp
+                        top = WindowInsetsSpacer.topPadding,
+                        bottom = WindowInsetsSpacer.bottomPadding
                     )
             )
-
-            Spacer(modifier = Modifier.height(15.dp))
         }
-
-        TopAppBar(
-            onBackPressed = onBackPressed,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    top = WindowInsetsSpacer.topPadding,
-                    bottom = WindowInsetsSpacer.bottomPadding
-                )
-        )
     }
 }
 

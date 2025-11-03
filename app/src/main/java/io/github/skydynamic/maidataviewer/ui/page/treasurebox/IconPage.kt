@@ -9,16 +9,22 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -59,6 +65,7 @@ import io.github.skydynamic.maidataviewer.core.getString
 import io.github.skydynamic.maidataviewer.core.manager.collection.CollectionType
 import io.github.skydynamic.maidataviewer.core.manager.resource.ResourceManagerType
 import io.github.skydynamic.maidataviewer.ui.component.UnknownProgressCircularProgress
+import io.github.skydynamic.maidataviewer.ui.component.WindowInsetsSpacer
 import io.github.skydynamic.maidataviewer.ui.component.WindowInsetsSpacer.TopPaddingSpacer
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
 import kotlinx.coroutines.Dispatchers
@@ -81,7 +88,7 @@ object IconPageViewModel : ViewModel() {
 
     var searchResult by mutableStateOf<List<MaimaiIconData>>(emptyList())
 
-    var listState by mutableStateOf<LazyListState?>(null)
+    var listState by mutableStateOf<LazyGridState?>(null)
 }
 
 @Composable
@@ -172,7 +179,7 @@ fun IconPage(
     }
 
     if (IconPageViewModel.listState == null) {
-        IconPageViewModel.listState = rememberLazyListState()
+        IconPageViewModel.listState = rememberLazyGridState()
     }
 
     LaunchedEffect(Unit) {
@@ -191,9 +198,9 @@ fun IconPage(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .windowInsetsPadding(WindowInsets.navigationBars)
         ) {
-            TopPaddingSpacer()
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -294,18 +301,21 @@ fun IconPage(
                         }
                     }
 
-                    LazyColumn(
+                    LazyVerticalGrid(
                         modifier = Modifier
                             .fillMaxWidth()
                             .fillMaxHeight()
                             .heightIn(1000.dp)
                             .padding(top = 8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
+                        columns = GridCells.Fixed(2),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                         state = IconPageViewModel.listState!!
-                    ){
+                    ) {
                         if (IconPageViewModel.isSearchingActive) {
                             item(
-                                key = "search_result_title"
+                                key = "search_bar",
+                                span = { GridItemSpan(2) }
                             ) {
                                 ShadowElevatedCard(
                                     modifier = Modifier
@@ -319,7 +329,7 @@ fun IconPage(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            text = R.string.title_search_result.getString()
+                                            text = R.string.icon_search_result.getString()
                                                 .format(
                                                     IconPageViewModel.searchResult.size
                                                 ),
