@@ -14,7 +14,9 @@ data class MaimaiDataMeta(
     var currentTitleDataVersion: MaiVersion,
     var latestTitleDataVersion: MaiVersion,
     var currentIconDataVersion: MaiVersion,
-    var latestIconDataVersion: MaiVersion
+    var latestIconDataVersion: MaiVersion,
+    var currentPlateDataVersion: MaiVersion,
+    var latestPlateDataVersion: MaiVersion
 ) {
     fun isLatestMaimaiDataVersion(): Boolean {
         return currentMaimaiDataVersion >= latestMaimaiDataVersion
@@ -26,6 +28,10 @@ data class MaimaiDataMeta(
 
     fun isLatestIconDataVersion(): Boolean {
         return currentIconDataVersion >= latestIconDataVersion
+    }
+
+    fun isLatestPlateDataVersion(): Boolean {
+        return currentPlateDataVersion >= latestPlateDataVersion
     }
 
     fun updateMaimaiData(c: MaiVersion, l: MaiVersion) {
@@ -41,6 +47,11 @@ data class MaimaiDataMeta(
     fun updateIconData(c: MaiVersion, l: MaiVersion) {
         currentIconDataVersion = c
         latestIconDataVersion = l
+    }
+
+    fun updatePlateData(c: MaiVersion, l: MaiVersion) {
+        currentPlateDataVersion = c
+        latestPlateDataVersion = l
     }
 
     companion object {
@@ -71,13 +82,21 @@ data class MaimaiDataMeta(
                     val latestIcon = CollectionType.ICON.manager!!
                         .getLatestCollectionDataVersion() ?: MaiVersion(-1, 0)
 
+                    val currentPlate = CollectionType.PLATE.manager!!
+                        .currentCollectionVersion
+
+                    val latestPlate = CollectionType.PLATE.manager!!
+                        .getLatestCollectionDataVersion() ?: MaiVersion(-1, 0)
+
                     instance = MaimaiDataMeta(
                         current,
                         latest,
                         currentTitle,
                         latestTitle,
                         currentIcon,
-                        latestIcon
+                        latestIcon,
+                        currentPlate,
+                        latestPlate
                     )
                     onFinished()
                 }

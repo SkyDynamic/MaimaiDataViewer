@@ -2,7 +2,7 @@ package io.github.skydynamic.maidataviewer.core.manager
 
 import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import io.github.skydynamic.maidataviewer.core.data.MaimaiUpdateData
-import io.github.skydynamic.maidataviewer.viewmodel.SongPageViewModel
+import io.github.skydynamic.maidataviewer.viewmodel.MusicPageViewModel
 import kotlinx.serialization.json.Json
 import java.io.File
 
@@ -63,7 +63,7 @@ class MusicDataManager(
         }.toMutableList()
 
         MusicAliasManager.getMusicByAlias(
-            SongPageViewModel.searchText.value
+            MusicPageViewModel.searchText.value
         ).forEach {
             if (!result.contains(it)) result.add(it)
         }
@@ -139,10 +139,16 @@ class MusicDataManager(
     }
 
     companion object {
-        lateinit var instance: MusicDataManager
+        private var _instance: MusicDataManager? = null
+
+        val instance: MusicDataManager
+            get() {
+                return _instance ?:
+                throw IllegalStateException("MusicDataManager is not initialized")
+            }
 
         fun init(musicDataDir: File) {
-            instance = MusicDataManager(musicDataDir)
+            _instance = MusicDataManager(musicDataDir)
         }
 
         fun exists(id: Int): Boolean {

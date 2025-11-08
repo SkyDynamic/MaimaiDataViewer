@@ -54,12 +54,10 @@ import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.MaimaiDataMeta
 import io.github.skydynamic.maidataviewer.core.getString
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
-import io.github.skydynamic.maidataviewer.core.manager.collection.TitleDataManager
 import io.github.skydynamic.maidataviewer.core.manager.UpdateDataManager
 import io.github.skydynamic.maidataviewer.core.manager.collection.CollectionType
 import io.github.skydynamic.maidataviewer.core.not
 import io.github.skydynamic.maidataviewer.ui.AppContent
-import io.github.skydynamic.maidataviewer.ui.component.WindowInsetsSpacer
 import io.github.skydynamic.maidataviewer.ui.component.card.IntroductionCard
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
 import io.github.skydynamic.maidataviewer.ui.component.text.AnimatedTextTitleGroup
@@ -277,6 +275,56 @@ fun HomePage(
                         Icon(Icons.Filled.Refresh, "")
                     }
                 } else if (!meta.isLatestIconDataVersion() && HomePageViewModel.isUpdateMaiIconAvailable.value) {
+                    CircularProgressIndicator(
+                        strokeWidth = 4.dp,
+                        gapSize = 4.dp
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+            ) {
+                AnimatedTextTitleGroup(
+                    title = R.string.plate_version.getString(),
+                    titleStyle = MaterialTheme.typography.titleSmall,
+                    subtitle = "${meta.latestPlateDataVersion}" +
+                            " (${meta.latestPlateDataVersion.toStandardString()})",
+                    subtitleColor = if (!meta.isLatestPlateDataVersion()) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.primary
+                    },
+                    subtitleWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                if (!meta.isLatestPlateDataVersion() && !HomePageViewModel.isUpdateMaiPlateDataAvailable) {
+                    TextButton(
+                        modifier = Modifier
+                            .height(40.dp),
+                        onClick = {
+                            HomePageViewModel.isUpdateMaiPlateDataAvailable.value = true
+                            GlobalViewModel.viewModelScope.launch(Dispatchers.IO) {
+                                CollectionType.PLATE.manager!!.downloadCollectionData {
+                                    if (it != null) {
+                                        meta.updatePlateData(
+                                            it,
+                                            meta.latestPlateDataVersion
+                                        )
+                                    }
+                                    HomePageViewModel.isUpdateMaiPlateDataAvailable.value = false
+                                    CollectionType.PLATE.manager!!.loadCollectionData()
+                                }
+                            }
+                        }
+                    ) {
+                        Icon(Icons.Filled.Refresh, "")
+                    }
+                } else if (!meta.isLatestPlateDataVersion() && HomePageViewModel.isUpdateMaiPlateDataAvailable.value) {
                     CircularProgressIndicator(
                         strokeWidth = 4.dp,
                         gapSize = 4.dp

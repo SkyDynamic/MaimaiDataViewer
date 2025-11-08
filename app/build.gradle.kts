@@ -13,8 +13,8 @@ android {
         applicationId = "io.github.skydynamic.maidataviewer"
         minSdk = 28
         targetSdk = 36
-        versionCode = 576
-        versionName = "1.1.5"
+        versionCode = 586
+        versionName = "1.1.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -72,6 +72,9 @@ dependencies {
     implementation(libs.androidx.material.icons.core)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
+    // Android Paging
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
 
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.serialization.json)

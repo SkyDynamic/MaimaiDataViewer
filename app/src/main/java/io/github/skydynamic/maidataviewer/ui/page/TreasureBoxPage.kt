@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.HorizontalDivider
@@ -47,23 +46,6 @@ enum class DataTool(
         R.drawable.dice,
         "randomMusicPage"
     );
-}
-
-enum class CollectionPage(
-    val pageName: String,
-    val desc: String,
-    var page: String
-) {
-    TITLE_PAGE(
-        R.string.title_page.getString(),
-        R.string.title_page_desc.getString(),
-        "titlePage"
-    ),
-    ICON_PAGE(
-        R.string.icon_page.getString(),
-        R.string.icon_page_desc.getString(),
-        "iconPage"
-    )
 }
 
 @Composable
@@ -195,7 +177,7 @@ fun TreasureBoxPage() {
                         .padding(8.dp),
                     maxItemsInEachRow = 2
                 ) {
-                    CollectionPage.entries.forEach {
+                    CollectionPages.entries.forEach {
                         Column(
                             modifier = Modifier
                                 .weight(1f)
@@ -241,7 +223,7 @@ fun TreasureBoxPage() {
                         }
                     }
 
-                    if (CollectionPage.entries.size % 2 != 0) {
+                    if (CollectionPages.entries.size % 2 != 0) {
                         Spacer(
                             modifier = Modifier
                                 .weight(1f)

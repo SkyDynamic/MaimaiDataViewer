@@ -7,8 +7,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import io.github.skydynamic.maidataviewer.Application.Companion.application
-import io.github.skydynamic.maidataviewer.core.data.IMaimaiCollectionData
-import io.github.skydynamic.maidataviewer.core.manager.collection.CollectionManager
 import java.io.File
 import kotlin.math.absoluteValue
 

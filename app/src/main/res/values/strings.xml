@@ -71,4 +71,8 @@
     <string name="search_collection_placeholder">Type keyword</string>
     <string name="icon_version">App Current MaimaiDX Icon Data</string>
     <string name="icon_search_result">%s icon have been successfully searched</string>
+    <string name="plate_page">Maimai Plate</string>
+    <string name="plate_page_desc">View all the maimaiDX plate</string>
+    <string name="plate_search_result">%s plate have been successfully search</string>
+    <string name="plate_version">App Current MaimaiDX Plate Data</string>
 </resources>

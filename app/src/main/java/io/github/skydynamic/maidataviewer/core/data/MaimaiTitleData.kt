@@ -7,10 +7,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MaimaiTitleData(
     override val id: Int,
-    override val name: String? = "",
-    override val normalText: String? = "",
+    override val name: String?,
+    override val normalText: String?,
     val rareType: RareType,
 ) : IMaimaiCollectionData {
+
+    @Suppress("unused")
     enum class RareType(
         val resId: Int,
     ) {

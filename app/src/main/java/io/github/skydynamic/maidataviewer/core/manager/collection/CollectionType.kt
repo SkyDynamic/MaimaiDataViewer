@@ -14,16 +14,11 @@ enum class CollectionType(
         httpClient: AppHttpClient) -> CollectionManager<*>,
     var manager: CollectionManager<*>?
 ) {
-    TITLE("title", TitleDataManager::init, null) {
-        override fun <T : IMaimaiCollectionData> getTypedManager(): CollectionManager<T> {
-            return manager as CollectionManager<T>
-        }
-    },
-    ICON("icon", MaimaiIconManager::build, null) {
-        override fun <T : IMaimaiCollectionData> getTypedManager(): CollectionManager<T> {
-            return manager as CollectionManager<T>
-        }
-    };
+    TITLE("title", TitleDataManager::init, null),
+    ICON("icon", MaimaiIconManager::build, null),
+    PLATE("plate", MaimaiPlateManager::build, null);
 
-    abstract fun <T : IMaimaiCollectionData> getTypedManager(): CollectionManager<T>?
+    fun <T : IMaimaiCollectionData> getTypedManager(): CollectionManager<T>? {
+        return manager as CollectionManager<T>?
+    }
 }

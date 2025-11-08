@@ -1,9 +1,16 @@
 package io.github.skydynamic.maidataviewer.ui.page
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,11 +42,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -48,8 +53,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import io.github.skydynamic.maidataviewer.R
-import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import io.github.skydynamic.maidataviewer.core.getString
 import io.github.skydynamic.maidataviewer.core.manager.GenreType
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
@@ -58,49 +64,40 @@ import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
 import io.github.skydynamic.maidataviewer.ui.AppNavController
 import io.github.skydynamic.maidataviewer.ui.component.UnknownProgressCircularProgress
 import io.github.skydynamic.maidataviewer.ui.component.button.GenreSelectorButton
+import io.github.skydynamic.maidataviewer.ui.component.card.CollapsibleSearchCard
 import io.github.skydynamic.maidataviewer.ui.component.card.MusicSimpleCard
+import io.github.skydynamic.maidataviewer.ui.component.card.PaginationCard
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
 import io.github.skydynamic.maidataviewer.ui.component.menu.GenreDropdownMenu
 import io.github.skydynamic.maidataviewer.viewmodel.GlobalViewModel
-import io.github.skydynamic.maidataviewer.viewmodel.SongPageViewModel
+import io.github.skydynamic.maidataviewer.viewmodel.MusicPageViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 fun search() {
-    if (SongPageViewModel.isSearchingActive.value
-        && SongPageViewModel.searchJob.value != null
+    if (MusicPageViewModel.isSearchingActive.value
+        && MusicPageViewModel.searchJob.value != null
     ) {
-        SongPageViewModel.searchJob.value?.cancel()
+        MusicPageViewModel.searchJob.value?.cancel()
     }
-    SongPageViewModel.searchJob.value = GlobalViewModel.viewModelScope
+
+    MusicPageViewModel.searchJob.value = GlobalViewModel.viewModelScope
         .launch(Dispatchers.IO) {
-            SongPageViewModel.isSearchingActive.value = true
-            SongPageViewModel.isSearching.value = true
-            SongPageViewModel.shouldScrollToTop.value = true
+            MusicPageViewModel.isSearchingActive.value = true
+            MusicPageViewModel.isSearching.value = true
+            MusicPageViewModel.shouldScrollToTop.value = true
 
-            val result = mutableListOf<MaimaiMusicData>()
+            MusicPageViewModel.currentPage.intValue = 0
 
-            val genre =
-                if (SongPageViewModel.genreFilter.intValue == -1) null
-                else SongPageViewModel.genreFilter.intValue
-            val version =
-                if (SongPageViewModel.versionFilter.intValue == -1) null
-                else SongPageViewModel.versionFilter.intValue
-            result += MusicDataManager.instance
-                .searchMusicData(
-                    SongPageViewModel.searchText.value,
-                    genre,
-                    version
-                )
+            MusicPageViewModel.search()
 
-            SongPageViewModel.searchResult.value = result
-            SongPageViewModel.isSearchingActive.value = false
-            SongPageViewModel.searchJob.value = null
+            MusicPageViewModel.isSearchingActive.value = false
+            MusicPageViewModel.searchJob.value = null
         }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun MusicPage() {
     var genreDropdownMenuActive by remember { mutableStateOf(false) }
@@ -108,82 +105,52 @@ fun MusicPage() {
 
     var showMessageCard by remember { mutableStateOf(false) }
 
-    if (SongPageViewModel.listState.value == null) {
-        SongPageViewModel.listState.value = rememberLazyListState()
+    if (MusicPageViewModel.listState.value == null) {
+        MusicPageViewModel.listState.value = rememberLazyListState()
     }
 
-    val listState = SongPageViewModel.listState.value
+    val listState = MusicPageViewModel.listState.value
 
-    val activeItems = remember { mutableStateMapOf<Int, MaimaiMusicData?>() }
+    val musicData = MusicPageViewModel.searchResult.value?.collectAsLazyPagingItems()
 
-    LaunchedEffect(SongPageViewModel.searchResult.value) {
-        if (SongPageViewModel.shouldScrollToTop.value) {
+    LaunchedEffect(MusicPageViewModel.currentPage.intValue) {
+        val page = MusicPageViewModel.currentPage.intValue
+        val total = MusicPageViewModel.searchResultState.value.totalPage
+        if (page >= 0 && page <= total) {
             listState?.scrollToItem(0)
-            SongPageViewModel.shouldScrollToTop.value = false
-        }
 
-        activeItems.clear()
-
-        val initCount = minOf(25, SongPageViewModel.searchResult.value.size)
-        for (i in 0 until initCount) {
-            activeItems[i] = SongPageViewModel.searchResult.value.getOrNull(i)
+            MusicPageViewModel.search()
         }
     }
 
-
-    LaunchedEffect(listState) {
-        snapshotFlow {
-            val first = listState?.firstVisibleItemIndex ?: 0
-            Pair(first, first + (listState?.layoutInfo?.visibleItemsInfo?.size ?: 0))
-        }
-            .collect { (start, end) ->
-                if (SongPageViewModel.searchResult.value.isEmpty()) {
-                    activeItems.clear()
-                    return@collect
-                }
-
-                val rangeStart = maxOf(0, start - 25)
-                val rangeEnd = minOf(SongPageViewModel.searchResult.value.size, end + 25)
-
-                activeItems.keys.removeAll { it !in rangeStart..rangeEnd }
-
-                for (i in rangeStart until rangeEnd) {
-                    if (!activeItems.containsKey(i)) {
-                        activeItems[i] = SongPageViewModel.searchResult.value.getOrNull(i)
-                    }
-                }
-            }
-    }
-
-
-    LaunchedEffect(SongPageViewModel.showLoadedFinishedMessage.value) {
-        if (SongPageViewModel.showLoadedFinishedMessage.value) {
+    LaunchedEffect(MusicPageViewModel.showLoadedFinishedMessage.value) {
+        if (MusicPageViewModel.showLoadedFinishedMessage.value) {
             showMessageCard = true
             launch {
                 delay(1000)
                 showMessageCard = false
                 delay(300)
-                SongPageViewModel.showLoadedFinishedMessage.value = false
+                MusicPageViewModel.showLoadedFinishedMessage.value = false
             }
         }
     }
 
     LaunchedEffect(Unit) {
         if (!MusicDataManager.instance.getIsLoaded()) {
-            SongPageViewModel.viewModelScope.launch(Dispatchers.IO) {
+            MusicPageViewModel.viewModelScope.launch(Dispatchers.IO) {
                 MusicDataManager.instance.loadMusicData {
-                    SongPageViewModel.isLoadingMusic.value = false
+                    MusicPageViewModel.isLoadingMusic.value = false
                     if (it > 0) {
-                        SongPageViewModel.showLoadedFinishedMessage.value = true
+                        MusicPageViewModel.showLoadedFinishedMessage.value = true
                     }
                 }
             }
         } else {
-            SongPageViewModel.isLoadingMusic.value = false
+            MusicPageViewModel.isLoadingMusic.value = false
         }
 
         if (!MusicAliasManager.instance.getIsLoaded()) {
-            SongPageViewModel.viewModelScope.launch(Dispatchers.IO) {
+            MusicPageViewModel.viewModelScope.launch(Dispatchers.IO) {
                 MusicAliasManager.instance.loadAliasData()
             }
         }
@@ -194,7 +161,7 @@ fun MusicPage() {
             .fillMaxSize()
             .padding(16.dp),
     ) {
-        if (SongPageViewModel.isLoadingMusic.value || SongPageViewModel.showLoadedFinishedMessage.value) {
+        if (MusicPageViewModel.isLoadingMusic.value || MusicPageViewModel.showLoadedFinishedMessage.value) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -226,15 +193,15 @@ fun MusicPage() {
                     }
                 }
 
-                if (SongPageViewModel.isLoadingMusic.value) {
+                if (MusicPageViewModel.isLoadingMusic.value) {
                     UnknownProgressCircularProgress(
                         strokeWidth = 4.dp,
                         gapSize = 4.dp
                     )
                 }
             }
-        } else if (SongPageViewModel.isSearching.value) {
-            if (SongPageViewModel.isSearchingActive.value) {
+        } else if (MusicPageViewModel.isSearching.value) {
+            if (MusicPageViewModel.isSearchingActive.value) {
                 UnknownProgressCircularProgress(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -243,24 +210,46 @@ fun MusicPage() {
                     gapSize = 4.dp
                 )
             } else {
-                Column(
+                Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 8.dp),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .padding(top = 8.dp)
+                        .padding(bottom = 65.dp),
                 ) {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
                             .fillMaxHeight()
                             .heightIn(1000.dp)
-                            .padding(top = 16.dp),
+                            .padding(top = 24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         state = listState!!
                     ) {
                         item("spacerTop") {
-                            Spacer(Modifier.height(160.dp))
+                            AnimatedContent(
+                                targetState = MusicPageViewModel.isSearchCardCollapsed.value,
+                                transitionSpec = {
+                                    if (targetState) {
+                                        slideInVertically { height -> height } + fadeIn() togetherWith
+                                                slideOutVertically { height -> -height } + fadeOut()
+                                    } else {
+                                        slideInVertically { height -> -height } + fadeIn() togetherWith
+                                                slideOutVertically { height -> height } + fadeOut()
+                                    }
+                                }
+                            ) { isCollapsed ->
+                                Spacer(
+                                    modifier = Modifier
+                                        .height(
+                                            if (!isCollapsed) {
+                                                190.dp
+                                            } else {
+                                                12.dp
+                                            }
+                                        )
+                                )
+                            }
                         }
 
                         item(
@@ -278,7 +267,7 @@ fun MusicPage() {
                                 ) {
                                     Text(
                                         text = R.string.search_result.getString().format(
-                                            SongPageViewModel.searchResult.value.size
+                                            MusicPageViewModel.searchResultState.value.currentSearchCount
                                         ),
                                         style = MaterialTheme.typography.bodyMedium,
                                         textAlign = TextAlign.Center,
@@ -291,14 +280,14 @@ fun MusicPage() {
                             }
                         }
 
-                        if (SongPageViewModel.searchResult.value.isNotEmpty()) {
+                        if (musicData != null) {
                             items(
-                                count = SongPageViewModel.searchResult.value.size,
-                                key = { SongPageViewModel.searchResult.value[it].id }
+                                count = musicData.itemCount,
+                                key = musicData.itemKey { it.id }
                             ) { index ->
-                                val item = SongPageViewModel.searchResult.value[index]
+                                val item = musicData[index]
 
-                                if (activeItems.contains(index)) {
+                                if (item != null) {
                                     MusicSimpleCard(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -316,9 +305,23 @@ fun MusicPage() {
                             }
                         }
 
-                        item("spacerButton") {
-                            Spacer(Modifier.height(90.dp))
+                        item(
+                            key = "spacerBottom"
+                        ) {
+                            Spacer(modifier = Modifier.height(65.dp))
                         }
+                    }
+
+                    PaginationCard(
+                        modifier = Modifier
+                            .height(70.dp)
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .align(Alignment.BottomCenter),
+                        currentPage = MusicPageViewModel.currentPage.intValue + 1,
+                        totalPage = MusicPageViewModel.searchResultState.value.totalPage,
+                    ) {
+                        MusicPageViewModel.currentPage.intValue = it - 1
                     }
                 }
             }
@@ -329,9 +332,14 @@ fun MusicPage() {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ShadowElevatedCard(
+            CollapsibleSearchCard(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                isCollapsed = MusicPageViewModel.isSearchCardCollapsed.value,
+                onCollapseToggle = {
+                    MusicPageViewModel.isSearchCardCollapsed.value =
+                        !MusicPageViewModel.isSearchCardCollapsed.value
+                }
             ) {
                 Row(
                     modifier = Modifier
@@ -340,9 +348,9 @@ fun MusicPage() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedTextField(
-                        value = SongPageViewModel.searchText.value,
-                        onValueChange = { SongPageViewModel.searchText.value = it },
-                        enabled = !SongPageViewModel.isLoadingMusic.value,
+                        value = MusicPageViewModel.searchText.value,
+                        onValueChange = { MusicPageViewModel.searchText.value = it },
+                        enabled = !MusicPageViewModel.isLoadingMusic.value,
                         label = { Text(R.string.search.getString()) },
                         placeholder = {
                             Text(
@@ -366,7 +374,7 @@ fun MusicPage() {
 
                     Button(
                         onClick = { search() },
-                        enabled = !SongPageViewModel.isLoadingMusic.value,
+                        enabled = !MusicPageViewModel.isLoadingMusic.value,
                         shape = RoundedCornerShape(16.dp),
                         contentPadding = PaddingValues(8.dp),
                         modifier = Modifier
@@ -399,7 +407,7 @@ fun MusicPage() {
                     Box(modifier = Modifier.weight(0.5f)) {
                         GenreSelectorButton(
                             value = MaiGenreManager.musicGenre
-                                .getGenreName(SongPageViewModel.genreFilter.intValue),
+                                .getGenreName(MusicPageViewModel.genreFilter.intValue),
                             label = R.string.genre.getString(),
                             onClick = { genreDropdownMenuActive = true }
                         )
@@ -408,9 +416,9 @@ fun MusicPage() {
                             expanded = genreDropdownMenuActive,
                             onDismissRequest = { genreDropdownMenuActive = false },
                             onSelectedChange = {
-                                SongPageViewModel.genreFilter.intValue = it
-                                if (SongPageViewModel.searchText.value != ""
-                                    || SongPageViewModel.isSearching.value
+                                MusicPageViewModel.genreFilter.intValue = it
+                                if (MusicPageViewModel.searchText.value != ""
+                                    || MusicPageViewModel.isSearching.value
                                 ) {
                                     search()
                                 }
@@ -422,7 +430,7 @@ fun MusicPage() {
                     Box(modifier = Modifier.weight(0.5f)) {
                         GenreSelectorButton(
                             value = MaiGenreManager.versionGenre
-                                .getGenreName(SongPageViewModel.versionFilter.intValue),
+                                .getGenreName(MusicPageViewModel.versionFilter.intValue),
                             label = R.string.versionGenre.getString(),
                             onClick = { versionDropdownMenuActive = true }
                         )
@@ -431,9 +439,9 @@ fun MusicPage() {
                             expanded = versionDropdownMenuActive,
                             onDismissRequest = { versionDropdownMenuActive = false },
                             onSelectedChange = {
-                                SongPageViewModel.versionFilter.intValue = it
-                                if (SongPageViewModel.searchText.value != ""
-                                    || SongPageViewModel.isSearching.value
+                                MusicPageViewModel.versionFilter.intValue = it
+                                if (MusicPageViewModel.searchText.value != ""
+                                    || MusicPageViewModel.isSearching.value
                                 ) {
                                     search()
                                 }

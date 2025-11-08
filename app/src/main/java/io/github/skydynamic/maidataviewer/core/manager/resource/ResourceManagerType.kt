@@ -2,6 +2,7 @@ package io.github.skydynamic.maidataviewer.core.manager.resource
 
 import android.content.res.AssetManager
 import io.github.skydynamic.maidataviewer.core.manager.collection.MaimaiIconManager
+import io.github.skydynamic.maidataviewer.core.manager.collection.MaimaiPlateManager
 import io.github.skydynamic.maidataviewer.core.network.AppHttpClient
 import java.io.File
 
@@ -13,5 +14,6 @@ enum class ResourceManagerType(
     var instance: MaimaiResourceManager?
 ) {
     JACKET(MaimaiJacketManager::build, null),
-    ICON(MaimaiIconManager::build, null);
+    ICON(MaimaiIconManager::build, null),
+    PLATE(MaimaiPlateManager::build, null);
 }

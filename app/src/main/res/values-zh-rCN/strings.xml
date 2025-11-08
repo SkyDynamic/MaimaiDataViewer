@@ -72,4 +72,8 @@
     <string name="search_collection_placeholder">属于收藏品名称关键词</string>
     <string name="icon_version">当前舞萌DX头像数据版本</string>
     <string name="icon_search_result">已成功搜索到%s个头像</string>
+    <string name="plate_page">姓名框</string>
+    <string name="plate_page_desc">查看舞萌DX的所有姓名框及其获取方法</string>
+    <string name="plate_search_result">已成功搜索到%s个称号</string>
+    <string name="plate_version">当前舞萌DX姓名框数据版本</string>
 </resources>

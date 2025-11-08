@@ -11,15 +11,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
@@ -47,16 +42,14 @@ import io.github.skydynamic.maidataviewer.MainActivity
 import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.getString
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
-import io.github.skydynamic.maidataviewer.ui.component.WindowInsetsSpacer
 import io.github.skydynamic.maidataviewer.ui.page.AchievementDataTablePage
+import io.github.skydynamic.maidataviewer.ui.page.CollectionPages
 import io.github.skydynamic.maidataviewer.ui.page.HomePage
 import io.github.skydynamic.maidataviewer.ui.page.MusicDetailPage
 import io.github.skydynamic.maidataviewer.ui.page.MusicPage
 import io.github.skydynamic.maidataviewer.ui.page.TreasureBoxPage
-import io.github.skydynamic.maidataviewer.ui.page.treasurebox.IconPage
 import io.github.skydynamic.maidataviewer.ui.page.treasurebox.RandomMusicPage
 import io.github.skydynamic.maidataviewer.ui.page.treasurebox.RatingCalculatorPage
-import io.github.skydynamic.maidataviewer.ui.page.treasurebox.TitlePage
 import io.github.skydynamic.maidataviewer.viewmodel.AchievementDataTablePageViewModel
 import io.github.skydynamic.maidataviewer.viewmodel.GlobalViewModel
 
@@ -272,19 +265,11 @@ object AppContent {
                 }
             }
 
-            composable(
-                "titlePage"
-            ) {
-                TitlePage {
-                    navController.popBackStack()
-                }
-            }
-
-            composable(
-                "iconPage"
-            ) {
-                IconPage {
-                    navController.popBackStack()
+            CollectionPages.entries.forEach { page ->
+                composable(
+                    page.page
+                ) {
+                    page.pageComposable(navController::popBackStack)
                 }
             }
         }
