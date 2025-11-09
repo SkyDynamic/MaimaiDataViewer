@@ -1,11 +1,8 @@
-package io.github.skydynamic.maidataviewer.ui.page
+package io.github.skydynamic.maidataviewer.ui.page.treasurebox.collection
 
 import androidx.compose.runtime.Composable
 import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.getString
-import io.github.skydynamic.maidataviewer.ui.page.treasurebox.collection.IconPage
-import io.github.skydynamic.maidataviewer.ui.page.treasurebox.collection.PlatePage
-import io.github.skydynamic.maidataviewer.ui.page.treasurebox.collection.TitlePage
 
 enum class CollectionPages(
     val pageName: String,

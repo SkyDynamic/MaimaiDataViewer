@@ -1,15 +1,9 @@
-package io.github.skydynamic.maidataviewer.core
+package io.github.skydynamic.maidataviewer.core.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
-
-data class MusicDataPagingSourceState(
-    val currentPage: Int = 0,
-    val totalPage: Int = 0,
-    val currentSearchCount: Int = 0
-)
 
 class MusicDataPagingSource(
     var keyword: String = "",
@@ -17,8 +11,7 @@ class MusicDataPagingSource(
     var versionId: Int? = null,
     var currentPage: Int = 0
 ) : PagingSource<Int, MaimaiMusicData>() {
-
-    private var onSearchFinish: (MusicDataPagingSourceState) -> Unit = { 0 }
+    private var onSearchFinish: (PagingSourceState) -> Unit = { 0 }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MaimaiMusicData> {
         return try {
@@ -28,7 +21,7 @@ class MusicDataPagingSource(
             val allData = MusicDataManager.instance.searchMusicData(keyword, genreId, versionId)
                 .also {
                     val totalPage = if (it.isNotEmpty()) (it.size + pageSize - 1) / pageSize else 0
-                    onSearchFinish(MusicDataPagingSourceState(
+                    onSearchFinish(PagingSourceState(
                         currentPage,
                         totalPage,
                         it.size
@@ -69,7 +62,7 @@ class MusicDataPagingSource(
         return this
     }
 
-    fun setOnSearchFinished(onFinished: (MusicDataPagingSourceState) -> Unit): MusicDataPagingSource {
+    fun setOnSearchFinished(onFinished: (PagingSourceState) -> Unit): MusicDataPagingSource {
         onSearchFinish = onFinished
         return this
     }

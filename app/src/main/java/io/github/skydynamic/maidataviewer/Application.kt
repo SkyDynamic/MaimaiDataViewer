@@ -13,10 +13,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.core.net.toUri
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
-import io.github.skydynamic.maidataviewer.core.manager.resource.MaimaiJacketManager
 import io.github.skydynamic.maidataviewer.core.manager.MusicAliasManager
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
-import io.github.skydynamic.maidataviewer.core.manager.collection.TitleDataManager
 import io.github.skydynamic.maidataviewer.core.manager.UpdateDataManager
 import io.github.skydynamic.maidataviewer.core.manager.collection.CollectionManager
 import io.github.skydynamic.maidataviewer.core.manager.resource.MaimaiResourceManager

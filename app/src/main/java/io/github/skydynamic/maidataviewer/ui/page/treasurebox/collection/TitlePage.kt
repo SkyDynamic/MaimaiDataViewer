@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -59,41 +58,75 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.PagingSource.LoadResult.Page.Companion.COUNT_UNDEFINED
+import androidx.paging.cachedIn
+import androidx.paging.compose.collectAsLazyPagingItems
 import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.data.MaimaiTitleData
 import io.github.skydynamic.maidataviewer.core.getString
 import io.github.skydynamic.maidataviewer.core.manager.collection.CollectionType
+import io.github.skydynamic.maidataviewer.core.paging.CollectionPagingSource
+import io.github.skydynamic.maidataviewer.core.paging.PagingSourceState
 import io.github.skydynamic.maidataviewer.ui.component.UnknownProgressCircularProgress
 import io.github.skydynamic.maidataviewer.ui.component.card.CollapsibleSearchCard
+import io.github.skydynamic.maidataviewer.ui.component.card.PaginationCard
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 object TitlePageViewModel : ViewModel() {
     var isLoaded by mutableStateOf(false)
-    
     var searchText by mutableStateOf("")
-
     var filterRate by mutableIntStateOf(-1)
-
     var isSearchCardCollapsed by mutableStateOf(false)
-
     var isSearching by mutableStateOf(false)
-
     var isSearchingActive by mutableStateOf(false)
-
     var searchJob by mutableStateOf<Job?>(null)
-
-    var searchResult by mutableStateOf<List<MaimaiTitleData>>(emptyList())
-
+    var searchResult by mutableStateOf<Flow<PagingData<MaimaiTitleData>>?>(null)
+    var searchResultState by mutableStateOf(
+        PagingSourceState(0,0,0))
+    var currentPage by mutableIntStateOf(0)
     var listState by mutableStateOf<LazyListState?>(null)
+
+    fun search(
+        keyword: String = searchText,
+        rareType: Int = filterRate,
+    ) = Pager(
+        PagingConfig(
+            pageSize = 10,
+            enablePlaceholders = true,
+            initialLoadSize = 30,
+            prefetchDistance = 0,
+            jumpThreshold = COUNT_UNDEFINED,
+        )
+    ) {
+        val filterAction = if (rareType != -1) { list: List<MaimaiTitleData> ->
+            list.filter {
+                it.rareType.ordinal == rareType
+            }
+        } else null
+
+        CollectionPagingSource.create<MaimaiTitleData>()
+            .setManager(CollectionType.TITLE.getTypedManager()!!)
+            .setKeyWord(keyword)
+            .setFilterAction(filterAction)
+            .setOnSearchFinished {
+                searchResultState = it
+            }.setCurrentPage(currentPage)
+    }.also { searchResult = it.flow.cachedIn(viewModelScope) }
 }
 
 @Composable
 fun TitlePage(
     onBackPressed: () -> Unit
 ) {
+    val titleData = TitlePageViewModel.searchResult?.collectAsLazyPagingItems()
+
     fun search() {
         if (TitlePageViewModel.isSearchingActive && TitlePageViewModel.searchJob != null) {
             TitlePageViewModel.searchJob?.cancel()
@@ -103,26 +136,25 @@ fun TitlePage(
             TitlePageViewModel.isSearching = true
             TitlePageViewModel.isSearchingActive = true
 
-            val rareType = if (TitlePageViewModel.filterRate == -1) null
-            else TitlePageViewModel.filterRate
+            TitlePageViewModel.currentPage = 0
 
-            TitlePageViewModel.searchResult = CollectionType.TITLE
-                .getTypedManager<MaimaiTitleData>()?.search(
-                    TitlePageViewModel.searchText
-                ) { list ->
-                    if (rareType != null) {
-                        list.filter {
-                            it.rareType.ordinal == rareType
-                        }
-                    } else {
-                        list
-                    }
-                } ?: emptyList()
+            TitlePageViewModel.search()
+
+            TitlePageViewModel.searchJob = null
         }
     }
 
     if (TitlePageViewModel.listState == null) {
         TitlePageViewModel.listState = rememberLazyListState()
+    }
+
+    LaunchedEffect(TitlePageViewModel.currentPage) {
+        val page = TitlePageViewModel.currentPage
+        val total = TitlePageViewModel.searchResultState.totalPage
+        if (page >= 0 && page < total) {
+            TitlePageViewModel.listState?.scrollToItem(0)
+            TitlePageViewModel.search()
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -248,100 +280,126 @@ fun TitlePage(
                         }
                     }
 
-                    LazyColumn(
+                    Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .heightIn(1000.dp)
-                            .padding(top = 8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        state = TitlePageViewModel.listState!!
+                            .fillMaxSize()
                     ) {
-                        if (TitlePageViewModel.isSearchingActive) {
-                            item(
-                                key = "search_result_title"
-                            ) {
-                                ShadowElevatedCard(
-                                    modifier = Modifier
-                                        .heightIn(max = 40.dp)
-                                        .fillMaxSize()
-                                        .padding(horizontal = 8.dp)
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .heightIn(1000.dp)
+                                .padding(top = 8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            state = TitlePageViewModel.listState!!
+                        ) {
+                            if (TitlePageViewModel.isSearchingActive) {
+                                item(
+                                    key = "search_result_title"
                                 ) {
-                                    Row(
+                                    ShadowElevatedCard(
                                         modifier = Modifier
-                                            .fillMaxSize(),
-                                        verticalAlignment = Alignment.CenterVertically
+                                            .heightIn(max = 40.dp)
+                                            .fillMaxSize()
+                                            .padding(horizontal = 8.dp)
                                     ) {
-                                        Text(
-                                            text = R.string.title_search_result.getString()
-                                                .format(
-                                                    TitlePageViewModel.searchResult.size
-                                                ),
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            textAlign = TextAlign.Center,
-                                            fontWeight = FontWeight.Bold,
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxSize(),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = R.string.title_search_result.getString()
+                                                    .format(
+                                                        TitlePageViewModel.searchResultState.currentSearchCount
+                                                    ),
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                textAlign = TextAlign.Center,
+                                                fontWeight = FontWeight.Bold,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(8.dp)
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(8.dp)
+                                    )
+                                }
+                            }
+
+                            if (titleData != null) {
+                                items(
+                                    count = titleData.itemCount,
+                                    key = { titleData[it]?.id ?: it }
+                                ) {
+                                    val title = titleData[it]
+                                    if (title != null) {
+                                        HorizontalDivider(
+                                            thickness = 2.dp,
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .padding(8.dp)
+                                                .padding(horizontal = 16.dp)
+                                        )
+
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth(),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Image(
+                                                painterResource(title.rareType.resId),
+                                                contentDescription = null,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .size(36.dp)
+                                            )
+
+                                            Text(
+                                                text = title.name ?: "",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                textAlign = TextAlign.Center,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 54.dp),
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                                color = Color.Black
+                                            )
+                                        }
+
+                                        Text(
+                                            text = title.normalText ?: "",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            textAlign = TextAlign.Center,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 16.dp)
                                         )
                                     }
                                 }
+                            }
 
-                                Spacer(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(8.dp)
-                                )
+                            item(
+                                key = "spacerBottom"
+                            ) {
+                                Spacer(modifier = Modifier.height(65.dp))
                             }
                         }
 
-                        if (TitlePageViewModel.searchResult.isNotEmpty()) {
-                            items(
-                                TitlePageViewModel.searchResult,
-                                key = { it.id }
-                            ) { title ->
-                                HorizontalDivider(
-                                    thickness = 2.dp,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp)
-                                )
-
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Image(
-                                        painterResource(title.rareType.resId),
-                                        contentDescription = null,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .size(36.dp)
-                                    )
-
-                                    Text(
-                                        text = title.name ?: "",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 54.dp),
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        color = Color.Black
-                                    )
-                                }
-
-                                Text(
-                                    text = title.normalText ?: "",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp)
-                                )
-                            }
+                        PaginationCard(
+                            modifier = Modifier
+                                .height(70.dp)
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp, horizontal = 16.dp)
+                                .align(Alignment.BottomCenter),
+                            currentPage = TitlePageViewModel.currentPage + 1,
+                            totalPage = TitlePageViewModel.searchResultState.totalPage,
+                        ) {
+                            TitlePageViewModel.currentPage = it - 1
                         }
                     }
                 }

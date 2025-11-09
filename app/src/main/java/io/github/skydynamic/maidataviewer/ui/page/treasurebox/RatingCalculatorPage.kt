@@ -43,7 +43,6 @@ import io.github.skydynamic.maidataviewer.core.getString
 import io.github.skydynamic.maidataviewer.core.utils.calcRating
 import io.github.skydynamic.maidataviewer.core.utils.getMultiplierFactor
 import io.github.skydynamic.maidataviewer.core.utils.getRank
-import io.github.skydynamic.maidataviewer.ui.component.WindowInsetsSpacer.TopPaddingSpacer
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
 
 data class CalcResultStruct(

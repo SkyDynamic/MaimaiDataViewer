@@ -26,6 +26,7 @@ import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.getString
 import io.github.skydynamic.maidataviewer.ui.AppNavController
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
+import io.github.skydynamic.maidataviewer.ui.page.treasurebox.collection.CollectionPages
 
 
 enum class DataTool(

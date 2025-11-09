@@ -5,6 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -23,7 +24,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -56,6 +56,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.PagingSource.LoadResult.Page.Companion.COUNT_UNDEFINED
+import androidx.paging.cachedIn
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
@@ -64,32 +70,58 @@ import io.github.skydynamic.maidataviewer.core.data.MaimaiPlateData
 import io.github.skydynamic.maidataviewer.core.getString
 import io.github.skydynamic.maidataviewer.core.manager.collection.CollectionType
 import io.github.skydynamic.maidataviewer.core.manager.resource.ResourceManagerType
+import io.github.skydynamic.maidataviewer.core.paging.CollectionPagingSource
+import io.github.skydynamic.maidataviewer.core.paging.PagingSourceState
 import io.github.skydynamic.maidataviewer.ui.component.UnknownProgressCircularProgress
 import io.github.skydynamic.maidataviewer.ui.component.card.CollapsibleSearchCard
+import io.github.skydynamic.maidataviewer.ui.component.card.PaginationCard
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.io.File
 
 object PlatePageViewModel : ViewModel() {
     var isLoaded by mutableStateOf(false)
-
     var searchText by mutableStateOf("")
-
     var filterGenre by mutableIntStateOf(-1)
-
     var isSearchCardCollapsed by mutableStateOf(false)
-
     var isSearching by mutableStateOf(false)
-
     var isSearchingActive by mutableStateOf(false)
-
     var searchJob by mutableStateOf<Job?>(null)
-
-    var searchResult by mutableStateOf<List<MaimaiPlateData>>(emptyList())
-
+    var searchResult by mutableStateOf<Flow<PagingData<MaimaiPlateData>>?>(null)
+    var searchResultState by mutableStateOf(
+        PagingSourceState(0,0,0))
+    var currentPage by mutableIntStateOf(0)
     var listState by mutableStateOf<LazyGridState?>(null)
+
+    fun search(
+        keyword: String = searchText,
+        genre: Int = filterGenre,
+    ) = Pager(
+        PagingConfig(
+            pageSize = 10,
+            enablePlaceholders = true,
+            initialLoadSize = 10,
+            prefetchDistance = 0,
+            jumpThreshold = COUNT_UNDEFINED,
+        )
+    ) {
+        val filterAction = if (filterGenre != -1) { list: List<MaimaiPlateData> ->
+            list.filter {
+                it.genre == genre
+            }
+        } else null
+
+        CollectionPagingSource.create<MaimaiPlateData>()
+            .setManager(CollectionType.PLATE.getTypedManager()!!)
+            .setKeyWord(keyword)
+            .setFilterAction(filterAction)
+            .setOnSearchFinished {
+                searchResultState = it
+            }.setCurrentPage(currentPage)
+    }.also { searchResult = it.flow.cachedIn(viewModelScope) }
 }
 
 @Composable
@@ -153,6 +185,8 @@ fun PlateSimpleCard(
 fun PlatePage(
     onBackPressed: () -> Unit
 ) {
+    val plateData = PlatePageViewModel.searchResult?.collectAsLazyPagingItems()
+
     fun search() {
         if (PlatePageViewModel.isSearchingActive && PlatePageViewModel.searchJob != null) {
             PlatePageViewModel.searchJob?.cancel()
@@ -162,26 +196,25 @@ fun PlatePage(
             PlatePageViewModel.isSearching = true
             PlatePageViewModel.isSearchingActive = true
 
-            val genre = if (PlatePageViewModel.filterGenre == -1) null
-            else PlatePageViewModel.filterGenre
+            PlatePageViewModel.currentPage = 0
 
-            PlatePageViewModel.searchResult = CollectionType.PLATE
-                .getTypedManager<MaimaiPlateData>()?.search(
-                    PlatePageViewModel.searchText
-                ) { list ->
-                    if (genre != null) {
-                        list.filter {
-                            it.genre == genre
-                        }
-                    } else {
-                        list
-                    }
-                } ?: emptyList()
+            PlatePageViewModel.search()
+
+            PlatePageViewModel.searchJob = null
         }
     }
 
     if (PlatePageViewModel.listState == null) {
         PlatePageViewModel.listState = rememberLazyGridState()
+    }
+
+    LaunchedEffect(PlatePageViewModel.currentPage) {
+        val page = PlatePageViewModel.currentPage
+        val total = PlatePageViewModel.searchResultState.totalPage
+        if (page >= 0 && page < total) {
+            PlatePageViewModel.listState?.scrollToItem(0)
+            PlatePageViewModel.search()
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -307,63 +340,92 @@ fun PlatePage(
                         }
                     }
 
-                    LazyVerticalGrid(
+                    Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .heightIn(1000.dp)
-                            .padding(top = 8.dp),
-                        columns = GridCells.Fixed(2),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.Top),
-                        state = PlatePageViewModel.listState!!
+                            .fillMaxSize()
                     ) {
-                        if (PlatePageViewModel.isSearchingActive) {
-                            item(
-                                key = "search_bar",
-                                span = { GridItemSpan(2) }
-                            ) {
-                                ShadowElevatedCard(
-                                    modifier = Modifier
-                                        .heightIn(max = 40.dp)
-                                        .fillMaxSize()
-                                        .padding(horizontal = 8.dp)
+                        LazyVerticalGrid(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .heightIn(1000.dp)
+                                .padding(top = 8.dp),
+                            columns = GridCells.Fixed(2),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalArrangement = Arrangement.spacedBy(
+                                8.dp,
+                                alignment = Alignment.Top
+                            ),
+                            state = PlatePageViewModel.listState!!
+                        ) {
+                            if (PlatePageViewModel.isSearchingActive) {
+                                item(
+                                    key = "search_bar",
+                                    span = { GridItemSpan(2) }
                                 ) {
-                                    Row(
+                                    ShadowElevatedCard(
                                         modifier = Modifier
-                                            .fillMaxSize(),
-                                        verticalAlignment = Alignment.CenterVertically
+                                            .heightIn(max = 40.dp)
+                                            .fillMaxSize()
+                                            .padding(horizontal = 8.dp)
                                     ) {
-                                        Text(
-                                            text = R.string.plate_search_result.getString()
-                                                .format(
-                                                    PlatePageViewModel.searchResult.size
-                                                ),
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            textAlign = TextAlign.Center,
-                                            fontWeight = FontWeight.Bold,
+                                        Row(
                                             modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(8.dp)
-                                        )
+                                                .fillMaxSize(),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = R.string.plate_search_result.getString()
+                                                    .format(
+                                                        PlatePageViewModel.searchResultState.currentSearchCount
+                                                    ),
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                textAlign = TextAlign.Center,
+                                                fontWeight = FontWeight.Bold,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(8.dp)
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(8.dp)
+                                    )
+                                }
+                            }
+
+                            if (plateData != null) {
+                                items(
+                                    count = plateData.itemCount,
+                                    key = { plateData[it]?.id ?: it }
+                                ) {
+                                    val item = plateData[it]
+                                    if (item != null) {
+                                        PlateSimpleCard(item)
                                     }
                                 }
+                            }
 
-                                Spacer(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(8.dp)
-                                )
+                            item(
+                                key = "spacerBottom"
+                            ) {
+                                Spacer(modifier = Modifier.height(65.dp))
                             }
                         }
 
-                        if (PlatePageViewModel.searchResult.isNotEmpty()) {
-                            items(
-                                items = PlatePageViewModel.searchResult,
-                                key = { it.id }
-                            ) {
-                                PlateSimpleCard(it)
-                            }
+                        PaginationCard(
+                            modifier = Modifier
+                                .height(70.dp)
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp, horizontal = 16.dp)
+                                .align(Alignment.BottomCenter),
+                            currentPage = PlatePageViewModel.currentPage + 1,
+                            totalPage = PlatePageViewModel.searchResultState.totalPage
+                        ) {
+                            PlatePageViewModel.currentPage = it - 1
                         }
                     }
                 }

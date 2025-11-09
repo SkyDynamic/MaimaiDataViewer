@@ -43,7 +43,7 @@ import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.getString
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
 import io.github.skydynamic.maidataviewer.ui.page.AchievementDataTablePage
-import io.github.skydynamic.maidataviewer.ui.page.CollectionPages
+import io.github.skydynamic.maidataviewer.ui.page.treasurebox.collection.CollectionPages
 import io.github.skydynamic.maidataviewer.ui.page.HomePage
 import io.github.skydynamic.maidataviewer.ui.page.MusicDetailPage
 import io.github.skydynamic.maidataviewer.ui.page.MusicPage

@@ -116,7 +116,7 @@ fun MusicPage() {
     LaunchedEffect(MusicPageViewModel.currentPage.intValue) {
         val page = MusicPageViewModel.currentPage.intValue
         val total = MusicPageViewModel.searchResultState.value.totalPage
-        if (page >= 0 && page <= total) {
+        if (page >= 0 && page < total) {
             listState?.scrollToItem(0)
 
             MusicPageViewModel.search()
