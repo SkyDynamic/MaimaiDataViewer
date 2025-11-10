@@ -23,7 +23,7 @@ class MaimaiPlateManager(
     override var _isLoaded: Boolean = false
     override var _currentCollectionVersion: MaiVersion = MaiVersion(-1, 0)
 
-    val assetsUrl = "https://assets2.lxns.net/maimai/plate"
+    val assetsUrl = "https://maimai-assets.skydynamic.top/plate"
 
     private var plateData: Map<Int, MaimaiPlateData> = emptyMap()
 

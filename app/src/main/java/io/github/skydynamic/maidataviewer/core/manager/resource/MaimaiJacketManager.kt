@@ -15,7 +15,7 @@ class MaimaiJacketManager(
     override val resPath: File,
     override val httpClient: AppHttpClient,
 ) : MaimaiResourceManager {
-    val assetsUrl = "https://assets2.lxns.net/maimai/jacket"
+    val assetsUrl = "https://maimai-assets.skydynamic.top/jacket"
 
     private fun checkFileBroken(file: File): Boolean {
         val bitmap = BitmapFactory.decodeFile(file.toString())
