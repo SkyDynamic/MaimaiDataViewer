@@ -16,7 +16,6 @@ class MaimaiJacketManager(
     override val httpClient: AppHttpClient,
 ) : MaimaiResourceManager {
     val assetsUrl = "https://assets2.lxns.net/maimai/jacket"
-    val baseApiUrl = "https://mdvu.skydynamic.top/api/v0/title"
 
     private fun checkFileBroken(file: File): Boolean {
         val bitmap = BitmapFactory.decodeFile(file.toString())
@@ -25,7 +24,7 @@ class MaimaiJacketManager(
         }
         try {
             bitmap.width
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             return true
         }
 
@@ -33,39 +32,43 @@ class MaimaiJacketManager(
     }
 
     override suspend fun getResFile(id: Int): File? {
-        var yid = id
-        var aid = id
-        if (id > 0) {
-            if (id > 100000) {
-                yid = id % 10000
-            } else if (yid > 10000) {
-                aid -= 10000
-            }
-
-            val jacketPath = resPath.resolve("jacket")
-            jacketPath.mkdirsIfNotExists()
-
-            val jacketFile = jacketPath.resolve("$yid.png")
-            var result: Long? = null
-            if (!jacketFile.exists() || checkFileBroken(jacketFile)) {
-                jacketFile.deleteOnExit()
-                result = httpClient.request {
-                    it.get("$assetsUrl/$aid.png")
-                        .bodyAsChannel()
-                        .copyTo(jacketFile.outputStream())
-                }
-                Log.i("MaimaiJacketManager", "Downloaded jacket $id")
-            }
-            return if (result != null || jacketFile.exists() || !checkFileBroken(jacketFile)) {
-                jacketFile
-            } else {
-                null
-            }
-        } else {
+        if (id <= 0) {
             Log.e("MaimaiJacketManager", "Invalid jacket id: $id")
             return null
         }
+
+        val idStr = id.toString()
+        val suffix = if (idStr.length >= 5) {
+            idStr.substring(idStr.length - 4)
+        } else {
+            idStr
+        }
+
+        val numericSuffix = suffix.toInt()
+
+        val jacketPath = resPath.resolve("jacket")
+        jacketPath.mkdirsIfNotExists()
+
+        val jacketFile = jacketPath.resolve("$suffix.png")
+        var result: Long? = null
+
+        if (!jacketFile.exists() || checkFileBroken(jacketFile)) {
+            jacketFile.deleteOnExit()
+            result = httpClient.request {
+                it.get("$assetsUrl/$numericSuffix.png")
+                    .bodyAsChannel()
+                    .copyTo(jacketFile.outputStream())
+            }
+            Log.i("MaimaiJacketManager", "Downloaded jacket $id -> $numericSuffix")
+        }
+
+        return if (result != null || jacketFile.exists() && !checkFileBroken(jacketFile)) {
+            jacketFile
+        } else {
+            null
+        }
     }
+
 
     override fun getResByteFromAssets(id: Int): ByteArray? {
         if (id >= 0) {
