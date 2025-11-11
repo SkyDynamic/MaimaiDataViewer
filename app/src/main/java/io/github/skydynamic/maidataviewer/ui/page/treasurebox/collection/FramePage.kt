@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -80,9 +81,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.io.File
-import kotlin.random.Random
 
-object IconPageViewModel : ViewModel() {
+object FramePageViewModel : ViewModel() {
     var isLoaded by mutableStateOf(false)
     var searchText by mutableStateOf("")
     var filterGenre by mutableIntStateOf(-1)
@@ -115,7 +115,7 @@ object IconPageViewModel : ViewModel() {
         } else null
 
         CollectionPagingSource.create<MaimaiCommonCollectionData>()
-            .setManager(CollectionType.ICON.getTypedManager()!!)
+            .setManager(CollectionType.FRAME.getTypedManager()!!)
             .setKeyWord(keyword)
             .setFilterAction(filterAction)
             .setOnSearchFinished {
@@ -125,18 +125,18 @@ object IconPageViewModel : ViewModel() {
 }
 
 @Composable
-fun IconSimpleCard(
-    iconData: MaimaiCommonCollectionData
+fun FrameSimpleCard(
+    frameData: MaimaiCommonCollectionData
 ) {
-    val iconResManager = ResourceManagerType.ICON.instance!!
+    val frameResManager = ResourceManagerType.FRAME.instance!!
 
-    val defaultIconByte = remember { iconResManager.getResByteFromAssets(0) }
-    var iconFile by remember { mutableStateOf<File?>(null) }
+    val defaultFrameByte = remember { frameResManager.getResByteFromAssets(0) }
+    var frameFile by remember { mutableStateOf<File?>(null) }
 
-    LaunchedEffect(iconData.id) {
-        IconPageViewModel.viewModelScope.launch(Dispatchers.IO) {
-            iconFile = try {
-                ResourceManagerType.ICON.instance!!.getResFile(iconData.id)
+    LaunchedEffect(frameData.id) {
+        FramePageViewModel.viewModelScope.launch(Dispatchers.IO) {
+            frameFile = try {
+                ResourceManagerType.FRAME.instance!!.getResFile(frameData.id)
             } catch (_: Exception) {
                 null
             }
@@ -152,11 +152,11 @@ fun IconSimpleCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(iconFile ?: defaultIconByte)
+                    .data(frameFile ?: defaultFrameByte)
                     .crossfade(true)
                     .build(),
                 contentDescription = null,
@@ -165,14 +165,14 @@ fun IconSimpleCard(
             )
 
             Text(
-                text = iconData.name ?: "",
+                text = frameData.name ?: "",
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleSmall
             )
 
             Text(
-                text = "(${iconData.normalText})",
+                text = "(${frameData.normalText})",
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -182,49 +182,49 @@ fun IconSimpleCard(
 }
 
 @Composable
-fun IconPage(
+fun FramePage(
     onBackPressed: () -> Unit
 ) {
-    val iconData = IconPageViewModel.searchResult?.collectAsLazyPagingItems()
+    val frameData = FramePageViewModel.searchResult?.collectAsLazyPagingItems()
 
     fun search() {
-        if (IconPageViewModel.isSearchingActive && IconPageViewModel.searchJob != null) {
-            IconPageViewModel.searchJob?.cancel()
+        if (FramePageViewModel.isSearchingActive && FramePageViewModel.searchJob != null) {
+            FramePageViewModel.searchJob?.cancel()
         }
 
-        IconPageViewModel.searchJob = IconPageViewModel.viewModelScope.launch(Dispatchers.IO) {
-            IconPageViewModel.isSearching = true
-            IconPageViewModel.isSearchingActive = true
+        FramePageViewModel.searchJob = FramePageViewModel.viewModelScope.launch(Dispatchers.IO) {
+            FramePageViewModel.isSearching = true
+            FramePageViewModel.isSearchingActive = true
 
-            IconPageViewModel.currentPage = 0
+            FramePageViewModel.currentPage = 0
 
-            IconPageViewModel.search()
+            FramePageViewModel.search()
 
-            IconPageViewModel.searchJob = null
+            FramePageViewModel.searchJob = null
         }
     }
 
-    if (IconPageViewModel.listState == null) {
-        IconPageViewModel.listState = rememberLazyGridState()
+    if (FramePageViewModel.listState == null) {
+        FramePageViewModel.listState = rememberLazyGridState()
     }
 
-    LaunchedEffect(IconPageViewModel.currentPage) {
-        val page = IconPageViewModel.currentPage
-        val total = IconPageViewModel.searchResultState.totalPage
+    LaunchedEffect(FramePageViewModel.currentPage) {
+        val page = FramePageViewModel.currentPage
+        val total = FramePageViewModel.searchResultState.totalPage
         if (page >= 0 && page < total) {
-            IconPageViewModel.listState?.scrollToItem(0)
-            IconPageViewModel.search()
+            FramePageViewModel.listState?.scrollToItem(0)
+            FramePageViewModel.search()
         }
     }
 
     LaunchedEffect(Unit) {
-        if (!CollectionType.ICON.manager!!.isLoaded) {
-            IconPageViewModel.viewModelScope.launch(Dispatchers.IO) {
-                CollectionType.ICON.manager!!.loadCollectionData()
-                IconPageViewModel.isLoaded = true
+        if (!CollectionType.FRAME.manager!!.isLoaded) {
+            FramePageViewModel.viewModelScope.launch(Dispatchers.IO) {
+                CollectionType.FRAME.manager!!.loadCollectionData()
+                FramePageViewModel.isLoaded = true
             }
         } else {
-            IconPageViewModel.isLoaded = true
+            FramePageViewModel.isLoaded = true
         }
         search()
     }
@@ -256,14 +256,14 @@ fun IconPage(
                 }
 
                 Text(
-                    text = R.string.icon_page.strings,
+                    text = R.string.plate_page.strings,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
                 )
             }
 
-            if (!IconPageViewModel.isLoaded) {
+            if (!FramePageViewModel.isLoaded) {
                 UnknownProgressCircularProgress(
                     strokeWidth = 4.dp,
                     gapSize = 4.dp
@@ -271,10 +271,10 @@ fun IconPage(
             }
 
             AnimatedVisibility(
-                visible = IconPageViewModel.isLoaded,
+                visible = FramePageViewModel.isLoaded,
                 enter = fadeIn(animationSpec = tween(500)),
                 exit = fadeOut(animationSpec = tween(500)),
-                label = "IconPage"
+                label = "FramePage"
             ) {
                 Column(
                     modifier = Modifier
@@ -284,10 +284,10 @@ fun IconPage(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp),
-                        isCollapsed = IconPageViewModel.isSearchCardCollapsed,
+                        isCollapsed = FramePageViewModel.isSearchCardCollapsed,
                         onCollapseToggle = {
-                            IconPageViewModel.isSearchCardCollapsed = !IconPageViewModel.isSearchCardCollapsed
-                        },
+                            FramePageViewModel.isSearchCardCollapsed = !FramePageViewModel.isSearchCardCollapsed
+                        }
                     ) {
                         Row(
                             modifier = Modifier
@@ -296,9 +296,9 @@ fun IconPage(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             OutlinedTextField(
-                                value = IconPageViewModel.searchText,
-                                onValueChange = { IconPageViewModel.searchText = it },
-                                enabled = IconPageViewModel.isLoaded,
+                                value = FramePageViewModel.searchText,
+                                onValueChange = { FramePageViewModel.searchText = it },
+                                enabled = FramePageViewModel.isLoaded,
                                 label = { Text(R.string.search.strings) },
                                 placeholder = {
                                     Text(
@@ -322,7 +322,7 @@ fun IconPage(
 
                             Button(
                                 onClick = { search() },
-                                enabled = IconPageViewModel.isLoaded,
+                                enabled = FramePageViewModel.isLoaded,
                                 shape = RoundedCornerShape(16.dp),
                                 contentPadding = PaddingValues(8.dp),
                                 modifier = Modifier
@@ -346,15 +346,19 @@ fun IconPage(
                     ) {
                         LazyVerticalGrid(
                             modifier = Modifier
-                                .fillMaxSize()
+                                .fillMaxWidth()
+                                .fillMaxHeight()
                                 .heightIn(1000.dp)
                                 .padding(top = 8.dp),
                             columns = GridCells.Fixed(2),
                             horizontalArrangement = Arrangement.Center,
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            state = IconPageViewModel.listState!!
+                            verticalArrangement = Arrangement.spacedBy(
+                                8.dp,
+                                alignment = Alignment.Top
+                            ),
+                            state = FramePageViewModel.listState!!
                         ) {
-                            if (IconPageViewModel.isSearchingActive) {
+                            if (FramePageViewModel.isSearchingActive) {
                                 item(
                                     key = "search_bar",
                                     span = { GridItemSpan(2) }
@@ -371,9 +375,9 @@ fun IconPage(
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Text(
-                                                text = R.string.icon_search_result.strings
+                                                text = R.string.plate_search_result.strings
                                                     .format(
-                                                        IconPageViewModel.searchResultState.currentSearchCount
+                                                        FramePageViewModel.searchResultState.currentSearchCount
                                                     ),
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 textAlign = TextAlign.Center,
@@ -393,14 +397,14 @@ fun IconPage(
                                 }
                             }
 
-                            if (iconData != null) {
+                            if (frameData != null) {
                                 items(
-                                    count = iconData.itemCount,
-                                    key = { iconData[it]?.id ?: Random.nextInt() }
+                                    count = frameData.itemCount,
+                                    key = { frameData[it]?.id ?: it }
                                 ) {
-                                    val item = iconData[it]
+                                    val item = frameData[it]
                                     if (item != null) {
-                                        IconSimpleCard(item)
+                                        FrameSimpleCard(item)
                                     }
                                 }
                             }
@@ -418,10 +422,10 @@ fun IconPage(
                                 .fillMaxWidth()
                                 .padding(vertical = 8.dp, horizontal = 16.dp)
                                 .align(Alignment.BottomCenter),
-                            currentPage = IconPageViewModel.currentPage + 1,
-                            totalPage = IconPageViewModel.searchResultState.totalPage,
+                            currentPage = FramePageViewModel.currentPage + 1,
+                            totalPage = FramePageViewModel.searchResultState.totalPage
                         ) {
-                            IconPageViewModel.currentPage = it - 1
+                            FramePageViewModel.currentPage = it - 1
                         }
                     }
                 }

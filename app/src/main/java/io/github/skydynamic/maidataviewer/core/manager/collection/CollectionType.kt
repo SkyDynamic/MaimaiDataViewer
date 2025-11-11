@@ -16,7 +16,8 @@ enum class CollectionType(
 ) {
     TITLE("title", TitleDataManager::init, null),
     ICON("icon", MaimaiIconManager::build, null),
-    PLATE("plate", MaimaiPlateManager::build, null);
+    PLATE("plate", MaimaiPlateManager::build, null),
+    FRAME("frame", MaimaiFrameManager::build, null);
 
     fun <T : IMaimaiCollectionData> getTypedManager(): CollectionManager<T>? {
         return manager as CollectionManager<T>?

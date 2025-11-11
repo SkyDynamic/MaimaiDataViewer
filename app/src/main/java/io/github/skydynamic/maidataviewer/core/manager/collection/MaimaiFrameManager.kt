@@ -15,7 +15,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.io.File
 
-class MaimaiPlateManager(
+class MaimaiFrameManager(
     override val assetManager: AssetManager,
     override val resPath: File,
     override val httpClient: AppHttpClient
@@ -23,38 +23,38 @@ class MaimaiPlateManager(
     override var _isLoaded: Boolean = false
     override var _currentCollectionVersion: MaiVersion = MaiVersion(-1, 0)
 
-    val assetsUrl = "https://maimai-assets.skydynamic.top/plate"
+    val assetsUrl = "https://maimai-assets.skydynamic.top/frame"
 
-    private var plateData: Map<Int, MaimaiCommonCollectionData> = emptyMap()
+    private var frameData: Map<Int, MaimaiCommonCollectionData> = emptyMap()
 
-    override val collectionType: CollectionType = CollectionType.PLATE
+    override val collectionType: CollectionType = CollectionType.FRAME
 
     @Serializable
-    data class PlateData(
+    data class FrameData(
         val version: String,
         val data: List<MaimaiCommonCollectionData>
     )
 
     override fun loadCollectionData() {
-        val file = resPath.resolve("plate_list.json")
+        val file = resPath.resolve("frame_list.json")
         if (file.exists()) {
             val json = file.readText()
-            val plateData = Json.Default.decodeFromString<PlateData>(json)
-            currentCollectionVersion = MaiVersion.Companion.tryParse(plateData.version)!!
-            this.plateData = plateData.data.associateBy { it.id }
+            val frameData = Json.decodeFromString<FrameData>(json)
+            currentCollectionVersion = MaiVersion.tryParse(frameData.version)!!
+            this.frameData = frameData.data.associateBy { it.id }
             isLoaded = true
         }
     }
 
     override fun getCollection(id: Int): MaimaiCommonCollectionData? {
-        return plateData[id]
+        return frameData[id]
     }
 
     override fun search(
         keyword: String,
         filterAction: ((List<MaimaiCommonCollectionData>) -> List<MaimaiCommonCollectionData>)?
     ): List<MaimaiCommonCollectionData> {
-        val result = plateData.values.filter {
+        val result = frameData.values.filter {
             it.name?.contains(keyword) == true
             || it.normalText?.contains(keyword) == true
         }
@@ -68,39 +68,39 @@ class MaimaiPlateManager(
 
     override suspend fun downloadCollectionData(onFinished: (MaiVersion?) -> Unit) {
         try {
-            val plateData = httpClient.request {
+            val frameData = httpClient.request {
                 val response = it.get("${this.baseApiUrl}/update")
-                response.body<PlateData>()
+                response.body<FrameData>()
             }
 
-            val latestVersion = MaiVersion.Companion.tryParse(plateData!!.version)
+            val latestVersion = MaiVersion.Companion.tryParse(frameData!!.version)
             if (latestVersion != null && latestVersion > currentCollectionVersion) {
                 currentCollectionVersion = latestVersion
-                resPath.resolve("plate_list.json")
-                    .writeText(Json.Default.encodeToString(plateData))
+                resPath.resolve("frame_list.json")
+                    .writeText(Json.Default.encodeToString(frameData))
             }
 
             onFinished(latestVersion)
         } catch (e: Exception) {
-            Log.e("PlateDataManager", "Error downloading plate data", e)
+            Log.e("FrameDataManager", "Error downloading frame data", e)
         }
     }
 
     override suspend fun getResFile(id: Int): File? {
-        val platePath = resPath.resolve("plate")
-        platePath.mkdirsIfNotExists()
+        val framePath = resPath.resolve("frame")
+        framePath.mkdirsIfNotExists()
 
-        val plateFile = platePath.resolve("$id.png")
-        if (!plateFile.exists()) {
+        val frameFile = framePath.resolve("$id.png")
+        if (!frameFile.exists()) {
             httpClient.request {
                 it.get("$assetsUrl/$id.png")
                     .bodyAsChannel()
-                    .copyTo(plateFile.outputStream())
+                    .copyTo(frameFile.outputStream())
             }
-            Log.i("MaimaiPlateManager", "Downloaded plate $id")
+            Log.i("MaimaiFrameManager", "Downloaded frame $id")
         }
-        return if (plateFile.exists()) {
-            plateFile
+        return if (frameFile.exists()) {
+            frameFile
         } else {
             null
         }
@@ -108,24 +108,24 @@ class MaimaiPlateManager(
 
     override fun getResByteFromAssets(id: Int): ByteArray? {
         if (id >= 0) {
-            val plateByte = assetManager.open("plate/$id.png").readBytes()
-            return plateByte
+            val frameByte = assetManager.open("frame/$id.png").readBytes()
+            return frameByte
         } else {
-            Log.e("MaimaiPlateManager", "Invalid plate id: $id")
+            Log.e("MaimaiFrameManager", "Invalid frame id: $id")
             return null
         }
     }
 
     companion object {
-        private var instance: MaimaiPlateManager? = null
+        private var instance: MaimaiFrameManager? = null
 
         fun build(
             assetsManager: AssetManager,
             resPath: File,
             httpClient: AppHttpClient
-        ): MaimaiPlateManager {
+        ): MaimaiFrameManager {
             if (instance == null) {
-                instance = MaimaiPlateManager(assetsManager, resPath, httpClient)
+                instance = MaimaiFrameManager(assetsManager, resPath, httpClient)
             }
             if (!instance!!.isLoaded) {
                 instance!!.loadCollectionData()

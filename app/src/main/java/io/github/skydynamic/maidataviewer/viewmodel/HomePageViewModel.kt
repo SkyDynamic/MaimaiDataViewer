@@ -9,4 +9,5 @@ object HomePageViewModel : ViewModel() {
     val isUpdateMaiTitleDataAvailable = mutableStateOf(false)
     val isUpdateMaiIconAvailable = mutableStateOf(false)
     val isUpdateMaiPlateDataAvailable = mutableStateOf(false)
+    val isUpdateMaiFrameDataAvailable = mutableStateOf(false)
 }

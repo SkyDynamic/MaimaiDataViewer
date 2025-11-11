@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import io.github.skydynamic.maidataviewer.R
-import io.github.skydynamic.maidataviewer.core.getString
+import io.github.skydynamic.maidataviewer.core.strings
 
 @Composable
 fun CommonDialog(
@@ -57,7 +57,7 @@ fun CommonDialog(
                     }
 
                     Text(
-                        text = R.string.close.getString(),
+                        text = R.string.close.strings,
                         modifier = Modifier.weight(1f),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,

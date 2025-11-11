@@ -66,7 +66,7 @@ import androidx.paging.cachedIn
 import androidx.paging.compose.collectAsLazyPagingItems
 import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.data.MaimaiTitleData
-import io.github.skydynamic.maidataviewer.core.getString
+import io.github.skydynamic.maidataviewer.core.strings
 import io.github.skydynamic.maidataviewer.core.manager.collection.CollectionType
 import io.github.skydynamic.maidataviewer.core.paging.CollectionPagingSource
 import io.github.skydynamic.maidataviewer.core.paging.PagingSourceState
@@ -196,7 +196,7 @@ fun TitlePage(
                 }
 
                 Text(
-                    text = R.string.title_page.getString(),
+                    text = R.string.title_page.strings,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -239,10 +239,10 @@ fun TitlePage(
                                 value = TitlePageViewModel.searchText,
                                 onValueChange = { TitlePageViewModel.searchText = it },
                                 enabled = TitlePageViewModel.isLoaded,
-                                label = { Text(R.string.search.getString()) },
+                                label = { Text(R.string.search.strings) },
                                 placeholder = {
                                     Text(
-                                        R.string.search_collection_placeholder.getString(),
+                                        R.string.search_collection_placeholder.strings,
                                         autoSize = TextAutoSize.StepBased(minFontSize = 8.sp)
                                     )
                                 },
@@ -272,7 +272,7 @@ fun TitlePage(
                                     .weight(0.25f)
                             ) {
                                 Text(
-                                    text = R.string.search.getString(),
+                                    text = R.string.search.strings,
                                     maxLines = 1,
                                     autoSize = TextAutoSize.StepBased(maxFontSize = 16.sp)
                                 )
@@ -309,7 +309,7 @@ fun TitlePage(
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Text(
-                                                text = R.string.title_search_result.getString()
+                                                text = R.string.title_search_result.strings
                                                     .format(
                                                         TitlePageViewModel.searchResultState.currentSearchCount
                                                     ),

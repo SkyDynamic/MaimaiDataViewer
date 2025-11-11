@@ -58,7 +58,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
-import io.github.skydynamic.maidataviewer.core.getString
+import io.github.skydynamic.maidataviewer.core.strings
 import io.github.skydynamic.maidataviewer.core.manager.GenreType
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
@@ -294,7 +294,7 @@ fun RandomMusicPage(
                 }
 
                 Text(
-                    text = R.string.random_music.getString(),
+                    text = R.string.random_music.strings,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -334,7 +334,7 @@ fun RandomMusicPage(
                             Box(modifier = Modifier.weight(0.5f)) {
                                 GenreSelectorButton(
                                     value = MaiGenreManager.musicGenre.getGenreName(genreFilter),
-                                    label = R.string.genre.getString(),
+                                    label = R.string.genre.strings,
                                     onClick = { genreDropdownMenuActive = true }
                                 )
 
@@ -352,7 +352,7 @@ fun RandomMusicPage(
                             Box(modifier = Modifier.weight(0.5f)) {
                                 GenreSelectorButton(
                                     value = MaiGenreManager.versionGenre.getGenreName(versionFilter),
-                                    label = R.string.versionGenre.getString(),
+                                    label = R.string.versionGenre.strings,
                                     onClick = { versionDropdownMenuActive = true }
                                 )
 
@@ -378,7 +378,7 @@ fun RandomMusicPage(
                                     .weight(1f)
                             ) {
                                 Text(
-                                    text = R.string.min_level.getString(),
+                                    text = R.string.min_level.strings,
                                     style = MaterialTheme.typography.bodyLarge,
                                 )
 
@@ -402,7 +402,7 @@ fun RandomMusicPage(
                                     ),
                                     placeholder = {
                                         Text(
-                                            text = R.string.rating_calculator_music_level_placeholder.getString(),
+                                            text = R.string.rating_calculator_music_level_placeholder.strings,
                                             style = MaterialTheme.typography.bodyMedium,
                                         )
                                     }
@@ -414,7 +414,7 @@ fun RandomMusicPage(
                                     .weight(1f)
                             ) {
                                 Text(
-                                    text = R.string.max_level.getString(),
+                                    text = R.string.max_level.strings,
                                     style = MaterialTheme.typography.bodyLarge,
                                 )
 
@@ -438,7 +438,7 @@ fun RandomMusicPage(
                                     ),
                                     placeholder = {
                                         Text(
-                                            text = R.string.rating_calculator_music_level_placeholder.getString(),
+                                            text = R.string.rating_calculator_music_level_placeholder.strings,
                                             style = MaterialTheme.typography.bodyMedium,
                                         )
                                     }
@@ -447,7 +447,7 @@ fun RandomMusicPage(
                         }
 
                         Text(
-                            text = R.string.random_count.getString(),
+                            text = R.string.random_count.strings,
                             style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Start,
                             modifier = Modifier
@@ -475,7 +475,7 @@ fun RandomMusicPage(
                             ),
                             placeholder = {
                                 Text(
-                                    text = R.string.random_count_placeholder.getString()
+                                    text = R.string.random_count_placeholder.strings
                                         .format("1...4"),
                                     style = MaterialTheme.typography.bodyMedium,
                                 )
@@ -495,7 +495,7 @@ fun RandomMusicPage(
                             enabled = !isRolling
                         ) {
                             Text(
-                                text = R.string.random_music.getString(),
+                                text = R.string.random_music.strings,
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                         }

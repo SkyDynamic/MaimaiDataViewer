@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.github.skydynamic.maidataviewer.R
-import io.github.skydynamic.maidataviewer.core.getString
+import io.github.skydynamic.maidataviewer.core.strings
 import io.github.skydynamic.maidataviewer.ui.AppNavController
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
 import io.github.skydynamic.maidataviewer.ui.page.treasurebox.collection.CollectionPages
@@ -36,14 +36,14 @@ enum class DataTool(
     var page: String,
 ) {
     RATING_CALCULATOR(
-        R.string.rating_calculator.getString(),
-        R.string.rating_calculator_desc.getString(),
+        R.string.rating_calculator.strings,
+        R.string.rating_calculator_desc.strings,
         R.drawable.target,
         "ratingCalculatorPage"
     ),
     RANDOM_MUSIC(
-        R.string.random_music.getString(),
-        R.string.random_music_desc.getString(),
+        R.string.random_music.strings,
+        R.string.random_music_desc.strings,
         R.drawable.dice,
         "randomMusicPage"
     );
@@ -68,13 +68,13 @@ fun TreasureBoxPage() {
                     .padding(16.dp)
             ) {
                 Text(
-                    text = R.string.data_tool.getString(),
+                    text = R.string.data_tool.strings,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
-                    text = R.string.data_tool_desc.getString(),
+                    text = R.string.data_tool_desc.strings,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -155,13 +155,13 @@ fun TreasureBoxPage() {
                     .padding(16.dp)
             ) {
                 Text(
-                    text = R.string.collection_view.getString(),
+                    text = R.string.collection_view.strings,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
-                    text = R.string.collection_view_desc.getString(),
+                    text = R.string.collection_view_desc.strings,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

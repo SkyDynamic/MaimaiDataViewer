@@ -14,13 +14,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.skydynamic.maidataviewer.R
-import io.github.skydynamic.maidataviewer.core.getString
+import io.github.skydynamic.maidataviewer.core.strings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UnknownProgressCircularProgress(
     modifier: Modifier = Modifier,
-    message: String = R.string.loading.getString(),
+    message: String = R.string.loading.strings,
     strokeWidth: Dp = ProgressIndicatorDefaults.CircularStrokeWidth,
     gapSize: Dp = ProgressIndicatorDefaults.CircularIndicatorTrackGapSize,
     color: Color = ProgressIndicatorDefaults.circularColor,

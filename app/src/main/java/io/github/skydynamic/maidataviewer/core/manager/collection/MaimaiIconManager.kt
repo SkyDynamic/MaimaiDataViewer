@@ -3,7 +3,7 @@ package io.github.skydynamic.maidataviewer.core.manager.collection
 import android.content.res.AssetManager
 import android.util.Log
 import io.github.skydynamic.maidataviewer.core.MaiVersion
-import io.github.skydynamic.maidataviewer.core.data.MaimaiIconData
+import io.github.skydynamic.maidataviewer.core.data.MaimaiCommonCollectionData
 import io.github.skydynamic.maidataviewer.core.manager.resource.MaimaiResourceManager
 import io.github.skydynamic.maidataviewer.core.mkdirsIfNotExists
 import io.github.skydynamic.maidataviewer.core.network.AppHttpClient
@@ -19,20 +19,20 @@ class MaimaiIconManager(
     override val assetManager: AssetManager,
     override val resPath: File,
     override val httpClient: AppHttpClient
-) : MaimaiResourceManager, CollectionManager<MaimaiIconData> {
+) : MaimaiResourceManager, CollectionManager<MaimaiCommonCollectionData> {
     override var _isLoaded: Boolean = false
     override var _currentCollectionVersion: MaiVersion = MaiVersion(-1, 0)
 
     val assetsUrl = "https://maimai-assets.skydynamic.top/icon"
 
-    private var iconData: Map<Int, MaimaiIconData> = emptyMap()
+    private var iconData: Map<Int, MaimaiCommonCollectionData> = emptyMap()
 
     override val collectionType: CollectionType = CollectionType.ICON
 
     @Serializable
     data class IconData(
         val version: String,
-        val data: List<MaimaiIconData>
+        val data: List<MaimaiCommonCollectionData>
     )
 
     override fun loadCollectionData() {
@@ -46,14 +46,14 @@ class MaimaiIconManager(
         }
     }
 
-    override fun getCollection(id: Int): MaimaiIconData? {
+    override fun getCollection(id: Int): MaimaiCommonCollectionData? {
         return iconData[id]
     }
 
     override fun search(
         keyword: String,
-        filterAction: ((List<MaimaiIconData>) -> List<MaimaiIconData>)?
-    ): List<MaimaiIconData> {
+        filterAction: ((List<MaimaiCommonCollectionData>) -> List<MaimaiCommonCollectionData>)?
+    ): List<MaimaiCommonCollectionData> {
         val result = iconData.values.filter {
             it.name?.contains(keyword) == true
             || it.normalText?.contains(keyword) == true
@@ -127,7 +127,9 @@ class MaimaiIconManager(
             if (instance == null) {
                 instance = MaimaiIconManager(assetsManager, resPath, httpClient)
             }
-            instance!!.loadCollectionData()
+            if (!instance!!.isLoaded) {
+                instance!!.loadCollectionData()
+            }
             return instance!!
         }
     }

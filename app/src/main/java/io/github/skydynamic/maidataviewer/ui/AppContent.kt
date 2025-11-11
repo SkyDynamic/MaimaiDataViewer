@@ -40,11 +40,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import io.github.skydynamic.maidataviewer.MainActivity
 import io.github.skydynamic.maidataviewer.R
-import io.github.skydynamic.maidataviewer.core.getString
+import io.github.skydynamic.maidataviewer.core.strings
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
 import io.github.skydynamic.maidataviewer.ui.page.AchievementDataTablePage
 import io.github.skydynamic.maidataviewer.ui.page.treasurebox.collection.CollectionPages
 import io.github.skydynamic.maidataviewer.ui.page.HomePage
+import io.github.skydynamic.maidataviewer.ui.page.MaimaiDataManagerPage
 import io.github.skydynamic.maidataviewer.ui.page.MusicDetailPage
 import io.github.skydynamic.maidataviewer.ui.page.MusicPage
 import io.github.skydynamic.maidataviewer.ui.page.TreasureBoxPage
@@ -68,7 +69,7 @@ object AppContent {
         ) -> Unit) = {}
     ) {
         HOME(
-            R.string.home.getString(),
+            R.string.home.strings,
             TabIcon.VectorIcon(Icons.Filled.Home),
             { jumpFunction ->
                 HomePage(
@@ -77,21 +78,21 @@ object AppContent {
             }
         ),
         Music(
-            R.string.music_page.getString(),
+            R.string.music_page.strings,
             TabIcon.DrawableIcon(R.drawable.music_fill),
             {
                 MusicPage()
             }
         ),
         TreasureBox(
-            R.string.treasure_box_page.getString(),
+            R.string.treasure_box_page.strings,
             TabIcon.DrawableIcon(R.drawable.tbox),
             {
                 TreasureBoxPage()
             }
         ),
 //        SETTING(
-//            R.string.setting_page.getString(),
+//            R.string.setting_page.strings,
 //            TabIcon.VectorIcon(Icons.Filled.Settings),
 //            { _, _ ->
 //                EmptyPage()
@@ -208,6 +209,12 @@ object AppContent {
         ) {
             composable("mainContent") {
                 MainContent()
+            }
+
+            composable("dataManager") {
+                MaimaiDataManagerPage {
+                    navController.popBackStack()
+                }
             }
 
             composable(

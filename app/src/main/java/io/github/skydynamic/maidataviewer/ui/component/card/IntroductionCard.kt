@@ -42,7 +42,7 @@ fun IntroductionCard(
 
             Box(
                 modifier = Modifier
-                    .heightIn(min = 100.dp)
+                    .heightIn(min = 80.dp)
                     .fillMaxSize()
             ) {
                 content()

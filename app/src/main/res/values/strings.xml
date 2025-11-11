@@ -75,4 +75,13 @@
     <string name="plate_page_desc">View all the maimaiDX plate</string>
     <string name="plate_search_result">%s plate have been successfully search</string>
     <string name="plate_version">App Current MaimaiDX Plate Data</string>
+    <string name="frame_page">Maimai Frame</string>
+    <string name="frame_page_desc">View all the maimaiDX frame</string>
+    <string name="frame_search_result">%s frame have been successfully search</string>
+    <string name="frame_version">App Current MaimaiDX Frame Data</string>
+    <string name="data_manager_page">Data Updata Manager</string>
+    <string name="cancel">Cancel</string>
+    <string name="update">Update</string>
+    <string name="data_manager_page_desc">Manager app collection data update</string>
+    <string name="data_manager_page_desc_content">You can update app collection data there</string>
 </resources>

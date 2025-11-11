@@ -66,8 +66,8 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import io.github.skydynamic.maidataviewer.R
-import io.github.skydynamic.maidataviewer.core.data.MaimaiPlateData
-import io.github.skydynamic.maidataviewer.core.getString
+import io.github.skydynamic.maidataviewer.core.data.MaimaiCommonCollectionData
+import io.github.skydynamic.maidataviewer.core.strings
 import io.github.skydynamic.maidataviewer.core.manager.collection.CollectionType
 import io.github.skydynamic.maidataviewer.core.manager.resource.ResourceManagerType
 import io.github.skydynamic.maidataviewer.core.paging.CollectionPagingSource
@@ -90,7 +90,7 @@ object PlatePageViewModel : ViewModel() {
     var isSearching by mutableStateOf(false)
     var isSearchingActive by mutableStateOf(false)
     var searchJob by mutableStateOf<Job?>(null)
-    var searchResult by mutableStateOf<Flow<PagingData<MaimaiPlateData>>?>(null)
+    var searchResult by mutableStateOf<Flow<PagingData<MaimaiCommonCollectionData>>?>(null)
     var searchResultState by mutableStateOf(
         PagingSourceState(0,0,0))
     var currentPage by mutableIntStateOf(0)
@@ -108,13 +108,13 @@ object PlatePageViewModel : ViewModel() {
             jumpThreshold = COUNT_UNDEFINED,
         )
     ) {
-        val filterAction = if (filterGenre != -1) { list: List<MaimaiPlateData> ->
+        val filterAction = if (filterGenre != -1) { list: List<MaimaiCommonCollectionData> ->
             list.filter {
                 it.genre == genre
             }
         } else null
 
-        CollectionPagingSource.create<MaimaiPlateData>()
+        CollectionPagingSource.create<MaimaiCommonCollectionData>()
             .setManager(CollectionType.PLATE.getTypedManager()!!)
             .setKeyWord(keyword)
             .setFilterAction(filterAction)
@@ -126,7 +126,7 @@ object PlatePageViewModel : ViewModel() {
 
 @Composable
 fun PlateSimpleCard(
-    plateData: MaimaiPlateData
+    plateData: MaimaiCommonCollectionData
 ) {
     val plateResManager = ResourceManagerType.PLATE.instance!!
 
@@ -256,7 +256,7 @@ fun PlatePage(
                 }
 
                 Text(
-                    text = R.string.plate_page.getString(),
+                    text = R.string.plate_page.strings,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -299,10 +299,10 @@ fun PlatePage(
                                 value = PlatePageViewModel.searchText,
                                 onValueChange = { PlatePageViewModel.searchText = it },
                                 enabled = PlatePageViewModel.isLoaded,
-                                label = { Text(R.string.search.getString()) },
+                                label = { Text(R.string.search.strings) },
                                 placeholder = {
                                     Text(
-                                        R.string.search_collection_placeholder.getString(),
+                                        R.string.search_collection_placeholder.strings,
                                         autoSize = TextAutoSize.StepBased(minFontSize = 8.sp)
                                     )
                                 },
@@ -332,7 +332,7 @@ fun PlatePage(
                                     .weight(0.25f)
                             ) {
                                 Text(
-                                    text = R.string.search.getString(),
+                                    text = R.string.search.strings,
                                     maxLines = 1,
                                     autoSize = TextAutoSize.StepBased(maxFontSize = 16.sp)
                                 )
@@ -375,7 +375,7 @@ fun PlatePage(
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Text(
-                                                text = R.string.plate_search_result.getString()
+                                                text = R.string.plate_search_result.strings
                                                     .format(
                                                         PlatePageViewModel.searchResultState.currentSearchCount
                                                     ),

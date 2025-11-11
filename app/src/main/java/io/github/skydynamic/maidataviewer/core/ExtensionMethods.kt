@@ -3,6 +3,7 @@ package io.github.skydynamic.maidataviewer.core
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -11,6 +12,11 @@ import java.io.File
 import kotlin.math.absoluteValue
 
 fun Int.getString() = application.getString(this)
+
+@Stable
+inline val Int.strings
+    get() = getString()
+
 operator fun MutableState<Boolean>.not() = !value
 
 fun File.mkdirsIfNotExists() {

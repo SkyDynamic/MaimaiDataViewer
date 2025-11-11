@@ -11,20 +11,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Warning
@@ -52,12 +48,12 @@ import androidx.lifecycle.viewModelScope
 import io.github.skydynamic.maidataviewer.BuildConfig
 import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.MaimaiDataMeta
-import io.github.skydynamic.maidataviewer.core.getString
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
 import io.github.skydynamic.maidataviewer.core.manager.UpdateDataManager
-import io.github.skydynamic.maidataviewer.core.manager.collection.CollectionType
 import io.github.skydynamic.maidataviewer.core.not
+import io.github.skydynamic.maidataviewer.core.strings
 import io.github.skydynamic.maidataviewer.ui.AppContent
+import io.github.skydynamic.maidataviewer.ui.AppNavController
 import io.github.skydynamic.maidataviewer.ui.component.card.IntroductionCard
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
 import io.github.skydynamic.maidataviewer.ui.component.text.AnimatedTextTitleGroup
@@ -88,7 +84,7 @@ fun HomePage(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             TextTitleGroup(
-                title = R.string.app_version.getString(),
+                title = R.string.app_version.strings,
                 titleStyle = MaterialTheme.typography.titleSmall,
                 subtitle = "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
             )
@@ -100,7 +96,7 @@ fun HomePage(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 AnimatedTextTitleGroup(
-                    title = R.string.current_maimai_data_version.getString(),
+                    title = R.string.current_maimai_data_version.strings,
                     titleStyle = MaterialTheme.typography.titleSmall,
                     subtitle = "${meta.currentMaimaiDataVersion}" +
                             " (${meta.currentMaimaiDataVersion.toStandardString()})"
@@ -114,7 +110,7 @@ fun HomePage(
                             TooltipAnchorPosition.Above
                         ),
                         tooltip = {
-                            PlainTooltip { Text(R.string.not_local_mai_data.getString()) }
+                            PlainTooltip { Text(R.string.not_local_mai_data.strings) }
                         },
                         state = rememberTooltipState()
                     ) {
@@ -133,7 +129,7 @@ fun HomePage(
                     .wrapContentHeight()
             ) {
                 AnimatedTextTitleGroup(
-                    title = R.string.latest_maimai_data_version.getString(),
+                    title = R.string.latest_maimai_data_version.strings,
                     titleStyle = MaterialTheme.typography.titleSmall,
                     subtitle = "${meta.latestMaimaiDataVersion}" +
                             " (${meta.latestMaimaiDataVersion.toStandardString()})",
@@ -181,180 +177,24 @@ fun HomePage(
                     )
                 }
             }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-            ) {
-                AnimatedTextTitleGroup(
-                    title = R.string.title_version.getString(),
-                    titleStyle = MaterialTheme.typography.titleSmall,
-                    subtitle = "${meta.latestTitleDataVersion}" +
-                            " (${meta.latestTitleDataVersion.toStandardString()})",
-                    subtitleColor = if (!meta.isLatestTitleDataVersion()) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        MaterialTheme.colorScheme.primary
-                    },
-                    subtitleWeight = FontWeight.Bold
-                )
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                if (!meta.isLatestTitleDataVersion() && !HomePageViewModel.isUpdateMaiTitleDataAvailable) {
-                    TextButton(
-                        modifier = Modifier
-                            .height(40.dp),
-                        onClick = {
-                            HomePageViewModel.isUpdateMaiTitleDataAvailable.value = true
-                            GlobalViewModel.viewModelScope.launch(Dispatchers.IO) {
-                                CollectionType.TITLE.manager!!.downloadCollectionData {
-                                    if (it != null) {
-                                        meta.updateTitleData(
-                                            it,
-                                            meta.latestTitleDataVersion
-                                        )
-                                    }
-                                    HomePageViewModel.isUpdateMaiTitleDataAvailable.value = false
-                                    CollectionType.TITLE.manager!!.loadCollectionData()
-                                }
-                            }
-                        }
-                    ) {
-                        Icon(Icons.Filled.Refresh, "")
-                    }
-                } else if (!meta.isLatestTitleDataVersion() && HomePageViewModel.isUpdateMaiTitleDataAvailable.value) {
-                    CircularProgressIndicator(
-                        strokeWidth = 4.dp,
-                        gapSize = 4.dp
-                    )
-                }
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-            ) {
-                AnimatedTextTitleGroup(
-                    title = R.string.icon_version.getString(),
-                    titleStyle = MaterialTheme.typography.titleSmall,
-                    subtitle = "${meta.latestIconDataVersion}" +
-                            " (${meta.latestIconDataVersion.toStandardString()})",
-                    subtitleColor = if (!meta.isLatestIconDataVersion()) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        MaterialTheme.colorScheme.primary
-                    },
-                    subtitleWeight = FontWeight.Bold
-                )
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                if (!meta.isLatestIconDataVersion() && !HomePageViewModel.isUpdateMaiIconAvailable) {
-                    TextButton(
-                        modifier = Modifier
-                            .height(40.dp),
-                        onClick = {
-                            HomePageViewModel.isUpdateMaiIconAvailable.value = true
-                            GlobalViewModel.viewModelScope.launch(Dispatchers.IO) {
-                                CollectionType.ICON.manager!!.downloadCollectionData {
-                                    if (it != null) {
-                                        meta.updateIconData(
-                                            it,
-                                            meta.latestIconDataVersion
-                                        )
-                                    }
-                                    HomePageViewModel.isUpdateMaiIconAvailable.value = false
-                                    CollectionType.ICON.manager!!.loadCollectionData()
-                                }
-                            }
-                        }
-                    ) {
-                        Icon(Icons.Filled.Refresh, "")
-                    }
-                } else if (!meta.isLatestIconDataVersion() && HomePageViewModel.isUpdateMaiIconAvailable.value) {
-                    CircularProgressIndicator(
-                        strokeWidth = 4.dp,
-                        gapSize = 4.dp
-                    )
-                }
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-            ) {
-                AnimatedTextTitleGroup(
-                    title = R.string.plate_version.getString(),
-                    titleStyle = MaterialTheme.typography.titleSmall,
-                    subtitle = "${meta.latestPlateDataVersion}" +
-                            " (${meta.latestPlateDataVersion.toStandardString()})",
-                    subtitleColor = if (!meta.isLatestPlateDataVersion()) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        MaterialTheme.colorScheme.primary
-                    },
-                    subtitleWeight = FontWeight.Bold
-                )
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                if (!meta.isLatestPlateDataVersion() && !HomePageViewModel.isUpdateMaiPlateDataAvailable) {
-                    TextButton(
-                        modifier = Modifier
-                            .height(40.dp),
-                        onClick = {
-                            HomePageViewModel.isUpdateMaiPlateDataAvailable.value = true
-                            GlobalViewModel.viewModelScope.launch(Dispatchers.IO) {
-                                CollectionType.PLATE.manager!!.downloadCollectionData {
-                                    if (it != null) {
-                                        meta.updatePlateData(
-                                            it,
-                                            meta.latestPlateDataVersion
-                                        )
-                                    }
-                                    HomePageViewModel.isUpdateMaiPlateDataAvailable.value = false
-                                    CollectionType.PLATE.manager!!.loadCollectionData()
-                                }
-                            }
-                        }
-                    ) {
-                        Icon(Icons.Filled.Refresh, "")
-                    }
-                } else if (!meta.isLatestPlateDataVersion() && HomePageViewModel.isUpdateMaiPlateDataAvailable.value) {
-                    CircularProgressIndicator(
-                        strokeWidth = 4.dp,
-                        gapSize = 4.dp
-                    )
-                }
-            }
         }
     }
 
-    @Composable
-    fun MainPart(
-        modifier: Modifier = Modifier
-    ) {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-        ) {
+    fun LazyListScope.mainPart() {
+        item {
             IntroductionCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
-                title = R.string.home_songcard_title.getString(),
-                subtitle = R.string.home_songcard_subtitle.getString()
+                title = R.string.home_songcard_title.strings,
+                subtitle = R.string.home_songcard_subtitle.strings
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                 ) {
                     Text(
-                        text = R.string.home_songcard_desc.getString()
+                        text = R.string.home_songcard_desc.strings
                     )
 
                     Row(
@@ -370,12 +210,48 @@ fun HomePage(
                                 jumpFunction(AppContent.Tab.Music)
                             }
                         ) {
-                            Text(text = R.string.jump_to.getString())
+                            Text(text = R.string.jump_to.strings)
                         }
                     }
                 }
             }
 
+            IntroductionCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                title = R.string.data_manager_page.strings,
+                subtitle = R.string.data_manager_page_desc.strings
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    Text(
+                        text = R.string.data_manager_page_desc_content.strings
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .align(Alignment.End)
+                            .padding(top = 16.dp)
+                    ) {
+                        Button(
+                            modifier = Modifier
+                                .align(Alignment.Bottom),
+                            onClick = {
+                                AppNavController.getInstance().navigate("dataManager")
+                            }
+                        ) {
+                            Text(text = R.string.jump_to.strings)
+                        }
+                    }
+                }
+            }
+        }
+
+        item {
             ShadowElevatedCard(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -389,14 +265,15 @@ fun HomePage(
                                 slideOutVertically(animationSpec = tween(220)) { height -> -height } +
                                 fadeOut(animationSpec = tween(220))
                     },
-                    label = "AppInfoTransition"
+                    label = "AppInfoTransition",
+                    modifier = Modifier.defaultMinSize(minHeight = 200.dp)
                 ) { isLoading ->
                     if (isLoading) {
                         Column(
                             modifier = Modifier
-                                .heightIn(min = 150.dp)
-                                .fillMaxSize()
-                                .padding(16.dp),
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .defaultMinSize(minHeight = 150.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
@@ -405,7 +282,7 @@ fun HomePage(
                                     .size(64.dp)
                             )
                             Text(
-                                text = R.string.loading.getString(),
+                                text = R.string.loading.strings,
                                 modifier = Modifier.padding(top = 8.dp),
                                 style = MaterialTheme.typography.bodyMedium
                             )
@@ -417,24 +294,21 @@ fun HomePage(
                 }
             }
         }
+
+        item {
+            Spacer(modifier = Modifier
+                .height(80.dp)
+            )
+        }
     }
 
-    Row(
-        Modifier
+    LazyColumn(
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
             .fillMaxSize()
+            .padding(16.dp)
     ) {
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
-                .windowInsetsPadding(WindowInsets.statusBars)
-                .windowInsetsPadding(WindowInsets.navigationBars)
-        ) {
-            MainPart()
-        }
+        mainPart()
     }
 }

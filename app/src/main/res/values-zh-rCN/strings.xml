@@ -74,6 +74,15 @@
     <string name="icon_search_result">已成功搜索到%s个头像</string>
     <string name="plate_page">姓名框</string>
     <string name="plate_page_desc">查看舞萌DX的所有姓名框及其获取方法</string>
-    <string name="plate_search_result">已成功搜索到%s个称号</string>
+    <string name="plate_search_result">已成功搜索到%s个姓名框</string>
     <string name="plate_version">当前舞萌DX姓名框数据版本</string>
+    <string name="frame_page">背景板</string>
+    <string name="frame_page_desc">查看舞萌DX的所有背景板及其获取方法</string>
+    <string name="frame_search_result">已成功搜索到%s个背景板</string>
+    <string name="frame_version">当前舞萌DX背景板数据版本</string>
+    <string name="data_manager_page">数据更新管理器</string>
+    <string name="cancel">取消</string>
+    <string name="update">更新</string>
+    <string name="data_manager_page_desc">管理收藏品数据更新</string>
+    <string name="data_manager_page_desc_content">你可以在这里更新收藏品数据</string>
 </resources>

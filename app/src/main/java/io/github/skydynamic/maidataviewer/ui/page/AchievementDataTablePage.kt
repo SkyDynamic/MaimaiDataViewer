@@ -28,7 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import io.github.skydynamic.maidataviewer.R
-import io.github.skydynamic.maidataviewer.core.getString
+import io.github.skydynamic.maidataviewer.core.strings
 import io.github.skydynamic.maidataviewer.ui.component.BasicDataTableRow
 import io.github.skydynamic.maidataviewer.ui.component.DataTable
 import io.github.skydynamic.maidataviewer.ui.component.DataTableColumn
@@ -85,7 +85,7 @@ fun AchievementDataTablePage(
                     }
 
                     Text(
-                        text = R.string.back.getString(),
+                        text = R.string.back.strings,
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSurface
                     )

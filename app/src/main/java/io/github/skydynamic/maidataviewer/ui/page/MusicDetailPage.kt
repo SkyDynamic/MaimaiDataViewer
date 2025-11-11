@@ -70,7 +70,7 @@ import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.AchievementCalculator
 import io.github.skydynamic.maidataviewer.core.ExtensionMethods.buildDataTableRow
 import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
-import io.github.skydynamic.maidataviewer.core.getString
+import io.github.skydynamic.maidataviewer.core.strings
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
 import io.github.skydynamic.maidataviewer.core.manager.MusicAliasManager
 import io.github.skydynamic.maidataviewer.core.manager.resource.ResourceManagerType
@@ -129,7 +129,7 @@ private val dataTableHeader: List<DataTableColumn> = listOf(
         )
     ),
     DataTableColumn(
-        R.string.arch_table_count.getString(),
+        R.string.arch_table_count.strings,
         width = 60,
         style = DataTableRowStyle(
             textAlign = TextAlign.Center
@@ -311,7 +311,7 @@ fun MusicDetailPage(
         TempState.showAliasDialog -> {
             TextDialog(
                 text = R.string.song_exists_alias
-                    .getString()
+                    .strings
                     .format(
                         MusicAliasManager.getAlias(music.id)
                             .fastJoinToString("\n")
@@ -512,7 +512,7 @@ private fun MusicInfoCard(
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             InfoBox(
-                                type = R.string.music_type.getString(),
+                                type = R.string.music_type.strings,
                                 text = MaiGenreManager.musicGenre.getGenreName(music.genre),
                                 color = color
                             )
@@ -522,12 +522,12 @@ private fun MusicInfoCard(
                                 color = color
                             )
                             InfoBox(
-                                type = R.string.music_version.getString(),
+                                type = R.string.music_version.strings,
                                 text = MaiGenreManager.versionGenre.getGenreName(music.addVersion.id),
                                 color = color
                             )
                             InfoBox(
-                                type = R.string.artist.getString(),
+                                type = R.string.artist.strings,
                                 text = music.artist ?: "",
                                 color = color
                             )
@@ -642,7 +642,7 @@ private fun MusicDetailCard(
                 .padding(16.dp)
         ) {
             InfoBox(
-                type = R.string.music_level.getString(),
+                type = R.string.music_level.strings,
                 text = "%.1f".format(music.difficulties[currentChoiceDifficulty].level),
                 color = Color.White
             )
@@ -650,7 +650,7 @@ private fun MusicDetailCard(
             Spacer(Modifier.height(8.dp))
 
             InfoBox(
-                type = R.string.designer.getString(),
+                type = R.string.designer.strings,
                 text = music.difficulties[currentChoiceDifficulty].noteDesigner,
                 color = Color.White
             )
@@ -658,8 +658,8 @@ private fun MusicDetailCard(
             Spacer(Modifier.height(8.dp))
 
             InfoBox(
-                type = R.string.note_type.getString(),
-                text = if (isDX) R.string.dx.getString() else R.string.standard.getString(),
+                type = R.string.note_type.strings,
+                text = if (isDX) R.string.dx.strings else R.string.standard.strings,
                 color = Color.White
             )
 
@@ -690,7 +690,7 @@ private fun MusicDetailCard(
                 )
 
                 Text(
-                    text = R.string.note_score_detail.getString(),
+                    text = R.string.note_score_detail.strings,
                     style = MaterialTheme.typography.bodySmall,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
@@ -704,7 +704,7 @@ private fun MusicDetailCard(
             }
 
             Text(
-                text = "(${R.string.achievement_datatable_tips.getString()})",
+                text = "(${R.string.achievement_datatable_tips.strings})",
                 style = MaterialTheme.typography.bodySmall,
                 fontSize = 8.sp,
                 maxLines = 2,
@@ -752,7 +752,7 @@ private fun FaultToleranceCard(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = R.string.fault_tolerance_calc.getString(),
+                text = R.string.fault_tolerance_calc.strings,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
@@ -830,7 +830,7 @@ private fun FaultToleranceCard(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
-                        text = R.string.fault_torlerance.getString()
+                        text = R.string.fault_torlerance.strings
                             .format(currentChoiceNoteType.typeNmae),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
@@ -845,7 +845,7 @@ private fun FaultToleranceCard(
                         currentChoiceDifficulty = currentChoiceDifficulty,
                         currentChoiceNoteType = currentChoiceNoteType,
                         faultValue = 0.5f,
-                        title = R.string.rate_fault_torlerance.getString()
+                        title = R.string.rate_fault_torlerance.strings
                             .format("SSS+", "0.5%")
                     )
 
@@ -854,7 +854,7 @@ private fun FaultToleranceCard(
                         currentChoiceDifficulty = currentChoiceDifficulty,
                         currentChoiceNoteType = currentChoiceNoteType,
                         faultValue = 1f,
-                        title = R.string.rate_fault_torlerance.getString()
+                        title = R.string.rate_fault_torlerance.strings
                             .format("SSS", "1%")
                     )
                 }
@@ -998,13 +998,13 @@ private fun ActionButtonsRow(
                 if (jacketFile == null) {
                     Toast.makeText(
                         application,
-                        R.string.save_jacket_failed.getString(),
+                        R.string.save_jacket_failed.strings,
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
                     application.saveImageToGallery(
                         jacketFile.readBytes(),
-                        R.string.save_jacket_success.getString()
+                        R.string.save_jacket_success.strings
                     )
                 }
             },
@@ -1015,7 +1015,7 @@ private fun ActionButtonsRow(
             contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
         ) {
             Text(
-                text = R.string.save_jacket.getString(),
+                text = R.string.save_jacket.strings,
                 modifier = Modifier
                     .fillMaxWidth(),
                 textAlign = TextAlign.Center,
@@ -1035,7 +1035,7 @@ private fun ActionButtonsRow(
             contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
         ) {
             Text(
-                text = R.string.search_bilibili.getString(),
+                text = R.string.search_bilibili.strings,
                 modifier = Modifier
                     .fillMaxWidth(),
                 textAlign = TextAlign.Center,
@@ -1055,7 +1055,7 @@ private fun ActionButtonsRow(
             contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
         ) {
             Text(
-                text = R.string.view_music_alias.getString(),
+                text = R.string.view_music_alias.strings,
                 modifier = Modifier
                     .fillMaxWidth(),
                 textAlign = TextAlign.Center,
@@ -1096,7 +1096,7 @@ private fun TopAppBar(
             }
 
             Text(
-                text = R.string.back.getString(),
+                text = R.string.back.strings,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )

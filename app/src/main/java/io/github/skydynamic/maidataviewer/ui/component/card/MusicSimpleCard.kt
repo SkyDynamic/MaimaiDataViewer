@@ -38,7 +38,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
-import io.github.skydynamic.maidataviewer.core.getString
+import io.github.skydynamic.maidataviewer.core.strings
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
 import io.github.skydynamic.maidataviewer.core.manager.resource.ResourceManagerType
 import io.github.skydynamic.maidataviewer.viewmodel.GlobalViewModel
@@ -163,11 +163,11 @@ fun MusicSimpleCard(
                     ) {
                         Text(
                             text = if (isDX) {
-                                R.string.dx.getString()
+                                R.string.dx.strings
                             } else if (isStage) {
-                                R.string.stage.getString()
+                                R.string.stage.strings
                             } else {
-                                R.string.standard.getString()
+                                R.string.standard.strings
                             },
                             style = MaterialTheme.typography.bodySmallEmphasized,
                             textAlign = TextAlign.Center,

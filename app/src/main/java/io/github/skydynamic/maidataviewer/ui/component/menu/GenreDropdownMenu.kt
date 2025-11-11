@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.skydynamic.maidataviewer.R
-import io.github.skydynamic.maidataviewer.core.getString
+import io.github.skydynamic.maidataviewer.core.strings
 import io.github.skydynamic.maidataviewer.core.manager.GenreType
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
 
@@ -32,7 +32,7 @@ fun GenreDropdownMenu(
         shape = RoundedCornerShape(12.dp)
     ) {
         DropdownMenuItem(
-            text = { Text(R.string.all.getString()) },
+            text = { Text(R.string.all.strings) },
             onClick = {
                 onSelectedChange(-1)
                 onDismissRequest()

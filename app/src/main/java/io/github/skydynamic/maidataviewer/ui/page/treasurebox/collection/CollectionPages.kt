@@ -2,7 +2,7 @@ package io.github.skydynamic.maidataviewer.ui.page.treasurebox.collection
 
 import androidx.compose.runtime.Composable
 import io.github.skydynamic.maidataviewer.R
-import io.github.skydynamic.maidataviewer.core.getString
+import io.github.skydynamic.maidataviewer.core.strings
 
 enum class CollectionPages(
     val pageName: String,
@@ -13,8 +13,8 @@ enum class CollectionPages(
     ) -> Unit
 ) {
     TITLE_PAGE(
-        R.string.title_page.getString(),
-        R.string.title_page_desc.getString(),
+        R.string.title_page.strings,
+        R.string.title_page_desc.strings,
         "titlePage",
         { backPressed ->
             TitlePage {
@@ -23,8 +23,8 @@ enum class CollectionPages(
         }
     ),
     ICON_PAGE(
-        R.string.icon_page.getString(),
-        R.string.icon_page_desc.getString(),
+        R.string.icon_page.strings,
+        R.string.icon_page_desc.strings,
         "iconPage",
         { backPressed ->
             IconPage {
@@ -33,11 +33,21 @@ enum class CollectionPages(
         }
     ),
     PLATE_PAGE(
-        R.string.plate_page.getString(),
-        R.string.plate_page_desc.getString(),
+        R.string.plate_page.strings,
+        R.string.plate_page_desc.strings,
         "platePage",
         { backPressed ->
             PlatePage {
+                backPressed()
+            }
+        }
+    ),
+    FRAME_PAGE(
+        R.string.frame_page.strings,
+        R.string.frame_page_desc.strings,
+        "framePage",
+        { backPressed ->
+            FramePage {
                 backPressed()
             }
         }

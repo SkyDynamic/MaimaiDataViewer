@@ -39,14 +39,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import io.github.skydynamic.maidataviewer.R
-import io.github.skydynamic.maidataviewer.core.getString
+import io.github.skydynamic.maidataviewer.core.strings
 import io.github.skydynamic.maidataviewer.core.utils.calcRating
 import io.github.skydynamic.maidataviewer.core.utils.getMultiplierFactor
 import io.github.skydynamic.maidataviewer.core.utils.getRank
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
 
 data class CalcResultStruct(
-    val title: List<String> = listOf("Rank", "Rating", R.string.multiplierFactor.getString()),
+    val title: List<String> = listOf("Rank", "Rating", R.string.multiplierFactor.strings),
     val value: List<String> = listOf("-", "-", "-")
 ) {
     companion object {
@@ -106,7 +106,7 @@ fun RatingCalculatorPage(
                 }
 
                 Text(
-                    text = R.string.rating_calculator.getString(),
+                    text = R.string.rating_calculator.strings,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                 )
@@ -126,7 +126,7 @@ fun RatingCalculatorPage(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = R.string.rating_calculator_music_level.getString(),
+                        text = R.string.rating_calculator_music_level.strings,
                         style = MaterialTheme.typography.bodyLarge,
                     )
 
@@ -161,14 +161,14 @@ fun RatingCalculatorPage(
                         ),
                         placeholder = {
                             Text(
-                                text = R.string.rating_calculator_music_level_placeholder.getString(),
+                                text = R.string.rating_calculator_music_level_placeholder.strings,
                                 style = MaterialTheme.typography.bodyMedium,
                             )
                         }
                     )
 
                     Text(
-                        text = R.string.rating_calculator_achievement.getString(),
+                        text = R.string.rating_calculator_achievement.strings,
                         style = MaterialTheme.typography.bodyLarge,
                     )
 
@@ -203,7 +203,7 @@ fun RatingCalculatorPage(
                         ),
                         placeholder = {
                             Text(
-                                text = R.string.rating_calculator_achievement_placeholder.getString(),
+                                text = R.string.rating_calculator_achievement_placeholder.strings,
                                 style = MaterialTheme.typography.bodyMedium,
                             )
                         },
@@ -224,7 +224,7 @@ fun RatingCalculatorPage(
                         }
                     ) {
                         Text(
-                            text = R.string.confirm.getString(),
+                            text = R.string.confirm.strings,
                             style = MaterialTheme.typography.bodyLarge,
                         )
                     }

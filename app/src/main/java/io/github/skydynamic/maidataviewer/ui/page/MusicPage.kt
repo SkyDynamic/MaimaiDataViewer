@@ -56,7 +56,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import io.github.skydynamic.maidataviewer.R
-import io.github.skydynamic.maidataviewer.core.getString
+import io.github.skydynamic.maidataviewer.core.strings
 import io.github.skydynamic.maidataviewer.core.manager.GenreType
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
 import io.github.skydynamic.maidataviewer.core.manager.MusicAliasManager
@@ -184,7 +184,7 @@ fun MusicPage() {
                             .padding(vertical = 8.dp)
                     ) {
                         Text(
-                            text = R.string.load_finish.getString().format(MusicDataManager.getMusicLoadedSize()),
+                            text = R.string.load_finish.strings.format(MusicDataManager.getMusicLoadedSize()),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp),
@@ -266,7 +266,7 @@ fun MusicPage() {
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = R.string.search_result.getString().format(
+                                        text = R.string.search_result.strings.format(
                                             MusicPageViewModel.searchResultState.value.currentSearchCount
                                         ),
                                         style = MaterialTheme.typography.bodyMedium,
@@ -351,10 +351,10 @@ fun MusicPage() {
                         value = MusicPageViewModel.searchText.value,
                         onValueChange = { MusicPageViewModel.searchText.value = it },
                         enabled = !MusicPageViewModel.isLoadingMusic.value,
-                        label = { Text(R.string.search.getString()) },
+                        label = { Text(R.string.search.strings) },
                         placeholder = {
                             Text(
-                                R.string.search_placeholder.getString(),
+                                R.string.search_placeholder.strings,
                                 autoSize = TextAutoSize.StepBased(minFontSize = 8.sp)
                             )
                         },
@@ -384,7 +384,7 @@ fun MusicPage() {
                             .weight(0.25f)
                     ) {
                         Text(
-                            text = R.string.search.getString(),
+                            text = R.string.search.strings,
                             maxLines = 1,
                             autoSize = TextAutoSize.StepBased(maxFontSize = 16.sp)
                         )
@@ -408,7 +408,7 @@ fun MusicPage() {
                         GenreSelectorButton(
                             value = MaiGenreManager.musicGenre
                                 .getGenreName(MusicPageViewModel.genreFilter.intValue),
-                            label = R.string.genre.getString(),
+                            label = R.string.genre.strings,
                             onClick = { genreDropdownMenuActive = true }
                         )
 
@@ -431,7 +431,7 @@ fun MusicPage() {
                         GenreSelectorButton(
                             value = MaiGenreManager.versionGenre
                                 .getGenreName(MusicPageViewModel.versionFilter.intValue),
-                            label = R.string.versionGenre.getString(),
+                            label = R.string.versionGenre.strings,
                             onClick = { versionDropdownMenuActive = true }
                         )
 
