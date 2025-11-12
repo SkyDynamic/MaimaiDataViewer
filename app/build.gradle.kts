@@ -93,5 +93,8 @@ dependencies {
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
 
+    // Network Image Load
     implementation(libs.coil3.coil.compose)
+
+    implementation(libs.image.viewer)
 }

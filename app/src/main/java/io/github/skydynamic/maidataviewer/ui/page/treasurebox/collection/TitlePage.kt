@@ -66,10 +66,10 @@ import androidx.paging.cachedIn
 import androidx.paging.compose.collectAsLazyPagingItems
 import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.data.MaimaiTitleData
-import io.github.skydynamic.maidataviewer.core.strings
 import io.github.skydynamic.maidataviewer.core.manager.collection.CollectionType
 import io.github.skydynamic.maidataviewer.core.paging.CollectionPagingSource
 import io.github.skydynamic.maidataviewer.core.paging.PagingSourceState
+import io.github.skydynamic.maidataviewer.core.strings
 import io.github.skydynamic.maidataviewer.ui.component.UnknownProgressCircularProgress
 import io.github.skydynamic.maidataviewer.ui.component.card.CollapsibleSearchCard
 import io.github.skydynamic.maidataviewer.ui.component.card.PaginationCard
