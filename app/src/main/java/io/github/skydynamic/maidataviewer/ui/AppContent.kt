@@ -40,10 +40,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import io.github.skydynamic.maidataviewer.MainActivity
 import io.github.skydynamic.maidataviewer.R
-import io.github.skydynamic.maidataviewer.core.strings
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
+import io.github.skydynamic.maidataviewer.core.strings
 import io.github.skydynamic.maidataviewer.ui.page.AchievementDataTablePage
-import io.github.skydynamic.maidataviewer.ui.page.treasurebox.collection.CollectionPages
 import io.github.skydynamic.maidataviewer.ui.page.HomePage
 import io.github.skydynamic.maidataviewer.ui.page.MaimaiDataManagerPage
 import io.github.skydynamic.maidataviewer.ui.page.MusicDetailPage
@@ -51,6 +50,7 @@ import io.github.skydynamic.maidataviewer.ui.page.MusicPage
 import io.github.skydynamic.maidataviewer.ui.page.TreasureBoxPage
 import io.github.skydynamic.maidataviewer.ui.page.treasurebox.RandomMusicPage
 import io.github.skydynamic.maidataviewer.ui.page.treasurebox.RatingCalculatorPage
+import io.github.skydynamic.maidataviewer.ui.page.treasurebox.collection.CollectionPages
 import io.github.skydynamic.maidataviewer.viewmodel.AchievementDataTablePageViewModel
 import io.github.skydynamic.maidataviewer.viewmodel.GlobalViewModel
 
@@ -274,9 +274,16 @@ object AppContent {
 
             CollectionPages.entries.forEach { page ->
                 composable(
-                    page.page
-                ) {
-                    page.pageComposable(navController::popBackStack)
+                    page.page + "?pickMode={pickMode}",
+                    arguments = listOf(
+                        navArgument("pickMode") {
+                            type = NavType.BoolType
+                            defaultValue = false
+                        }
+                    )
+                ) { backStackEntry ->
+                    val pickMode = backStackEntry.arguments?.getBoolean("pickMode") ?: false
+                    page.pageComposable(navController::popBackStack, pickMode)
                 }
             }
         }

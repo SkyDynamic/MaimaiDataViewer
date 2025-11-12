@@ -35,7 +35,7 @@
     <string name="fault_torlerance">%s fault torlerance</string>
     <string name="rate_fault_torlerance">%s fault torlerance (%s)</string>
     <string name="save_jacket">Save jacket to gallery</string>
-    <string name="save_jacket_success">Saved jacket to gallery</string>
+    <string name="save_iamge_success">Saved image to gallery</string>
     <string name="save_jacket_failed">Jacket do not downlaod success, failed to save</string>
     <string name="search_bilibili">Search from bilibili</string>
     <string name="music_level">Level</string>
@@ -84,4 +84,14 @@
     <string name="update">Update</string>
     <string name="data_manager_page_desc">Manager app collection data update</string>
     <string name="data_manager_page_desc_content">You can update app collection data there</string>
+    <string name="submonitor_page">SubMonitor Preview Generator</string>
+    <string name="submonitor_page_desc">You can choose collection and generate submonitor preview there</string>
+    <string name="player_name">Player Nmae</string>
+    <string name="player_name_field_error">Player name must be less than 8 characters</string>
+    <string name="pick_icon">Pick Icon</string>
+    <string name="pick_plate">Pick Plate</string>
+    <string name="pick_frame">Pick Frame</string>
+    <string name="pick_title">Pick Title</string>
+    <string name="submit">Submit</string>
+    <string name="save">Save</string>
 </resources>

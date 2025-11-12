@@ -11,9 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.skydynamic.maidataviewer.R
-import io.github.skydynamic.maidataviewer.core.strings
 import io.github.skydynamic.maidataviewer.core.manager.GenreType
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
+import io.github.skydynamic.maidataviewer.core.strings
 
 @Composable
 fun GenreDropdownMenu(

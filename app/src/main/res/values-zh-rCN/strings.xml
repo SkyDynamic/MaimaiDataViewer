@@ -36,7 +36,7 @@
     <string name="fault_torlerance">%s 容错数量</string>
     <string name="rate_fault_torlerance">%s 容错 (%s)</string>
     <string name="save_jacket">保存曲绘到相册</string>
-    <string name="save_jacket_success">已保存到相册</string>
+    <string name="save_iamge_success">已保存到相册</string>
     <string name="save_jacket_failed">曲绘没有下载成功, 保存失败</string>
     <string name="search_bilibili">从B站搜索</string>
     <string name="music_level">定数</string>
@@ -85,4 +85,14 @@
     <string name="update">更新</string>
     <string name="data_manager_page_desc">管理收藏品数据更新</string>
     <string name="data_manager_page_desc_content">你可以在这里更新收藏品数据</string>
+    <string name="submonitor_page">副屏预览生成</string>
+    <string name="submonitor_page_desc">你可以在这里选择收藏品并生成副屏预览</string>
+    <string name="player_name">玩家名</string>
+    <string name="player_name_field_error">玩家名必须小于等于8个字符</string>
+    <string name="pick_icon">选取头像</string>
+    <string name="pick_plate">选取姓名框</string>
+    <string name="pick_frame">选取背景板</string>
+    <string name="pick_title">选取称号</string>
+    <string name="submit">提交</string>
+    <string name="save">保存</string>
 </resources>

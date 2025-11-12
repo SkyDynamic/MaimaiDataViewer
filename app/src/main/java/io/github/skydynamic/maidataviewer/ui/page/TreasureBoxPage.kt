@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -97,13 +98,14 @@ fun TreasureBoxPage() {
                                 .weight(1f)
                                 .wrapContentHeight()
                                 .padding(8.dp)
-                                .clickable {
-                                    AppNavController.getInstance().navigate(it.page)
-                                }
+                                .clip(MaterialTheme.shapes.medium)
                                 .background(
                                     color = MaterialTheme.colorScheme.surfaceContainerHigh,
                                     shape = MaterialTheme.shapes.medium
-                                ),
+                                )
+                                .clickable {
+                                    AppNavController.getInstance().navigate(it.page)
+                                },
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
@@ -184,13 +186,14 @@ fun TreasureBoxPage() {
                                 .weight(1f)
                                 .height(96.dp)
                                 .padding(8.dp)
-                                .clickable {
-                                    AppNavController.getInstance().navigate(it.page)
-                                }
+                                .clip(MaterialTheme.shapes.medium)
                                 .background(
                                     color = MaterialTheme.colorScheme.surfaceContainerHigh,
                                     shape = MaterialTheme.shapes.medium
-                                ),
+                                )
+                                .clickable {
+                                    AppNavController.getInstance().navigate(it.page)
+                                },
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center,
                         ) {
@@ -224,14 +227,14 @@ fun TreasureBoxPage() {
                         }
                     }
 
-                    if (CollectionPages.entries.size % 2 != 0) {
-                        Spacer(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(64.dp)
-                                .padding(8.dp)
-                        )
-                    }
+//                    if (CollectionPages.entries.size % 2 != 0) {
+//                        Spacer(
+//                            modifier = Modifier
+//                                .weight(1f)
+//                                .height(64.dp)
+//                                .padding(8.dp)
+//                        )
+//                    }
                 }
             }
         }

@@ -18,6 +18,7 @@ import io.github.skydynamic.maidataviewer.core.paging.CollectionPagingSource
 import io.github.skydynamic.maidataviewer.core.paging.PagingSourceState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import java.io.File
 
 abstract class BaseCollectionViewModel : ViewModel() {
     var isLoaded by mutableStateOf(false)
@@ -31,6 +32,7 @@ abstract class BaseCollectionViewModel : ViewModel() {
     var searchResultState by mutableStateOf(PagingSourceState(0, 0, 0))
     var currentPage by mutableIntStateOf(0)
     var listState by mutableStateOf<LazyGridState?>(null)
+    var pickItemFile by mutableStateOf<File?>(null)
 
     abstract fun getCollectionType(): CollectionType
 

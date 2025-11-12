@@ -19,22 +19,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewModelScope
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import io.github.skydynamic.maidataviewer.core.data.MaimaiCommonCollectionData
+import io.github.skydynamic.maidataviewer.core.getResFileAsync
 import io.github.skydynamic.maidataviewer.core.manager.resource.MaimaiResourceManager
 import io.github.skydynamic.maidataviewer.ui.component.dialog.PreviewFullscreen
-import io.github.skydynamic.maidataviewer.ui.page.treasurebox.collection.PlatePageViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.io.File
 
 @Composable
 fun CollectionSimpleCard(
     manager: MaimaiResourceManager,
-    collectionData: MaimaiCommonCollectionData
+    collectionData: MaimaiCommonCollectionData,
+    picked: ((File?) -> Unit)? = null
 ) {
     val defaultImageByte = remember { manager.getResByteFromAssets(0) }
     var imageFile by remember { mutableStateOf<File?>(null) }
@@ -42,12 +40,8 @@ fun CollectionSimpleCard(
     var showPreview by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        PlatePageViewModel.viewModelScope.launch(Dispatchers.IO) {
-            imageFile = try {
-                manager.getResFile(collectionData.id)
-            } catch (_: Exception) {
-                null
-            }
+        manager.getResFileAsync(collectionData.id) {
+            imageFile = it
         }
     }
 
@@ -62,7 +56,13 @@ fun CollectionSimpleCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        clickable = { showPreview = true }
+        clickable = {
+            if (picked != null) {
+                picked(imageFile)
+            } else {
+                showPreview = true
+            }
+        }
     ) {
         Column(
             modifier = Modifier

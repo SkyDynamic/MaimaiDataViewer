@@ -93,9 +93,13 @@ class MaimaiIconManager(
         val iconFile = iconPath.resolve("$id.png")
         if (!iconFile.exists()) {
             httpClient.request {
-                it.get("$assetsUrl/$id.png")
-                    .bodyAsChannel()
-                    .copyTo(iconFile.outputStream())
+                val request = it.get("$assetsUrl/$id.png")
+                if (request.status.value == 200) {
+                    request.bodyAsChannel()
+                        .copyTo(iconFile.outputStream())
+                } else {
+                    Log.e("MaimaiIconManager", "Error downloading icon $id")
+                }
             }
             Log.i("MaimaiIconManager", "Downloaded icon $id")
         }

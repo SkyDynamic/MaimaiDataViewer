@@ -93,9 +93,13 @@ class MaimaiFrameManager(
         val frameFile = framePath.resolve("$id.png")
         if (!frameFile.exists()) {
             httpClient.request {
-                it.get("$assetsUrl/$id.png")
-                    .bodyAsChannel()
-                    .copyTo(frameFile.outputStream())
+                val request = it.get("$assetsUrl/$id.png")
+                if (request.status.value == 200) {
+                    request.bodyAsChannel()
+                        .copyTo(frameFile.outputStream())
+                } else {
+                    Log.e("MaimaiFrameManager", "Error downloading frame $id")
+                }
             }
             Log.i("MaimaiFrameManager", "Downloaded frame $id")
         }

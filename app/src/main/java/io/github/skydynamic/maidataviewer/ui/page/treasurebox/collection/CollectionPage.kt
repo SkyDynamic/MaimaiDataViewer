@@ -58,6 +58,7 @@ import io.github.skydynamic.maidataviewer.ui.component.card.PaginationCard
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
 
 @Composable
 fun SearchBarContent(
@@ -156,8 +157,18 @@ fun CollectionPage(
     resourceManager: ResourceManagerType,
     title: String,
     searchResultStringRes: String,
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    onPicked: Boolean = false,
 ) {
+    val onPickedFunction = if (onPicked) {
+        { file: File? ->
+            viewModel.pickItemFile = file
+            onBackPressed()
+        }
+    } else {
+        null
+    }
+
     val collectionData = viewModel.searchResult?.collectAsLazyPagingItems()
 
     fun search() {
@@ -291,7 +302,8 @@ fun CollectionPage(
                                     if (item != null) {
                                         CollectionSimpleCard(
                                             manager = resourceManager.instance!!,
-                                            collectionData = item
+                                            collectionData = item,
+                                            picked = onPickedFunction
                                         )
                                     }
                                 }

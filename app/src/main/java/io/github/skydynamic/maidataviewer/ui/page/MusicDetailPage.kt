@@ -61,7 +61,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastJoinToString
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
@@ -70,10 +69,11 @@ import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.AchievementCalculator
 import io.github.skydynamic.maidataviewer.core.ExtensionMethods.buildDataTableRow
 import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
-import io.github.skydynamic.maidataviewer.core.strings
+import io.github.skydynamic.maidataviewer.core.getResFileAsync
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
 import io.github.skydynamic.maidataviewer.core.manager.MusicAliasManager
 import io.github.skydynamic.maidataviewer.core.manager.resource.ResourceManagerType
+import io.github.skydynamic.maidataviewer.core.strings
 import io.github.skydynamic.maidataviewer.ui.component.BasicDataTableRow
 import io.github.skydynamic.maidataviewer.ui.component.DataTable
 import io.github.skydynamic.maidataviewer.ui.component.DataTableColumn
@@ -82,9 +82,6 @@ import io.github.skydynamic.maidataviewer.ui.component.WindowInsetsSpacer
 import io.github.skydynamic.maidataviewer.ui.component.WindowInsetsSpacer.TopPaddingSpacer
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
 import io.github.skydynamic.maidataviewer.ui.component.dialog.TextDialog
-import io.github.skydynamic.maidataviewer.viewmodel.GlobalViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.math.absoluteValue
 
@@ -276,8 +273,10 @@ fun MusicDetailPage(
 ) {
     val isDX = music.id in 10000 until 100000
 
+    val manager = ResourceManagerType.JACKET.instance!!
+
     var currentChoiceDifficulty by remember { mutableIntStateOf(0) }
-    val defaultJacketFile = remember { ResourceManagerType.JACKET.instance!!.getResByteFromAssets(0) }
+    val defaultJacketFile = remember { manager.getResByteFromAssets(0) }
     var jacketFile by remember { mutableStateOf<File?>(null) }
     var currentChoiceNoteType by remember { mutableStateOf(NoteType.TAP) }
 
@@ -288,13 +287,9 @@ fun MusicDetailPage(
         })
     }
 
-    LaunchedEffect(music.id) {
-        GlobalViewModel.viewModelScope.launch(Dispatchers.IO) {
-            jacketFile = try {
-                ResourceManagerType.JACKET.instance!!.getResFile(music.id)
-            } catch (_: Exception) {
-                null
-            }
+    LaunchedEffect(Unit) {
+        manager.getResFileAsync(music.id) {
+            jacketFile = it
         }
     }
 
@@ -1004,7 +999,7 @@ private fun ActionButtonsRow(
                 } else {
                     application.saveImageToGallery(
                         jacketFile.readBytes(),
-                        R.string.save_jacket_success.strings
+                        "jacket_${musicName}.jpg"
                     )
                 }
             },

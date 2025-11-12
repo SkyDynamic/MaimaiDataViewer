@@ -10,9 +10,9 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.PagingSource.LoadResult.Page.Companion.COUNT_UNDEFINED
 import androidx.paging.cachedIn
+import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import io.github.skydynamic.maidataviewer.core.paging.MusicDataPagingSource
 import io.github.skydynamic.maidataviewer.core.paging.PagingSourceState
-import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 

@@ -11,12 +11,16 @@ object IconPageViewModel : BaseCollectionViewModel() {
 }
 
 @Composable
-fun IconPage(onBackPressed: () -> Unit) {
+fun IconPage(
+    onPicked: Boolean = false,
+    onBackPressed: () -> Unit
+) {
     CollectionPage(
         viewModel = IconPageViewModel,
         resourceManager = ResourceManagerType.ICON,
         title = R.string.icon_page.strings,
         searchResultStringRes = R.string.icon_search_result.strings,
-        onBackPressed = onBackPressed
+        onBackPressed = onBackPressed,
+        onPicked = onPicked
     )
 }

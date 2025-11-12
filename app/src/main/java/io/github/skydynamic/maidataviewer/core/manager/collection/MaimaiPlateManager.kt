@@ -93,9 +93,13 @@ class MaimaiPlateManager(
         val plateFile = platePath.resolve("$id.png")
         if (!plateFile.exists()) {
             httpClient.request {
-                it.get("$assetsUrl/$id.png")
-                    .bodyAsChannel()
-                    .copyTo(plateFile.outputStream())
+                val request = it.get("$assetsUrl/$id.png")
+                if (request.status.value == 200) {
+                    request.bodyAsChannel()
+                        .copyTo(plateFile.outputStream())
+                } else {
+                    Log.e("MaimaiPlateManager", "Error downloading name plate $id")
+                }
             }
             Log.i("MaimaiPlateManager", "Downloaded plate $id")
         }

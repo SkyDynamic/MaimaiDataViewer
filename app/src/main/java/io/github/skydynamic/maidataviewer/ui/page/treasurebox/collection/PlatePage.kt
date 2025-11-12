@@ -11,12 +11,16 @@ object PlatePageViewModel : BaseCollectionViewModel() {
 }
 
 @Composable
-fun PlatePage(onBackPressed: () -> Unit) {
+fun PlatePage(
+    onPicked: Boolean = false,
+    onBackPressed: () -> Unit
+) {
     CollectionPage(
         viewModel = PlatePageViewModel,
         resourceManager = ResourceManagerType.PLATE,
         title = R.string.plate_page.strings,
         searchResultStringRes = R.string.plate_search_result.strings,
-        onBackPressed = onBackPressed
+        onBackPressed = onBackPressed,
+        onPicked = onPicked
     )
 }

@@ -67,6 +67,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.data.MaimaiTitleData
 import io.github.skydynamic.maidataviewer.core.manager.collection.CollectionType
+import io.github.skydynamic.maidataviewer.core.noRippleClickable
 import io.github.skydynamic.maidataviewer.core.paging.CollectionPagingSource
 import io.github.skydynamic.maidataviewer.core.paging.PagingSourceState
 import io.github.skydynamic.maidataviewer.core.strings
@@ -92,6 +93,8 @@ object TitlePageViewModel : ViewModel() {
         PagingSourceState(0,0,0))
     var currentPage by mutableIntStateOf(0)
     var listState by mutableStateOf<LazyListState?>(null)
+
+    var pickItem by mutableStateOf<MaimaiTitleData?>(null)
 
     fun search(
         keyword: String = searchText,
@@ -123,6 +126,7 @@ object TitlePageViewModel : ViewModel() {
 
 @Composable
 fun TitlePage(
+    onPicked: Boolean = false,
     onBackPressed: () -> Unit
 ) {
     val titleData = TitlePageViewModel.searchResult?.collectAsLazyPagingItems()
@@ -190,16 +194,14 @@ fun TitlePage(
                     Icon(
                         Icons.Default.Close,
                         contentDescription = Icons.Default.Close.name,
-                        modifier = Modifier.height(24.dp),
-                        tint = MaterialTheme.colorScheme.onBackground
+                        modifier = Modifier.height(24.dp)
                     )
                 }
 
                 Text(
                     text = R.string.title_page.strings,
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
+                    fontWeight = FontWeight.Bold
                 )
             }
 
@@ -347,7 +349,13 @@ fun TitlePage(
 
                                         Box(
                                             modifier = Modifier
-                                                .fillMaxWidth(),
+                                                .fillMaxWidth()
+                                                .noRippleClickable {
+                                                    if (onPicked) {
+                                                        TitlePageViewModel.pickItem = title
+                                                        onBackPressed()
+                                                    }
+                                                },
                                             contentAlignment = Alignment.Center
                                         ) {
                                             Image(

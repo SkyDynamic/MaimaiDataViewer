@@ -5,12 +5,16 @@ import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Typeface
 import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
 import io.github.skydynamic.maidataviewer.core.manager.MusicAliasManager
@@ -98,8 +102,16 @@ class Application : Application() {
         val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
         resolver.openOutputStream(uri!!).use {
             it?.write(image)
-            Toast.makeText(this, R.string.save_jacket_success, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.save_iamge_success, Toast.LENGTH_SHORT).show()
         }
+    }
+
+    fun getBitmapFromDrawable(drawableId: Int): Bitmap {
+        return BitmapFactory.decodeResource(resources, drawableId)
+    }
+
+    fun getFont(font: Int): Typeface {
+        return ResourcesCompat.getFont(this, font) ?: Typeface.DEFAULT
     }
 
     private fun isPackageInstalled(packageName: String): Boolean {

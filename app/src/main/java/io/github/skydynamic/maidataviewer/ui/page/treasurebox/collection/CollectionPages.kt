@@ -9,15 +9,16 @@ enum class CollectionPages(
     val desc: String,
     var page: String,
     val pageComposable: @Composable (
-            backPressed: () -> Any
+            backPressed: () -> Any,
+            onPick: Boolean
     ) -> Unit
 ) {
     TITLE_PAGE(
         R.string.title_page.strings,
         R.string.title_page_desc.strings,
         "titlePage",
-        { backPressed ->
-            TitlePage {
+        { backPressed, onPick ->
+            TitlePage(onPicked = onPick) {
                 backPressed()
             }
         }
@@ -26,8 +27,8 @@ enum class CollectionPages(
         R.string.icon_page.strings,
         R.string.icon_page_desc.strings,
         "iconPage",
-        { backPressed ->
-            IconPage {
+        { backPressed, onPick ->
+            IconPage(onPicked = onPick) {
                 backPressed()
             }
         }
@@ -36,8 +37,8 @@ enum class CollectionPages(
         R.string.plate_page.strings,
         R.string.plate_page_desc.strings,
         "platePage",
-        { backPressed ->
-            PlatePage {
+        { backPressed, onPick ->
+            PlatePage(onPicked = onPick) {
                 backPressed()
             }
         }
@@ -46,8 +47,18 @@ enum class CollectionPages(
         R.string.frame_page.strings,
         R.string.frame_page_desc.strings,
         "framePage",
-        { backPressed ->
-            FramePage {
+        { backPressed, onPick ->
+            FramePage(onPicked = onPick) {
+                backPressed()
+            }
+        }
+    ),
+    SUB_MONITOR_PREVIEW_PAGE(
+        R.string.submonitor_page.strings,
+        R.string.submonitor_page_desc.strings,
+        "subMonitorPreviewPage",
+        { backPressed, _ ->
+            SubMonitorPreviewPage {
                 backPressed()
             }
         }

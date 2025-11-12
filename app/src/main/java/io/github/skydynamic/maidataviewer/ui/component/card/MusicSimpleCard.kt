@@ -32,18 +32,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewModelScope
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
-import io.github.skydynamic.maidataviewer.core.strings
+import io.github.skydynamic.maidataviewer.core.getResFileAsync
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
 import io.github.skydynamic.maidataviewer.core.manager.resource.ResourceManagerType
-import io.github.skydynamic.maidataviewer.viewmodel.GlobalViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import io.github.skydynamic.maidataviewer.core.strings
 import java.io.File
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -53,16 +50,14 @@ fun MusicSimpleCard(
     music: MaimaiMusicData,
     onClick: () -> Unit
 ) {
-    val defaultJacketFile = remember { ResourceManagerType.JACKET.instance!!.getResByteFromAssets(0) }
+    val manager = ResourceManagerType.JACKET.instance!!
+
+    val defaultJacketFile = remember { manager.getResByteFromAssets(0) }
     var jacketFile by remember { mutableStateOf<File?>(null) }
 
     LaunchedEffect(music.id) {
-        GlobalViewModel.viewModelScope.launch(Dispatchers.IO) {
-            jacketFile = try {
-                ResourceManagerType.JACKET.instance!!.getResFile(music.id)
-            } catch (_: Exception) {
-                null
-            }
+        manager.getResFileAsync(music.id) {
+            jacketFile = it
         }
     }
 

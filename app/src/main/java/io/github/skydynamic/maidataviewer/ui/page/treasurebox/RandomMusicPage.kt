@@ -52,24 +52,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
-import io.github.skydynamic.maidataviewer.core.strings
+import io.github.skydynamic.maidataviewer.core.getResFileAsync
 import io.github.skydynamic.maidataviewer.core.manager.GenreType
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
 import io.github.skydynamic.maidataviewer.core.manager.resource.ResourceManagerType
 import io.github.skydynamic.maidataviewer.core.noRippleClickable
+import io.github.skydynamic.maidataviewer.core.strings
 import io.github.skydynamic.maidataviewer.ui.AppNavController
 import io.github.skydynamic.maidataviewer.ui.component.UnknownProgressCircularProgress
 import io.github.skydynamic.maidataviewer.ui.component.button.GenreSelectorButton
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
 import io.github.skydynamic.maidataviewer.ui.component.menu.GenreDropdownMenu
-import io.github.skydynamic.maidataviewer.viewmodel.GlobalViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -91,17 +90,14 @@ fun RandomMusicItem(
     isRolling: Boolean = false,
     onCardClick: (MaimaiMusicData) -> Unit,
 ) {
-    val defaultJacketFile = remember { ResourceManagerType.JACKET.instance!!.getResByteFromAssets(0) }
+    val manager = ResourceManagerType.JACKET.instance!!
+    val defaultJacketFile = remember { manager.getResByteFromAssets(0) }
     var jacketFile by remember { mutableStateOf<File?>(null) }
     val musicData: MaimaiMusicData? = MusicDataManager.getMusicData(id)
 
     LaunchedEffect(id) {
-        GlobalViewModel.viewModelScope.launch(Dispatchers.IO) {
-            jacketFile = try {
-                ResourceManagerType.JACKET.instance!!.getResFile(id)
-            } catch (_: Exception) {
-                null
-            }
+        manager.getResFileAsync(id) {
+            jacketFile = it
         }
     }
 

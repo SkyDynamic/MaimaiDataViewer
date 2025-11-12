@@ -11,12 +11,16 @@ object FramePageViewModel : BaseCollectionViewModel() {
 }
 
 @Composable
-fun FramePage(onBackPressed: () -> Unit) {
+fun FramePage(
+    onPicked: Boolean = false,
+    onBackPressed: () -> Unit,
+) {
     CollectionPage(
         viewModel = FramePageViewModel,
         resourceManager = ResourceManagerType.FRAME,
         title = R.string.frame_page.strings,
         searchResultStringRes = R.string.frame_search_result.strings,
-        onBackPressed = onBackPressed
+        onBackPressed = onBackPressed,
+        onPicked = onPicked
     )
 }

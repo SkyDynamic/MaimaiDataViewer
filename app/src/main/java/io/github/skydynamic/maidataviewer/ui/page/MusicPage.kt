@@ -56,11 +56,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import io.github.skydynamic.maidataviewer.R
-import io.github.skydynamic.maidataviewer.core.strings
 import io.github.skydynamic.maidataviewer.core.manager.GenreType
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
 import io.github.skydynamic.maidataviewer.core.manager.MusicAliasManager
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
+import io.github.skydynamic.maidataviewer.core.strings
 import io.github.skydynamic.maidataviewer.ui.AppNavController
 import io.github.skydynamic.maidataviewer.ui.component.UnknownProgressCircularProgress
 import io.github.skydynamic.maidataviewer.ui.component.button.GenreSelectorButton
