@@ -305,6 +305,14 @@ fun CollectionPage(
                                             collectionData = item,
                                             picked = onPickedFunction
                                         )
+                                    } else {
+                                        Spacer(modifier = Modifier.height(10.dp))
+                                    }
+                                }
+
+                                if (collectionData.itemCount % 2 != 0) {
+                                    item(key = "spacer") {
+                                        Spacer(modifier = Modifier.height(10.dp))
                                     }
                                 }
                             }

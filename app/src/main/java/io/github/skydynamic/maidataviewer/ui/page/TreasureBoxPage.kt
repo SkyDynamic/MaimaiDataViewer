@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -52,191 +53,192 @@ enum class DataTool(
 
 @Composable
 fun TreasureBoxPage() {
-    Column(
+    LazyColumn(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        ShadowElevatedCard(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(16.dp)
-        ) {
-            Column(
+        item {
+            ShadowElevatedCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .padding(16.dp)
             ) {
-                Text(
-                    text = R.string.data_tool.strings,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Text(
-                    text = R.string.data_tool_desc.strings,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                HorizontalDivider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-
-                FlowRow(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
-                        .padding(8.dp),
-                    maxItemsInEachRow = 2
+                        .padding(16.dp)
                 ) {
-                    DataTool.entries.forEach {
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)
-                                .wrapContentHeight()
-                                .padding(8.dp)
-                                .clip(MaterialTheme.shapes.medium)
-                                .background(
-                                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                    shape = MaterialTheme.shapes.medium
+                    Text(
+                        text = R.string.data_tool.strings,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Text(
+                        text = R.string.data_tool_desc.strings,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+
+                    FlowRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                            .padding(8.dp),
+                        maxItemsInEachRow = 2
+                    ) {
+                        DataTool.entries.forEach {
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .wrapContentHeight()
+                                    .padding(8.dp)
+                                    .clip(MaterialTheme.shapes.medium)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                        shape = MaterialTheme.shapes.medium
+                                    )
+                                    .clickable {
+                                        AppNavController.getInstance().navigate(it.page)
+                                    },
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(4.dp),
+                            ) {
+                                Image(
+                                    painter = painterResource(it.icon),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .height(32.dp)
+                                        .padding(top = 4.dp)
                                 )
-                                .clickable {
-                                    AppNavController.getInstance().navigate(it.page)
-                                },
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(4.dp),
-                        ) {
-                            Image(
-                                painter = painterResource(it.icon),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .height(32.dp)
-                                    .padding(top = 4.dp)
-                            )
 
-                            Text(
-                                text = it.toolName,
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 4.dp)
-                                    .padding(top = 4.dp)
-                            )
+                                Text(
+                                    text = it.toolName,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 4.dp)
+                                        .padding(top = 4.dp)
+                                )
 
-                            Text(
-                                text = it.desc,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 4.dp)
-                                    .padding(bottom = 4.dp)
-                            )
+                                Text(
+                                    text = it.desc,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 4.dp)
+                                        .padding(bottom = 4.dp)
+                                )
+                            }
                         }
                     }
                 }
             }
         }
 
-        ShadowElevatedCard(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(16.dp)
-        ) {
-            Column(
+        item {
+            ShadowElevatedCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .padding(16.dp)
             ) {
-                Text(
-                    text = R.string.collection_view.strings,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Text(
-                    text = R.string.collection_view_desc.strings,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                HorizontalDivider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-
-                FlowRow(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
-                        .padding(8.dp),
-                    maxItemsInEachRow = 2
+                        .padding(16.dp)
                 ) {
-                    CollectionPages.entries.forEach {
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(96.dp)
-                                .padding(8.dp)
-                                .clip(MaterialTheme.shapes.medium)
-                                .background(
-                                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                    shape = MaterialTheme.shapes.medium
+                    Text(
+                        text = R.string.collection_view.strings,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Text(
+                        text = R.string.collection_view_desc.strings,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+
+                    FlowRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                            .padding(8.dp),
+                        maxItemsInEachRow = 2
+                    ) {
+                        CollectionPages.entries.forEach {
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(96.dp)
+                                    .padding(8.dp)
+                                    .clip(MaterialTheme.shapes.medium)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                        shape = MaterialTheme.shapes.medium
+                                    )
+                                    .clickable {
+                                        AppNavController.getInstance().navigate(it.page)
+                                    },
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
+                            ) {
+                                Text(
+                                    text = it.pageName,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 4.dp)
+                                        .padding(top = 4.dp)
                                 )
-                                .clickable {
-                                    AppNavController.getInstance().navigate(it.page)
-                                },
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                        ) {
-                            Text(
-                                text = it.pageName,
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 4.dp)
-                                    .padding(top = 4.dp)
-                            )
 
-                            Spacer(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(8.dp)
-                            )
+                                Spacer(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(8.dp)
+                                )
 
-                            Text(
-                                text = it.desc,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 4.dp)
-                                    .padding(bottom = 4.dp)
-                            )
+                                Text(
+                                    text = it.desc,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 4.dp)
+                                        .padding(bottom = 4.dp)
+                                )
+                            }
                         }
                     }
-
-//                    if (CollectionPages.entries.size % 2 != 0) {
-//                        Spacer(
-//                            modifier = Modifier
-//                                .weight(1f)
-//                                .height(64.dp)
-//                                .padding(8.dp)
-//                        )
-//                    }
                 }
             }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(60.dp))
         }
     }
 }
