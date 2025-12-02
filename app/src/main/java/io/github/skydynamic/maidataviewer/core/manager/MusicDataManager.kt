@@ -1,10 +1,12 @@
 package io.github.skydynamic.maidataviewer.core.manager
 
+import io.github.skydynamic.maidataviewer.core.data.Difficulty
 import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import io.github.skydynamic.maidataviewer.core.data.MaimaiUpdateData
 import io.github.skydynamic.maidataviewer.viewmodel.MusicPageViewModel
 import kotlinx.serialization.json.Json
 import java.io.File
+import kotlin.math.min
 
 class MusicDataManager(
     private val musicDataDir: File
@@ -54,7 +56,9 @@ class MusicDataManager(
     fun searchMusicData(
         keyword: String,
         genreId: Int? = null,
-        versionId: Int? = null
+        versionId: Int? = null,
+        levelRange: ClosedFloatingPointRange<Float>? = null,
+        targetDifficulty: List<Difficulty>? = null
     ): List<MaimaiMusicData> {
         var result = musicDataList.filter {
             (it.name?.lowercase()?.contains(keyword.lowercase()) == true
@@ -66,6 +70,25 @@ class MusicDataManager(
             MusicPageViewModel.searchText.value
         ).forEach {
             if (!result.contains(it)) result.add(it)
+        }
+
+        val targetDiffMap = targetDifficulty?.map { it.ordinal } ?: emptyList()
+
+        if (levelRange != null) {
+            val minLevel = "%.1f".format(levelRange.start).toFloat()
+            val maxLevel = "%.1f".format(levelRange.endInclusive).toFloat()
+
+            result = result.filter {
+                it.difficulties.filterIndexed { index, _ ->
+                    if (targetDiffMap.isNotEmpty()) {
+                        index in targetDiffMap
+                    } else {
+                        true
+                    }
+                }.any { difficulty ->
+                    difficulty.level >= minLevel && difficulty.level <= maxLevel
+                }
+            }.toMutableList ()
         }
 
         if (genreId != null) {

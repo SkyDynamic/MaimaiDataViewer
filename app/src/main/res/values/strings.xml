@@ -94,4 +94,8 @@
     <string name="pick_title">Pick Title</string>
     <string name="submit">Submit</string>
     <string name="save">Save</string>
+    <string name="music_level_filter">Filter range of music level</string>
+    <string name="min_value">Min Value</string>
+    <string name="max_value">Max Value</string>
+    <string name="filter_target_difficulty">Target Difficulty</string>
 </resources>

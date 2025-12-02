@@ -95,4 +95,8 @@
     <string name="pick_title">选取称号</string>
     <string name="submit">提交</string>
     <string name="save">保存</string>
+    <string name="music_level_filter">定数范围</string>
+    <string name="min_value">最小值</string>
+    <string name="max_value">最大值</string>
+    <string name="filter_target_difficulty">目标难度</string>
 </resources>

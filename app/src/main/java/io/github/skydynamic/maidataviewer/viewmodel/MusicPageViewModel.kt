@@ -3,6 +3,7 @@ package io.github.skydynamic.maidataviewer.viewmodel
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -10,6 +11,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.PagingSource.LoadResult.Page.Companion.COUNT_UNDEFINED
 import androidx.paging.cachedIn
+import io.github.skydynamic.maidataviewer.core.data.Difficulty
 import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import io.github.skydynamic.maidataviewer.core.paging.MusicDataPagingSource
 import io.github.skydynamic.maidataviewer.core.paging.PagingSourceState
@@ -25,6 +27,8 @@ object MusicPageViewModel : ViewModel() {
     val searchText = mutableStateOf("")
     val genreFilter = mutableIntStateOf(-1)
     val versionFilter = mutableIntStateOf(-1)
+    val levelFilterRange = mutableStateOf(1f..15f)
+    val levelDifficultyTarget = Difficulty.entries.toMutableStateList()
 
     val isSearchCardCollapsed = mutableStateOf(false)
     val isSearching = mutableStateOf(false)
@@ -39,7 +43,9 @@ object MusicPageViewModel : ViewModel() {
     fun search(
         keyword: String = searchText.value,
         genreId: Int? = if (genreFilter.intValue == -1) null else genreFilter.intValue,
-        versionId: Int? = if (versionFilter.intValue == -1) null else versionFilter.intValue
+        versionId: Int? = if (versionFilter.intValue == -1) null else versionFilter.intValue,
+        levelRange: ClosedFloatingPointRange<Float> = levelFilterRange.value,
+        targetDifficulty: List<Difficulty> = levelDifficultyTarget
     ) = Pager(
         PagingConfig(
             pageSize = 10,
@@ -53,6 +59,8 @@ object MusicPageViewModel : ViewModel() {
             .setKeyWord(keyword)
             .setGenreId(genreId)
             .setVersionId(versionId)
+            .setLevelRange(levelRange)
+            .setTargetDifficulty(targetDifficulty)
             .setOnSearchFinished {
                 searchResultState.value = it
             }

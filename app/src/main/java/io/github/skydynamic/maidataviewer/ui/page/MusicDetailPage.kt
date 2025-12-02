@@ -68,6 +68,7 @@ import io.github.skydynamic.maidataviewer.Application.Companion.application
 import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.AchievementCalculator
 import io.github.skydynamic.maidataviewer.core.ExtensionMethods.buildDataTableRow
+import io.github.skydynamic.maidataviewer.core.data.Difficulty
 import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import io.github.skydynamic.maidataviewer.core.getResFileAsync
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
@@ -91,14 +92,6 @@ object TempState : ViewModel() {
     fun reset() {
         showAliasDialog = false
     }
-}
-
-enum class Difficulty(val diffName: String, val color: Color) {
-    BASIC("Basic", Color(28, 133, 0)),
-    ADVANCED("Advanced", Color(168, 137, 0)),
-    EXPERT("Expert", Color(220, 40, 40)),
-    MASTER("Master", Color(165, 0, 235)),
-    REMASTER("Re:Mas", Color(186, 153, 255))
 }
 
 enum class NoteType(val typeNmae: String) {

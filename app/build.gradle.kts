@@ -13,8 +13,8 @@ android {
         applicationId = "io.github.skydynamic.maidataviewer"
         minSdk = 28
         targetSdk = 36
-        versionCode = 777
-        versionName = "1.2.0"
+        versionCode = 780
+        versionName = "1.2.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

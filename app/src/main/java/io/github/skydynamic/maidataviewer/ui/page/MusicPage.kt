@@ -11,6 +11,7 @@ import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,30 +33,36 @@ import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewModelScope
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import io.github.skydynamic.maidataviewer.R
+import io.github.skydynamic.maidataviewer.core.data.Difficulty
 import io.github.skydynamic.maidataviewer.core.manager.GenreType
 import io.github.skydynamic.maidataviewer.core.manager.MaiGenreManager
 import io.github.skydynamic.maidataviewer.core.manager.MusicAliasManager
@@ -69,32 +76,33 @@ import io.github.skydynamic.maidataviewer.ui.component.card.MusicSimpleCard
 import io.github.skydynamic.maidataviewer.ui.component.card.PaginationCard
 import io.github.skydynamic.maidataviewer.ui.component.card.ShadowElevatedCard
 import io.github.skydynamic.maidataviewer.ui.component.menu.GenreDropdownMenu
-import io.github.skydynamic.maidataviewer.viewmodel.GlobalViewModel
 import io.github.skydynamic.maidataviewer.viewmodel.MusicPageViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-fun search() {
+fun search(
+    scope: CoroutineScope
+) {
     if (MusicPageViewModel.isSearchingActive.value
         && MusicPageViewModel.searchJob.value != null
     ) {
         MusicPageViewModel.searchJob.value?.cancel()
     }
 
-    MusicPageViewModel.searchJob.value = GlobalViewModel.viewModelScope
-        .launch(Dispatchers.IO) {
-            MusicPageViewModel.isSearchingActive.value = true
-            MusicPageViewModel.isSearching.value = true
-            MusicPageViewModel.shouldScrollToTop.value = true
+    MusicPageViewModel.searchJob.value = scope.launch(Dispatchers.IO) {
+        MusicPageViewModel.isSearchingActive.value = true
+        MusicPageViewModel.isSearching.value = true
+        MusicPageViewModel.shouldScrollToTop.value = true
 
-            MusicPageViewModel.currentPage.intValue = 0
+        MusicPageViewModel.currentPage.intValue = 0
 
-            MusicPageViewModel.search()
+        MusicPageViewModel.search()
 
-            MusicPageViewModel.isSearchingActive.value = false
-            MusicPageViewModel.searchJob.value = null
-        }
+        MusicPageViewModel.isSearchingActive.value = false
+        MusicPageViewModel.searchJob.value = null
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
@@ -112,6 +120,11 @@ fun MusicPage() {
     val listState = MusicPageViewModel.listState.value
 
     val musicData = MusicPageViewModel.searchResult.value?.collectAsLazyPagingItems()
+
+    val sheetState = rememberModalBottomSheetState()
+    val isSheetVisible = remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(MusicPageViewModel.currentPage.intValue) {
         val page = MusicPageViewModel.currentPage.intValue
@@ -137,7 +150,7 @@ fun MusicPage() {
 
     LaunchedEffect(Unit) {
         if (!MusicDataManager.instance.getIsLoaded()) {
-            MusicPageViewModel.viewModelScope.launch(Dispatchers.IO) {
+            scope.launch(Dispatchers.IO) {
                 MusicDataManager.instance.loadMusicData {
                     MusicPageViewModel.isLoadingMusic.value = false
                     if (it > 0) {
@@ -150,7 +163,7 @@ fun MusicPage() {
         }
 
         if (!MusicAliasManager.instance.getIsLoaded()) {
-            MusicPageViewModel.viewModelScope.launch(Dispatchers.IO) {
+            scope.launch(Dispatchers.IO) {
                 MusicAliasManager.instance.loadAliasData()
             }
         }
@@ -243,7 +256,7 @@ fun MusicPage() {
                                     modifier = Modifier
                                         .height(
                                             if (!isCollapsed) {
-                                                190.dp
+                                                255.dp
                                             } else {
                                                 12.dp
                                             }
@@ -362,7 +375,7 @@ fun MusicPage() {
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                         keyboardActions = KeyboardActions(
-                            onSearch = { search() }
+                            onSearch = { search(scope) }
                         ),
                         shape = RoundedCornerShape(25.dp),
                         modifier = Modifier
@@ -373,7 +386,7 @@ fun MusicPage() {
                     )
 
                     Button(
-                        onClick = { search() },
+                        onClick = { search(scope) },
                         enabled = !MusicPageViewModel.isLoadingMusic.value,
                         shape = RoundedCornerShape(16.dp),
                         contentPadding = PaddingValues(8.dp),
@@ -420,7 +433,7 @@ fun MusicPage() {
                                 if (MusicPageViewModel.searchText.value != ""
                                     || MusicPageViewModel.isSearching.value
                                 ) {
-                                    search()
+                                    search(scope)
                                 }
                             },
                             genreType = GenreType.MUSIC,
@@ -443,11 +456,225 @@ fun MusicPage() {
                                 if (MusicPageViewModel.searchText.value != ""
                                     || MusicPageViewModel.isSearching.value
                                 ) {
-                                    search()
+                                    search(scope)
                                 }
                             },
                             genreType = GenreType.VERSION,
                         )
+                    }
+                }
+
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp)
+                        .padding(8.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    contentPadding = PaddingValues(1.dp),
+                    onClick = {
+                        isSheetVisible.value = true
+                    },
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = R.string.music_level_filter.strings,
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
+                            autoSize = TextAutoSize.StepBased(minFontSize = 8.sp, maxFontSize = 16.sp)
+                        )
+                        if (MusicPageViewModel.levelFilterRange.value.start == MusicPageViewModel.levelFilterRange.value.endInclusive) {
+                            Text(
+                                text = "%.1f".format(MusicPageViewModel.levelFilterRange.value.start),
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = TextAlign.Center,
+                                maxLines = 1,
+                                autoSize = TextAutoSize.StepBased(minFontSize = 8.sp, maxFontSize = 16.sp)
+                            )
+                        } else {
+                            Text(
+                                text = "%.1f".format(MusicPageViewModel.levelFilterRange.value.start)
+                                        + " ... "
+                                        + "%.1f".format(MusicPageViewModel.levelFilterRange.value.endInclusive),
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = TextAlign.Center,
+                                maxLines = 1,
+                                autoSize = TextAutoSize.StepBased(
+                                    minFontSize = 8.sp,
+                                    maxFontSize = 16.sp
+                                ),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        if (isSheetVisible.value) {
+            ModalBottomSheet(
+                modifier = Modifier.fillMaxHeight(),
+                sheetState = sheetState,
+                onDismissRequest = { isSheetVisible.value = false }
+            ) {
+                val tempMinValue = remember { mutableStateOf("%.1f".format(MusicPageViewModel.levelFilterRange.value.start)) }
+                val tempMinValueFieldError = remember { mutableStateOf(false) }
+                val tempMaxValue = remember { mutableStateOf("%.1f".format(MusicPageViewModel.levelFilterRange.value.endInclusive)) }
+                val tempMaxValueFieldError = remember { mutableStateOf(false) }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "%.1f".format(MusicPageViewModel.levelFilterRange.value.start)
+                        )
+
+                        Text(
+                            text = " - "
+                        )
+
+                        Text(
+                            text = "%.1f".format(MusicPageViewModel.levelFilterRange.value.endInclusive)
+                        )
+                    }
+                    RangeSlider(
+                        value = MusicPageViewModel.levelFilterRange.value,
+                        onValueChange = {
+                            MusicPageViewModel.levelFilterRange.value = it
+                            tempMinValue.value = "%.1f".format(it.start)
+                            tempMaxValue.value = "%.1f".format(it.endInclusive)
+                        },
+                        valueRange = 1f..15f,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+                    ) {
+                        OutlinedTextField(
+                            modifier = Modifier.weight(1f),
+                            value = tempMinValue.value,
+                            onValueChange = {
+                                tempMinValue.value = it
+                            },
+                            placeholder = {
+                                Text(text = R.string.min_value.strings)
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    val value = tempMinValue.value.toFloatOrNull()
+                                    if (
+                                        value != null
+                                        && value >= 1f
+                                        && value <= MusicPageViewModel.levelFilterRange.value.endInclusive
+                                        )
+                                    {
+                                        tempMinValue.value = "%.1f".format(value)
+                                        MusicPageViewModel.levelFilterRange.value = value..MusicPageViewModel.levelFilterRange.value.endInclusive
+                                        tempMinValueFieldError.value = false
+                                    } else {
+                                        tempMinValueFieldError.value = true
+                                    }
+                                }
+                            ),
+                            isError = tempMinValueFieldError.value,
+                            singleLine = true,
+                        )
+
+                        OutlinedTextField(
+                            modifier = Modifier.weight(1f),
+                            value = tempMaxValue.value,
+                            onValueChange = {
+                                tempMaxValue.value = it
+                            },
+                            placeholder = {
+                                Text(text = R.string.max_value.strings)
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    val value = tempMaxValue.value.toFloatOrNull()
+                                    if (
+                                        value != null
+                                        && value >= MusicPageViewModel.levelFilterRange.value.start
+                                        && value <= 15f
+                                        )
+                                    {
+                                        tempMaxValue.value = "%.1f".format(value)
+                                        MusicPageViewModel.levelFilterRange.value = MusicPageViewModel.levelFilterRange.value.start..value
+                                        tempMinValueFieldError.value = false
+                                    } else {
+                                        tempMaxValueFieldError.value = true
+                                    }
+                                }
+                            ),
+                            isError = tempMaxValueFieldError.value,
+                            singleLine = true,
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                MaterialTheme.colorScheme.surfaceContainer,
+                                RoundedCornerShape(8.dp)
+                            )
+                            .padding(top = 8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = R.string.filter_target_difficulty.strings
+                            )
+
+                            Difficulty.entries.forEach { difficulty ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Checkbox(
+                                        checked = MusicPageViewModel.levelDifficultyTarget.contains(difficulty),
+                                        onCheckedChange = {
+                                            if (it) {
+                                                MusicPageViewModel.levelDifficultyTarget.add(difficulty)
+                                            } else {
+                                                MusicPageViewModel.levelDifficultyTarget.remove(difficulty)
+                                            }
+                                        }
+                                    )
+
+                                    Text(
+                                        text = difficulty.diffName,
+                                        modifier = Modifier.padding(start = 8.dp)
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }

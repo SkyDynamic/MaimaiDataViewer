@@ -2,6 +2,7 @@ package io.github.skydynamic.maidataviewer.core.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import io.github.skydynamic.maidataviewer.core.data.Difficulty
 import io.github.skydynamic.maidataviewer.core.data.MaimaiMusicData
 import io.github.skydynamic.maidataviewer.core.manager.MusicDataManager
 
@@ -9,6 +10,8 @@ class MusicDataPagingSource(
     var keyword: String = "",
     var genreId: Int? = null,
     var versionId: Int? = null,
+    var levelRange: ClosedFloatingPointRange<Float>? = null,
+    var targetDifficulty: List<Difficulty>? = null,
     var currentPage: Int = 0
 ) : PagingSource<Int, MaimaiMusicData>() {
     private var onSearchFinish: (PagingSourceState) -> Unit = { 0 }
@@ -18,15 +21,22 @@ class MusicDataPagingSource(
             val key = params.key ?: 0
             val pageSize = params.loadSize
 
-            val allData = MusicDataManager.instance.searchMusicData(keyword, genreId, versionId)
-                .also {
-                    val totalPage = if (it.isNotEmpty()) (it.size + pageSize - 1) / pageSize else 0
-                    onSearchFinish(PagingSourceState(
+            val allData = MusicDataManager.instance.searchMusicData(
+                keyword,
+                genreId,
+                versionId,
+                levelRange,
+                targetDifficulty
+            ).also {
+                val totalPage = if (it.isNotEmpty()) (it.size + pageSize - 1) / pageSize else 0
+                onSearchFinish(
+                    PagingSourceState(
                         currentPage,
                         totalPage,
                         it.size
-                    ))
-                }
+                    )
+                )
+            }
 
             val sublist = allData.drop(currentPage * pageSize).take(pageSize)
 
@@ -59,6 +69,16 @@ class MusicDataPagingSource(
 
     fun setVersionId(versionId: Int?): MusicDataPagingSource {
         this.versionId = versionId
+        return this
+    }
+
+    fun setLevelRange(levelRange: ClosedFloatingPointRange<Float>?): MusicDataPagingSource {
+        this.levelRange = levelRange
+        return this
+    }
+
+    fun setTargetDifficulty(targetDifficulty: List<Difficulty>?): MusicDataPagingSource {
+        this.targetDifficulty = targetDifficulty
         return this
     }
 
