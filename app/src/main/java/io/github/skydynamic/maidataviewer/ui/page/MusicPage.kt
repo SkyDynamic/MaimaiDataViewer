@@ -40,6 +40,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Text
@@ -178,7 +179,8 @@ fun MusicPage() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(),
+                    .fillMaxHeight()
+                    .padding(top = 50.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -228,7 +230,6 @@ fun MusicPage() {
                         .fillMaxWidth()
                         .fillMaxHeight()
                         .padding(top = 8.dp)
-                        .padding(bottom = 65.dp),
                 ) {
                     LazyColumn(
                         modifier = Modifier
