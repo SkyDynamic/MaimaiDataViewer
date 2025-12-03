@@ -75,6 +75,8 @@ dependencies {
     // Android Paging
     implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.compose)
+    // Android Datastore
+    implementation(libs.androidx.datastore.preferences)
 
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.serialization.json)

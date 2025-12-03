@@ -99,4 +99,7 @@
     <string name="min_value">最小值</string>
     <string name="max_value">最大值</string>
     <string name="filter_target_difficulty">目标难度</string>
+    <string name="resource_node">资源中转节点</string>
+    <string name="resource_node_desc">下载资源的时候使用的中转节点</string>
+    <string name="custom_node_url">自定义节点</string>
 </resources>

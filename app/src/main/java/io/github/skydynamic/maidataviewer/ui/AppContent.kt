@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -48,6 +49,7 @@ import io.github.skydynamic.maidataviewer.ui.page.HomePage
 import io.github.skydynamic.maidataviewer.ui.page.MaimaiDataManagerPage
 import io.github.skydynamic.maidataviewer.ui.page.MusicDetailPage
 import io.github.skydynamic.maidataviewer.ui.page.MusicPage
+import io.github.skydynamic.maidataviewer.ui.page.SettingPage
 import io.github.skydynamic.maidataviewer.ui.page.TreasureBoxPage
 import io.github.skydynamic.maidataviewer.ui.page.treasurebox.RandomMusicPage
 import io.github.skydynamic.maidataviewer.ui.page.treasurebox.RatingCalculatorPage
@@ -92,13 +94,13 @@ object AppContent {
                 TreasureBoxPage()
             }
         ),
-//        SETTING(
-//            R.string.setting_page.strings,
-//            TabIcon.VectorIcon(Icons.Filled.Settings),
-//            { _, _ ->
-//                EmptyPage()
-//            }
-//        );
+        SETTING(
+            R.string.setting_page.strings,
+            TabIcon.VectorIcon(Icons.Filled.Settings),
+            {
+                SettingPage()
+            }
+        );
     }
 
     @Composable

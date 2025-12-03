@@ -7,13 +7,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,8 +21,11 @@ import androidx.compose.ui.window.Dialog
 import io.github.skydynamic.maidataviewer.R
 import io.github.skydynamic.maidataviewer.core.strings
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun CommonDialog(
+fun ConfirmDialog(
+    title: String,
+    onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -40,33 +41,43 @@ fun CommonDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
+                Text(
+                    text = title,
+                    modifier = Modifier
+                        .padding(8.dp),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                )
+
+                content()
+
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
                 ) {
-                    IconButton(
+                    TextButton(
                         onClick = onDismiss
                     ) {
-                        Icon(
-                            imageVector = Icons.Filled.Close,
-                            contentDescription = "Close"
+                        Text(
+                            text = R.string.cancel.strings,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
 
-                    Text(
-                        text = R.string.close.strings,
-                        modifier = Modifier.weight(1f),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                    )
+                    TextButton(
+                        onClick = onConfirm,
+                    ) {
+                        Text(
+                            text = R.string.confirm.strings,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
-
-                content()
             }
         }
     }

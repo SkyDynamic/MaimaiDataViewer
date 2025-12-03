@@ -1,6 +1,7 @@
 [versions]
 agp = "8.11.2"
 coilComposeVersion = "3.3.0"
+datastorePreferences = "1.2.0"
 kotlin = "2.2.20"
 coreKtx = "1.10.1"
 junit = "4.13.2"
@@ -21,6 +22,7 @@ version = "1.1.1-beta.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIconsCore" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsCore" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }

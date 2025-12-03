@@ -7,6 +7,8 @@ import io.github.skydynamic.maidataviewer.core.data.MaimaiCommonCollectionData
 import io.github.skydynamic.maidataviewer.core.manager.resource.MaimaiResourceManager
 import io.github.skydynamic.maidataviewer.core.mkdirsIfNotExists
 import io.github.skydynamic.maidataviewer.core.network.AppHttpClient
+import io.github.skydynamic.maidataviewer.core.network.ResourceNode
+import io.github.skydynamic.maidataviewer.core.network.getUrl
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsChannel
@@ -23,7 +25,8 @@ class MaimaiFrameManager(
     override var _isLoaded: Boolean = false
     override var _currentCollectionVersion: MaiVersion = MaiVersion(-1, 0)
 
-    val assetsUrl = "https://maimai-assets.skydynamic.top/frame"
+    val assetsUrl
+        get() = suspend { ResourceNode.getCurrentNode().getUrl("frame") }
 
     private var frameData: Map<Int, MaimaiCommonCollectionData> = emptyMap()
 
@@ -93,7 +96,7 @@ class MaimaiFrameManager(
         val frameFile = framePath.resolve("$id.png")
         if (!frameFile.exists()) {
             httpClient.request {
-                val request = it.get("$assetsUrl/$id.png")
+                val request = it.get("${assetsUrl()}/$id.png")
                 if (request.status.value == 200) {
                     request.bodyAsChannel()
                         .copyTo(frameFile.outputStream())

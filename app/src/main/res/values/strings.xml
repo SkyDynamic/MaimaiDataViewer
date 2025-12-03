@@ -98,4 +98,7 @@
     <string name="min_value">Min Value</string>
     <string name="max_value">Max Value</string>
     <string name="filter_target_difficulty">Target Difficulty</string>
+    <string name="resource_node">Resource Proxy Node</string>
+    <string name="resource_node_desc">Download resources use proxy node</string>
+    <string name="custom_node_url">Custom resource node url</string>
 </resources>

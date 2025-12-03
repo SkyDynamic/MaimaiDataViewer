@@ -5,9 +5,12 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import io.github.skydynamic.maidataviewer.core.mkdirsIfNotExists
 import io.github.skydynamic.maidataviewer.core.network.AppHttpClient
+import io.github.skydynamic.maidataviewer.core.network.ResourceNode
+import io.github.skydynamic.maidataviewer.core.network.getUrl
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.utils.io.jvm.javaio.copyTo
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.io.File
 
 class MaimaiJacketManager(
@@ -15,7 +18,8 @@ class MaimaiJacketManager(
     override val resPath: File,
     override val httpClient: AppHttpClient,
 ) : MaimaiResourceManager {
-    val assetsUrl = "https://maimai-assets.skydynamic.top/jacket"
+    val assetsUrl
+        get() = suspend { ResourceNode.getCurrentNode().getUrl("jacket") }
 
     private fun checkFileBroken(file: File): Boolean {
         val bitmap = BitmapFactory.decodeFile(file.toString())
@@ -55,7 +59,7 @@ class MaimaiJacketManager(
         if (!jacketFile.exists() || checkFileBroken(jacketFile)) {
             jacketFile.deleteOnExit()
             result = httpClient.request {
-                it.get("$assetsUrl/$numericSuffix.png")
+                it.get("${assetsUrl()}/$numericSuffix.png")
                     .bodyAsChannel()
                     .copyTo(jacketFile.outputStream())
             }
