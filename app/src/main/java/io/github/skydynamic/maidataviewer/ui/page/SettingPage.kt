@@ -71,6 +71,7 @@ fun SettingPage() {
                     coroutineScope.launch {
                         preferencesDataStore.update {
                             it[AppConfig.chooseNode] = chooseNode.value.nodeName
+                            it[AppConfig.customNodeUrl] = customNodeUrl.value
                         }
                     }.invokeOnCompletion {
                         showChooseNodeDialog.value = false
